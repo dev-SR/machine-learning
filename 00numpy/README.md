@@ -1,3 +1,4 @@
+
 - [NumPy](#numpy)
   - [Why Numpy?](#why-numpy)
     - [Vectorization](#vectorization)
@@ -19,7 +20,9 @@
   - [Generating an array of random numbers in NumPy](#generating-an-array-of-random-numbers-in-numpy)
     - [NumPy Random Seed](#numpy-random-seed)
   - [Indexing and Masking](#indexing-and-masking)
-    - [Array slicing](#array-slicing)
+    - [slice operator `[begin:end]`](#slice-operator-beginend)
+      - [Stride](#stride)
+      - [More In Depth - shape,dimensionality](#more-in-depth---shapedimensionality)
       - [Negative slicing of NumPy arrays](#negative-slicing-of-numpy-arrays)
     - [Masking](#masking)
     - [Selecting values from your array that fulfill certain conditions](#selecting-values-from-your-array-that-fulfill-certain-conditions)
@@ -456,6 +459,10 @@ print()
 
 
 
+`(3,)` Python here tells us the object has three items along the first axis i.e. trailing comma is needed in Python to
+indicate that the purpose is a tuple with only one element.
+
+
 `(n,)` is called a rank 1 array. It doesn't behave consistently as a row vector or column vector which makes some of its operation and effect not intuitive. If we take transpose of this `(n,)` data structure, it will look exactly the same and the dot product will give you a number and not a matrix.
 
 The vector of shape `(n,1)` or `(1,n)` row or column vectors are much more intuitive and consistent.
@@ -529,6 +536,9 @@ df
 ```
 
 
+
+
+<div>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -704,130 +714,121 @@ print(r) # fixed
 
 ## Indexing and Masking
 
-If a 2D array a has `shape(5,6)`, then you can access `a[0,0]` up to `a[4,5]`. `Axis 0` is thus the first dimension (the "rows"), and `axis 1` is the second dimension (the "columns").
+Remember that numpy indices start from `0` and the element at any particular index can be found by `n-1`. For
+instance, you access the rst element by referencing the cell at `a[0]` and the second element at `a[1]`.
+
+<div align="center"><img src="img/indexing.jpg" alt="dfs" width="800px"></div>
+
+Unlike accessing arrays in, say, JavaScript, numpy arrays have a powerful selection notation that you can use
+to read data in a variety of ways. For instance, we can use commas to select along multiple axes `a[i,j]`.
+
+
+If a 2D array a has `shape(4,3)`, then you can access `a[0,0]` up to `a[3,2]`. `Axis 0` is thus the first dimension (the "rows"), and `axis 1` is the second dimension (the "columns").
 
 
 ```python
 a = np.array([
-	[1, 2, 4],
-	[5, 6, 7],
-	[8, 9, 10]
+	[1, 2, 3],
+	[4, 5, 6],
+	[7, 8, 9],
+    [10, 11, 12]
 ])
-a
+print(a.shape)
+
 ```
 
-
-
-
-    array([[ 1,  2,  4],
-           [ 5,  6,  7],
-           [ 8,  9, 10]])
-
+    (4, 3)
 
 
 
 ```python
 # first row
 print(a[0])
-# sencond last row
+# second last row
 print(a[1])
 # first element
 print(a[0,0])
 # last element
-print(a[2,2])
+print(a[3,2])
 ```
 
-    [1 2 4]
-    [5 6 7]
+    [1 2 3]
+    [4 5 6]
     1
-    10
+    12
 
 
-### Array slicing
+### slice operator `[begin:end]`
+
+`:` is the delimiter of the slice syntax to select a sub-part of a sequence, like: `[begin:end]`.
+
+
+```python
+a = np.array([
+    [1, 2, 3],
+   	[4, 5, 6],
+   	[7, 8, 9],
+    [10, 11, 12]
+])
+a[1:2]
+
+```
+
+
+
+
+    array([[4, 5, 6]])
+
+
+
+What about selecting all the first items along the second axis(axis=1) in a? Use the `:` operator:
+
+
+```python
+a[:,0]
+```
+
+
+
+
+    array([ 1,  4,  7, 10])
+
+
 
 `arr[start_row_idx : end_row_idx + 1, start_col_idx : end_col_idx + 1]`
 
 
 ```python
-a = np.array([
-	[1, 2, 4],
-	[5, 6, 7],
-	[8, 9, 10]
-])
-a
-```
-
-
-
-
-    array([[ 1,  2,  4],
-           [ 5,  6,  7],
-           [ 8,  9, 10]])
-
-
-
-
-```python
-v1 = a[0,:] # get 0th row , with all the columns
-print(v1)
-print(type(v1))
-print(v1.shape)
-print(v1.ndim)
-# vs
-print()
-v2 = a[:1, :]  # get all the rows till 1st, with all the columns
-print(v2)
-print(type(v2))
-print(v2.shape)
-print(v2.ndim)
-```
-
-    [1 2 4]
-    <class 'numpy.ndarray'>
-    (3,)
-    1
-
-    [[1 2 4]]
-    <class 'numpy.ndarray'>
-    (1, 3)
-    2
-
-
-
-```python
-a = np.array([[1 , 2, 3, 4],
+a = np.array([[1, 2, 3, 4],
               [5, 6, 7, 8],
               [9, 10, 11, 12],
-              [13 , 14, 15, 16]])
+              [13, 14, 15, 16]])
 ```
-
-<div align="center"><img src="img/indexing.jpg" alt="dfs" width="800px"></div>
 
 <div align="center"><img src="img/index_slice.jpg" alt="Itrtype" width="800px" ></div>
 
 
 ```python
-print(a[0:2,0:2])
+print(a[0:2, 0:2])
 print()
-print(a[:2,:2])
-```
-
-    [[1 2]
-     [5 6]]
-
-    [[1 2]
-     [5 6]]
-
-
-
-```python
+print(a[:2, :2])
 # diff. ways of indexing first two rows
+print()
 print(a[0:2])
 print()
-print(a[:2,:])
+print(a[:2, :])
 print()
 print(a[:2])
+print()
+print(a[:, 2:])  # all rows of last two rows
+
 ```
+
+    [[1 2]
+     [5 6]]
+
+    [[1 2]
+     [5 6]]
 
     [[1 2 3 4]
      [5 6 7 8]]
@@ -837,39 +838,6 @@ print(a[:2])
 
     [[1 2 3 4]
      [5 6 7 8]]
-
-
-
-```python
-print(a[:,1]) #all rows of column 2
-print("vs")
-print(a[:,1:2]) #all rows of column 2
-```
-
-    [ 2  6 10 14]
-    vs
-    [[ 2]
-     [ 6]
-     [10]
-     [14]]
-
-
-
-```python
-print(a[1,:]) #all columns of row 2
-print("vs")
-print(a[1:2,:]) #all columns of row 2
-```
-
-    [5 6 7 8]
-    vs
-    [[5 6 7 8]]
-
-
-
-```python
-print(a[:,2:]) #all rows of last two rows
-```
 
     [[ 3  4]
      [ 7  8]
@@ -877,19 +845,129 @@ print(a[:,2:]) #all rows of last two rows
      [15 16]]
 
 
+#### Stride
+We can also select regularly spaced elements by specifying a step size a er a second `:`. For example, to select
+the first and third element in a we can type:
+
+
+```python
+a[0:-1:2]
+```
+
+
+
+
+    array([[1, 2, 3],
+           [7, 8, 9]])
+
+
+
+
+```python
+# or, simply:
+a[::2]
+```
+
+
+
+
+    array([[1, 2, 3],
+           [7, 8, 9]])
+
+
+
+#### More In Depth - shape,dimensionality
+
+- `[0]~[0,:]` gets **all the element** of **_1st row_**
+- `[:1,:]` gets **all the element** of **_all the rows till 1st row_**
+
+
+```python
+a = np.array([
+	[1, 2, 4],
+	[5, 6, 7],
+	[8, 9, 10]
+])
+print(a[0])
+print("*"*40)
+v1 = a[0, :] # gets all the element of 1st row, with all the columns
+print(v1)
+print("shape: ",v1.shape)
+print("dimension: ",v1.ndim)
+print("*"*40)
+v2 = a[:1,:] # get all the element of all the rows till 1st row, with all the columns
+print(v2)
+print("shape: ", v2.shape)
+print("dimension: ",v2.ndim)
+
+```
+
+    [1 2 4]
+    ****************************************
+    [1 2 4]
+    shape:  (3,)
+    dimension:  1
+    ****************************************
+    [[1 2 4]]
+    shape:  (1, 3)
+    dimension:  2
+
+
+
+```python
+v3 = a[:2, :]  # get  all the `rows` till 2nd, with all the columns
+print(v3)
+```
+
+    [[1 2 4]
+     [5 6 7]]
+
+
+
+```python
+v1= a[:,1]
+print(v1)
+print(v1.shape)
+print("vs")
+v2 = a[:, 1:2]
+print(v2)
+print(v2.shape)
+```
+
+    [2 6 9]
+    (3,)
+    vs
+    [[2]
+     [6]
+     [9]]
+    (3, 1)
+
+
+
+```python
+print(a[1,:])
+print("vs")
+print(a[1:2,:])
+```
+
+    [5 6 7]
+    vs
+    [[5 6 7]]
+
+
 #### Negative slicing of NumPy arrays
 
 
 ```python
 # last column only
-print(a[:,-1]) # all rows, last column
+print(a[:,-1])
 print()
-print(a[:,3])
+print(a[:,2])
 ```
 
-    [ 4  8 12 16]
+    [ 4  7 10]
 
-    [ 4  8 12 16]
+    [ 4  7 10]
 
 
 
@@ -901,12 +979,11 @@ print()
 print(ans[1,0])
 ```
 
-    [[ 3  4]
-     [ 7  8]
-     [11 12]
-     [15 16]]
+    [[ 2  4]
+     [ 6  7]
+     [ 9 10]]
 
-    7
+    6
 
 
 If, however, we wanted to extract from the end, we would have to explicitly provide a negative step-size otherwise the result would be an empty list.
@@ -916,10 +993,9 @@ If, however, we wanted to extract from the end, we would have to explicitly prov
 print(a[:,-1:-3:-1])
 ```
 
-    [[ 4  3]
-     [ 8  7]
-     [12 11]
-     [16 15]]
+    [[ 4  2]
+     [ 7  6]
+     [10  9]]
 
 
 
@@ -928,10 +1004,9 @@ print('Reversed array :','\n',a[::-1,::-1])
 ```
 
     Reversed array :
-     [[16 15 14 13]
-     [12 11 10  9]
-     [ 8  7  6  5]
-     [ 4  3  2  1]]
+     [[10  9  8]
+     [ 7  6  5]
+     [ 4  2  1]]
 
 
 ### Masking
