@@ -3,7 +3,7 @@
 - [Machine Learning](#machine-learning)
 	- [Virtual Environment](#virtual-environment)
 		- [Activating Virtual Environment Using Conda](#activating-virtual-environment-using-conda)
-		- [Installing Jupyter Notebook inside Conda environment](#installing-jupyter-notebook-inside-conda-environment)
+		- [Installing packages inside Conda environment](#installing-packages-inside-conda-environment)
 		- [Opening Jupyter Notebook](#opening-jupyter-notebook)
 	- [Convert `ipynb` files into html, markdown, pdf and other format files](#convert-ipynb-files-into-html-markdown-pdf-and-other-format-files)
 
@@ -14,24 +14,23 @@
 ### Activating Virtual Environment Using Conda
 
 ```bash
-conda create ./env --prefix numpy pandas matplotlib scikit-learn
+conda create --prefix env
 ```
-
-This will create a virtual environment with the following Data Science tools numpy, pandas, matplotlib
-and scikit learn.
 
 After creating the VM, `conda` will show a message to activate the environment.
 
 ```bash
-conda activate D:\ML\project\env
+conda activate __dir__\env
 ```
 
-### Installing Jupyter Notebook inside Conda environment
+<div align="center"><img src="img/venv_1.jpg" alt="dfs" width="800px"></div>
+
+### Installing packages inside Conda environment
 
 Once we are inside `Conda` environment, we use the following command to install `Jupyter Notebook`
 
 ```bash
-conda install jupyter
+conda install numpy jupyter
 ```
 
 ### Opening Jupyter Notebook
@@ -39,9 +38,9 @@ conda install jupyter
 To open `Jupyter Notebook`, we firstly have to `activate` our environment and use command: `jupyter notebook`
 
 ```bash
-conda activate D:\ML\project\env
 jupyter notebook
 ```
+<div align="center"><img src="img/venv_2.jpg" alt="dfs" width="800px"></div>
 
 ## Convert `ipynb` files into html, markdown, pdf and other format files
 
