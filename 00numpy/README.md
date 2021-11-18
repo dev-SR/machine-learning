@@ -1,4 +1,3 @@
-
 - [NumPy](#numpy)
   - [Why Numpy?](#why-numpy)
     - [Vectorization](#vectorization)
@@ -17,9 +16,10 @@
     - [Difference between array shape `(n,)` vs `(1,n)` vs `(n,1)` 🚀🚀🚀](#difference-between-array-shape-n-vs-1n-vs-n1-)
     - [Sum of two Numpy Array](#sum-of-two-numpy-array)
     - [Axis concept in  `Pandas`](#axis-concept-in--pandas)
-  - [Generating an array of random numbers in NumPy](#generating-an-array-of-random-numbers-in-numpy)
-    - [NumPy Random Seed](#numpy-random-seed)
+  - [Random Array](#random-array)
+      - [NumPy Random Seed](#numpy-random-seed)
   - [Indexing and Masking](#indexing-and-masking)
+    - [Indexing](#indexing)
     - [slice operator `[begin:end]`](#slice-operator-beginend)
       - [Stride](#stride)
       - [More In Depth - shape,dimensionality](#more-in-depth---shapedimensionality)
@@ -27,30 +27,32 @@
     - [Masking](#masking)
     - [Selecting values from your array that fulfill certain conditions](#selecting-values-from-your-array-that-fulfill-certain-conditions)
       - [Indexing with a mask can be very useful to assign a new value to a sub-array](#indexing-with-a-mask-can-be-very-useful-to-assign-a-new-value-to-a-sub-array)
-      - [`np.where()` to select elements or indices from an array.](#npwhere-to-select-elements-or-indices-from-an-array)
+      - [`np.where()` to select elements or indices from an array](#npwhere-to-select-elements-or-indices-from-an-array)
   - [3D Arrays](#3d-arrays)
     - [Converting to 1D array with `flatten()` method](#converting-to-1d-array-with-flatten-method)
-  - [Manipulating Arrays](#manipulating-arrays)
+  - [Mathematical Operations](#mathematical-operations)
     - [Matrix Arithmetic](#matrix-arithmetic)
     - [with scalars](#with-scalars)
     - [Transcendental functions](#transcendental-functions)
     - [Shape Mismatch](#shape-mismatch)
     - [Dot Product](#dot-product)
-  - [Basic Reductions](#basic-reductions)
     - [Matrix Aggregation](#matrix-aggregation)
     - [Logical Operations](#logical-operations)
-    - [Statistics](#statistics)
+  - [Statistics](#statistics)
+  - [Miscellaneous Operations](#miscellaneous-operations)
+    - [Unique Items and Count](#unique-items-and-count)
+    - [Reversing Rows and Columns](#reversing-rows-and-columns)
   - [Broadcasting](#broadcasting)
-  - [Shape Manipulation - Transposing, Reshaping, Stacking etc...](#shape-manipulation---transposing-reshaping-stacking-etc)
+  - [Shape Manipulation - Transposing, Reshaping, Stacking etc](#shape-manipulation---transposing-reshaping-stacking-etc)
     - [flatten()](#flatten)
     - [reshape()](#reshape)
     - [Transpose](#transpose)
     - [Adding a Dimension](#adding-a-dimension)
     - [Stacking of Array](#stacking-of-array)
-  - [Vectorization](#vectorization-1)
+  - [🌟Vectorization🌟](#vectorization-1)
     - [Machine Learning context](#machine-learning-context)
-# NumPy
 
+# NumPy
 
 ```python
 import numpy as np
@@ -63,11 +65,9 @@ import numpy as np
 - performs fast operations (because of Vectorization)
 - `numpy` arrays can be treated as vectors and matrices from linear algebra (Vectorization)
 
-
 ```python
 l = [1,2,3,4,5,6,7,8,9,10]
 ```
-
 
 ```python
 %timeit [i**2 for i in l]
@@ -75,20 +75,12 @@ l = [1,2,3,4,5,6,7,8,9,10]
 
     3.52 µs ± 1.05 µs per loop (mean ± std. dev. of 7 runs, 100000 loops each)
 
-
-
 ```python
 arr = np.array(l)
 arr
 ```
 
-
-
-
     array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
-
-
-
 
 ```python
 %timeit arr**2
@@ -96,15 +88,12 @@ arr
 
     975 ns ± 122 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
 
-
 ### Vectorization
-
 
 ```python
 # adding 1 to each element of this vector
 l + 1
 ```
-
 
     ---------------------------------------------------------------------------
 
@@ -117,28 +106,16 @@ l + 1
 
     TypeError: can only concatenate list (not "int") to list
 
-
-
 ```python
 # but it's possible in numpy
 arr + 1
 ```
 
-
-
-
     array([ 2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
-
-
 
 ## Array Creation
 
-`array`: Fundamental element in numpy is homogenous array. Numpy Arrays can be 1D, 2D, 3D ...nD
-
-Different ways to create np array:
-
 ### 1) Python sequences to NumPy Arrays - `np.array()`
-
 
 ```python
 a1D = np.array([1, 2, 3, 4])
@@ -154,29 +131,21 @@ print(a2D)
     [[1 2]
      [3 4]]
 
-
 #### type conversation
 
 - `np.array(list,dtype='float')`
 - `arr.astype('int')`
 
-
 ```python
 ### int to float
 l2 = [[1,2,3],
-		[4,5,0]]
+  [4,5,0]]
 a2 = np.array(l2,dtype='float')
 a2
 ```
 
-
-
-
     array([[1., 2., 3.],
            [4., 5., 0.]])
-
-
-
 
 ```python
 # float to int
@@ -184,28 +153,16 @@ a3 = a2.astype('int')
 a3
 ```
 
-
-
-
     array([[1, 2, 3],
            [4, 5, 0]])
-
-
-
 
 ```python
 a4 = np.array(l2,dtype="bool")
 a4
 ```
 
-
-
-
     array([[ True,  True,  True],
            [ True,  True, False]])
-
-
-
 
 ```python
 # to list
@@ -218,20 +175,11 @@ print(type(l3))
     <class 'numpy.ndarray'>
     <class 'list'>
 
-
 ### 2) Functions for Generating General Arrays
-
-NumPy has over 40 built-in functions for creating arrays as laid out in the Array creation routines. These functions can be split into roughly three categories, based on the dimension of the array they create:
-
-1. 1D arrays
-2. 2D arrays
-3. ndarrays
-
 
 #### `arrange(start, end [exclusive], step)`
 
 `numpy.arange` creates arrays with regularly incrementing values. `arange` is an array-valued version of the built-in Python range function
-
 
 ```python
 print(np.arange(10))  # 0.... n-1
@@ -252,11 +200,9 @@ print(np.arange(1, 10, 2))  # start, end (exclusive), step
 
     [1 3 5 7 9]
 
-
 #### `numpy.linspace(s,en,equally spaced between)`
 
 `numpy.linspace`  will create arrays with a specified number of elements, and spaced equally between the specified beginning and end values.
-
 
 ```python
 print(np.linspace(1, 10, 5))  # start, end, number of points
@@ -264,9 +210,7 @@ print(np.linspace(1, 10, 5))  # start, end, number of points
 
     [ 1.    3.25  5.5   7.75 10.  ]
 
-
-####  `zeros()`
-
+#### `zeros()`
 
 ```python
 print(np.zeros(10))
@@ -290,9 +234,7 @@ print(np.zeros((2,3,3)))
       [0. 0. 0.]
       [0. 0. 0.]]]
 
-
 #### `np.ones()`
-
 
 ```python
 print(np.ones(10))
@@ -306,39 +248,25 @@ print(np.ones((3,3)) * 5)
      [5. 5. 5.]
      [5. 5. 5.]]
 
-
 #### `np.diag()` , `np.identity()` and `np.eye()`
-
 
 ```python
 np.diag([1,2,3,4])
 ```
-
-
-
 
     array([[1, 0, 0, 0],
            [0, 2, 0, 0],
            [0, 0, 3, 0],
            [0, 0, 0, 4]])
 
-
-
-
 ```python
 np.identity(4)
 ```
-
-
-
 
     array([[1., 0., 0., 0.],
            [0., 1., 0., 0.],
            [0., 0., 1., 0.],
            [0., 0., 0., 1.]])
-
-
-
 
 ```python
 c = np.eye(4)  # Return a 2-D array with ones on the diagonal and zeros elsewhere.
@@ -359,7 +287,6 @@ print(d)
      [0. 1.]
      [0. 0.]]
 
-
 ## Array Dimension
 
 Basic Attributes of the ndarray Class in numpy:
@@ -371,7 +298,6 @@ Basic Attributes of the ndarray Class in numpy:
 ### What is the Shape of an Array
 
 <div align="center"><img src="img/shape_1.png" alt="dfs"></div>
-
 
 ```python
 a2D = np.array([[67, 63, 87],
@@ -394,7 +320,6 @@ print("shape is indexable: ", a2D.shape[0], "~", a2D.shape[1])
     total item:  18
     shape:  (6, 3)
     shape is indexable:  6 ~ 3
-
 
 Numpy has a function called `shape` which returns the shape of an array. The shape is a tuple of integers. **These numbers denote the lengths of the corresponding array dimension.**
 
@@ -424,7 +349,6 @@ For example, if a 2D array a has shape `(5,6)`, then you can access `a[0,0]` up 
 
 <div align = "center" > <img src = "img/shape_2.png" alt = "dfs" width = "500px" > </div >
 
-
 ```python
 s = np.array([1, 2, 3]) #1D array
 print(s)
@@ -437,9 +361,9 @@ print(r)
 print("ndim:", r.ndim, ", shape: ", r.shape)
 # vs
 c= np.array([ #2D single Column array
-	[1],
-	[2],
-	[3]
+ [1],
+ [2],
+ [3]
 ])
 print(c)
 # 3 element across axis=0, 1 element axis=1
@@ -457,44 +381,37 @@ print()
      [3]]
     ndim: 2 , shape:  (3, 1)
 
-
-
 `(3,)` Python here tells us the object has three items along the first axis i.e. trailing comma is needed in Python to
 indicate that the purpose is a tuple with only one element.
-
 
 `(n,)` is called a rank 1 array. It doesn't behave consistently as a row vector or column vector which makes some of its operation and effect not intuitive. If we take transpose of this `(n,)` data structure, it will look exactly the same and the dot product will give you a number and not a matrix.
 
 The vector of shape `(n,1)` or `(1,n)` row or column vectors are much more intuitive and consistent.
-
 
 ```python
 a= np.array([1,2,3,4])
 b= np.array([10,20,30,40])
 ```
 
-
 ```python
 from sklearn.linear_model import LinearRegression
 regr = LinearRegression()
 try:
-	regr.fit(a,b)
+ regr.fit(a,b)
 except ValueError as v:
-	print(v)
+ print(v)
 ```
 
     Expected 2D array, got 1D array instead:
     array=[1 2 3 4].
     Reshape your data either using array.reshape(-1, 1) if your data has a single feature or array.reshape(1, -1) if it contains a single sample.
 
-
-
 ```python
 a=a.reshape(-1,1)
 try:
-	regr.fit(a, b)
+ regr.fit(a, b)
 except ValueError as v:
-	print(v)
+ print(v)
 ```
 
 ### Sum of two Numpy Array
@@ -515,11 +432,9 @@ axis 1 refers to the horizontal direction across the columns. That means that th
 So Generally
 If you do `.sum(axis=n)`, for example, then dimension `n` is collapsed and deleted, with each value in the new matrix equal to the sum of the corresponding collapsed values. For example, if `b` has shape `(5,6,7,8)`, and you do `c = b.sum(axis=2)`, then axis 2 (dimension with size 7) is collapsed, and the result has shape `(5,6,8)`.
 
-
 <div align="center"><img src="img/sum_all.png" alt="dfs"></div>
 
 Similarly, while executing another Numpy aggregation function `np.mean()`, we can specify what axis we want to calculate the values across.
-
 
 ### Axis concept in  `Pandas`
 
@@ -527,16 +442,12 @@ Same Array and Axis concept apply to `Pandas` as well Which is `0=down` and `1=a
 
 So a mean calculation on axis-0 will be the mean of all the rows in each column, and a mean on axis-1 will be a mean of all the columns in each row.
 
-
 ```python
 import pandas as pd
 df = pd.DataFrame([[10, 20, 30, 40], [2, 2, 2, 2], [3, 3, 3, 3]], columns=[
                        "col1", "col2", "col3", "col4"])
 df
 ```
-
-
-
 
 <div>
 <table border="1" class="dataframe">
@@ -575,32 +486,22 @@ df
 </table>
 </div>
 
-
-
 So if I call df.mean(axis=1), we'll get a mean across the rows:
-
 
 ```python
 df.mean(axis=1)
 ```
-
-
-
 
     0    25.0
     1     2.0
     2     3.0
     dtype: float64
 
-
-
-## Generating an array of random numbers in NumPy
+## Random Array
 
 We can generate an array of random numbers using `rand()`, `randn()` or `randint()` functions.
 
 - Using `random.rand()`, we can generate an array of random numbers of the shape we pass to it from uniform distribution over 0 to 1.
-
-
 
 ```python
 # For example, say we want a one-dimensional array of 4 objects that are uniformly
@@ -621,30 +522,21 @@ print(r)
      [0.31236268 0.85961221]
      [0.99364858 0.35495844]]
 
-
 - Using `randn()`, we can generate random samples from **Standard, normal or Gaussian distributioncentered around 0** . For example, let’s generate 7 random numbers:
-
 
 ```python
 r = np.random.randn(7)
 r
 ```
 
-
-
-
     array([ 0.85628608,  1.06652993, -0.24465544,  0.74419801, -0.35160372,
            -0.14436767, -0.06093946])
 
-
-
 When you plot the result will give us a normal distribution curve.
-
 
 ```python
 import matplotlib.pyplot as plt
 ```
-
 
 ```python
 r = np.random.randn(700)
@@ -652,18 +544,13 @@ plt.hist(r)
 plt.show()
 ```
 
-
-
-![svg](README_files/README_54_0.svg)
-
-
+![svg](README_files/README_56_0.svg)
 
 - Lastly, we can use the `randint()` function to generate an array of integers.
 - The `randint()` function can take up to 3 arguments;
-    - the low(inclusive),
-    - high(exclusive)
-    - size of the array.
-
+  - the low(inclusive),
+  - high(exclusive)
+  - size of the array.
 
 ```python
 print(np.arange(10)) # Remember!! not random but sequential
@@ -685,11 +572,9 @@ print(np.random.randint(2, 20, (2,3)))#generates 2D array of shape 2,3
     [[13  8 13]
      [ 5  8  9]]
 
-
-### NumPy Random Seed
+#### NumPy Random Seed
 
 If we set the np.random.seed(a_fixed_number) every time you call the numpy's other random function, the result will be the same:
-
 
 ```python
 r= np.random.randint(10,size=(2,3))
@@ -700,8 +585,6 @@ print(r)
     [[2 3 8]
      [1 3 3]]
 
-
-
 ```python
 np.random.seed(43)
 r= np.random.randint(10,size=(2,3))
@@ -711,8 +594,9 @@ print(r) # fixed
     [[4 0 1]
      [5 0 3]]
 
-
 ## Indexing and Masking
+
+### Indexing
 
 Remember that numpy indices start from `0` and the element at any particular index can be found by `n-1`. For
 instance, you access the rst element by referencing the cell at `a[0]` and the second element at `a[1]`.
@@ -722,15 +606,13 @@ instance, you access the rst element by referencing the cell at `a[0]` and the 
 Unlike accessing arrays in, say, JavaScript, numpy arrays have a powerful selection notation that you can use
 to read data in a variety of ways. For instance, we can use commas to select along multiple axes `a[i,j]`.
 
-
 If a 2D array a has `shape(4,3)`, then you can access `a[0,0]` up to `a[3,2]`. `Axis 0` is thus the first dimension (the "rows"), and `axis 1` is the second dimension (the "columns").
-
 
 ```python
 a = np.array([
-	[1, 2, 3],
-	[4, 5, 6],
-	[7, 8, 9],
+ [1, 2, 3],
+ [4, 5, 6],
+ [7, 8, 9],
     [10, 11, 12]
 ])
 print(a.shape)
@@ -738,8 +620,6 @@ print(a.shape)
 ```
 
     (4, 3)
-
-
 
 ```python
 # first row
@@ -757,46 +637,32 @@ print(a[3,2])
     1
     12
 
-
 ### slice operator `[begin:end]`
 
 `:` is the delimiter of the slice syntax to select a sub-part of a sequence, like: `[begin:end]`.
 
-
 ```python
 a = np.array([
     [1, 2, 3],
-   	[4, 5, 6],
-   	[7, 8, 9],
+    [4, 5, 6],
+    [7, 8, 9],
     [10, 11, 12]
 ])
 a[1:2]
 
 ```
 
-
-
-
     array([[4, 5, 6]])
 
-
-
 What about selecting all the first items along the second axis(axis=1) in a? Use the `:` operator:
-
 
 ```python
 a[:,0]
 ```
 
-
-
-
     array([ 1,  4,  7, 10])
 
-
-
 `arr[start_row_idx : end_row_idx + 1, start_col_idx : end_col_idx + 1]`
-
 
 ```python
 a = np.array([[1, 2, 3, 4],
@@ -806,7 +672,6 @@ a = np.array([[1, 2, 3, 4],
 ```
 
 <div align="center"><img src="img/index_slice.jpg" alt="Itrtype" width="800px" ></div>
-
 
 ```python
 print(a[0:2, 0:2])
@@ -844,49 +709,36 @@ print(a[:, 2:])  # all rows of last two rows
      [11 12]
      [15 16]]
 
-
 #### Stride
+
 We can also select regularly spaced elements by specifying a step size a er a second `:`. For example, to select
 the first and third element in a we can type:
-
 
 ```python
 a[0:-1:2]
 ```
 
-
-
-
     array([[1, 2, 3],
            [7, 8, 9]])
-
-
-
 
 ```python
 # or, simply:
 a[::2]
 ```
 
-
-
-
     array([[1, 2, 3],
            [7, 8, 9]])
-
-
 
 #### More In Depth - shape,dimensionality
 
 - `[0]~[0,:]` gets **all the element** of **_1st row_**
 - `[:1,:]` gets **all the element** of **_all the rows till 1st row_**
 
-
 ```python
 a = np.array([
-	[1, 2, 4],
-	[5, 6, 7],
-	[8, 9, 10]
+ [1, 2, 4],
+ [5, 6, 7],
+ [8, 9, 10]
 ])
 print(a[0])
 print("*"*40)
@@ -912,8 +764,6 @@ print("dimension: ",v2.ndim)
     shape:  (1, 3)
     dimension:  2
 
-
-
 ```python
 v3 = a[:2, :]  # get  all the `rows` till 2nd, with all the columns
 print(v3)
@@ -921,8 +771,6 @@ print(v3)
 
     [[1 2 4]
      [5 6 7]]
-
-
 
 ```python
 v1= a[:,1]
@@ -942,8 +790,6 @@ print(v2.shape)
      [9]]
     (3, 1)
 
-
-
 ```python
 print(a[1,:])
 print("vs")
@@ -954,9 +800,7 @@ print(a[1:2,:])
     vs
     [[5 6 7]]
 
-
 #### Negative slicing of NumPy arrays
-
 
 ```python
 # last column only
@@ -968,8 +812,6 @@ print(a[:,2])
     [ 4  7 10]
 
     [ 4  7 10]
-
-
 
 ```python
 #  last two  column only
@@ -985,9 +827,7 @@ print(ans[1,0])
 
     6
 
-
 If, however, we wanted to extract from the end, we would have to explicitly provide a negative step-size otherwise the result would be an empty list.
-
 
 ```python
 print(a[:,-1:-3:-1])
@@ -996,8 +836,6 @@ print(a[:,-1:-3:-1])
     [[ 4  2]
      [ 7  6]
      [10  9]]
-
-
 
 ```python
 print('Reversed array :','\n',a[::-1,::-1])
@@ -1008,11 +846,9 @@ print('Reversed array :','\n',a[::-1,::-1])
      [ 7  6  5]
      [ 4  2  1]]
 
-
 ### Masking
 
 NumPy arrays can be indexed with slices, but also with boolean or integer arrays **(masks)**. This method is called **fancy indexing**. It creates copies not views.
-
 
 ```python
 a = np.array([[1 , 2, 3, 4],
@@ -1029,8 +865,6 @@ print(a)
      [ 9  0  0 12]
      [ 1  2  3  4]]
 
-
-
 ```python
 mask = a>5
 print(mask)
@@ -1041,22 +875,14 @@ print(mask)
      [ True False False  True]
      [False False False False]]
 
-
-
 ```python
 # get all values greater then 5
 a[mask]
 ```
 
-
-
-
     array([ 8,  9, 12])
 
-
-
 ### Selecting values from your array that fulfill certain conditions
-
 
 ```python
 # print all of the values in the array that are less than 5.
@@ -1086,9 +912,7 @@ print(c)
 
     [3 4 5 8 9 3 4]
 
-
 #### Indexing with a mask can be very useful to assign a new value to a sub-array
-
 
 ```python
 a = np.random.randint(0, 20, 15)
@@ -1106,10 +930,7 @@ a
 
     array([-1, -1, -1,  7, 11,  1, -1, -1,  1, -1, -1, -1, 17,  5, -1])
 
-
-
-#### `np.where()` to select elements or indices from an array.
-
+#### `np.where()` to select elements or indices from an array
 
 ```python
 # print the indices of elements that are, for example, less than 5:
@@ -1122,40 +943,91 @@ print(b)
 
     (array([0, 0, 1, 2], dtype=int64), array([0, 3, 1, 3], dtype=int64))
 
-
 In this example, a tuple of arrays was returned: one for each dimension.
 The first array represents the row indices where these values are found, and
 the second array represents the column indices where the values are found.
 
- ## 3D Arrays
+## 3D Arrays
+
+<div align="center"><img src="img/tensor_numpy_1.jpg" alt="Itrtype" width="800px"></div>
 
 <div align="center"><img src="img/array_creation.jpg" alt="Itrtype" width="800px"></div>
 
-
 ```python
-a = np.array([[[1,2],[3,4],[5,6]],# first axis array
-[[7,8],[9,10],[11,12]],# second axis array
-[[13,14],[15,16],[17,18]]])# third axis array
+a = np.array([
+    # ch1
+    [[1, 2],
+     [3, 4],
+     [5, 6]
+    ],
+    #ch2
+    [[7, 8],
+     [9, 10],
+     [11, 12]],
+    # ch3
+    [[13, 14], [15, 16], [17, 18]],])
+a
 
-a.shape # 3 sets , 3 rows, 2 columns
 ```
 
+    array([[[ 1,  2],
+            [ 3,  4],
+            [ 5,  6]],
 
+           [[ 7,  8],
+            [ 9, 10],
+            [11, 12]],
 
+           [[13, 14],
+            [15, 16],
+            [17, 18]]])
+
+```python
+a.shape # 3 chanel , 3 rows, 2 columns
+```
 
     (3, 3, 2)
 
+```python
+a = np.array([[[1, 2], [3, 4], [5, 6]],
+              [[7, 8], [9, 10], [11, 12]],
+              [[13, 14], [15, 16], [17, 18]],
+              [[13, 14], [15, 16], [17, 18]]
+              ])
+print(a,'\n')
+print(a.shape)  # 4 chanel , 3 rows, 2 columns
+print(a.ndim)
+```
 
+    [[[ 1  2]
+      [ 3  4]
+      [ 5  6]]
 
+     [[ 7  8]
+      [ 9 10]
+      [11 12]]
+
+     [[13 14]
+      [15 16]
+      [17 18]]
+
+     [[13 14]
+      [15 16]
+      [17 18]]]
+
+    (4, 3, 2)
+    3
 
 ```python
-# value
-print(a[0],'\n')
-print(a[0,0],'\n')
-# First array, first row, first column value
+a = np.array([[[1, 2], [3, 4], [5, 6]],
+              [[7, 8], [9, 10], [11, 12]],
+              [[13, 14], [15, 16], [17, 18]],
+              ])
+print(a[0],'\n') # channel 1
+print(a[0, 0], '\n')  # ~ a[0][0] chanel 0, row 0
+# chanel 0, first row, first column value
 print(a[0,0,0],'\n')
-# First array last column
-print(a[0,:,1],'\n')
+print(a[1],'\n') # channel 2
 ```
 
     [[1 2]
@@ -1166,42 +1038,28 @@ print(a[0,:,1],'\n')
 
     1
 
-    [2 4 6]
-
-
-
-
-```python
-print(a[1])
-print()
-print(a[2])
-print()
-print("first row from each arrays:",'\n')
-print(a[:,0,:2])
-```
-
     [[ 7  8]
      [ 9 10]
      [11 12]]
 
-    [[13 14]
-     [15 16]
-     [17 18]]
+```python
+print("first row from each channel:",'\n')
+print(a[:,0,:])
+```
 
-    first row from each arrays:
+    first row from each channel:
 
     [[ 1  2]
      [ 7  8]
      [13 14]]
 
-
-
 ```python
-# First one rows for second and third arrays:
-print(a[1:,:1,:2])
+# First one rows for second and third channel:
+print(a[1:,:1,:])
 print('\n',"watch out!!",'\n')
-# First one rows for second and third arrays:
-print(a[1:,0,:2],'\n')
+# First one rows for second and third channel:
+print(a[1:,0,:],'\n')
+
 ```
 
     [[[ 7  8]]
@@ -1213,17 +1071,7 @@ print(a[1:,0,:2],'\n')
     [[ 7  8]
      [13 14]]
 
-
-
-
-```python
-
-```
-
 ### Converting to 1D array with `flatten()` method
-
-
-
 
 ```python
 print('Printing as a single array :','\n',a[1:,0:2,0:2].flatten())
@@ -1231,8 +1079,6 @@ print('Printing as a single array :','\n',a[1:,0:2,0:2].flatten())
 
     Printing as a single array :
      [ 7  8  9 10 13 14 15 16]
-
-
 
 ```python
 
@@ -1247,8 +1093,7 @@ print('Printing as a single array :','\n',a[1:,0:2,0:2].flatten())
      [[17 18]
       [15 16]]]
 
-
-## Manipulating Arrays
+## Mathematical Operations
 
 ### Matrix Arithmetic
 
@@ -1260,7 +1105,6 @@ We can get away with doing these arithmetic operations on matrices of **differen
 
 <div align="center"><img src="img/Matrix Arithmetic 2.jpg" alt="Itrtype" width="800px"></div>
 
-
 ```python
 a = np.array([10,20,30,40])
 b = np.arange(1,5)
@@ -1271,112 +1115,62 @@ print(b)
     [10 20 30 40]
     [1 2 3 4]
 
-
-
 ```python
 a + b
 ```
 
-
-
-
     array([11, 22, 33, 44])
-
-
-
 
 ```python
 a - b
 ```
 
-
-
-
     array([ 9, 18, 27, 36])
-
-
-
 
 ```python
 a * b
 ```
 
-
-
-
     array([ 10,  40,  90, 160])
 
-
-
 ### with scalars
-
 
 ```python
 a = np.array([1, 2, 3, 4])  # create an array
 a*2
 ```
 
-
-
-
     array([2, 4, 6, 8])
-
-
-
 
 ```python
 a= a ** 2
 a
 ```
 
-
-
-
     array([ 1,  4,  9, 16], dtype=int32)
-
-
-
 
 ```python
 # Masking
 a>15
 ```
 
-
-
-
     array([False,  True,  True,  True])
 
-
-
 ### Transcendental functions
-
 
 ```python
 np.log(b)
 ```
 
-
-
-
     array([0.        , 0.69314718, 1.09861229, 1.38629436])
-
-
-
 
 ```python
 np.sin(a)
 ```
 
-
-
-
     array([-0.54402111,  0.91294525, -0.98803162,  0.74511316])
 
-
-
 ### Shape Mismatch
-
 
 ```python
 a = np.arange(4)
@@ -1384,7 +1178,6 @@ a = np.arange(4)
 a + np.array([1, 2])
 
 ```
-
 
     ---------------------------------------------------------------------------
 
@@ -1398,8 +1191,6 @@ a + np.array([1, 2])
 
     ValueError: operands could not be broadcast together with shapes (4,) (2,)
 
-
-
 ```python
 a = np.array([[1,2],[3,4]])
 b = np.array([1,1])
@@ -1407,13 +1198,8 @@ a + b
 
 ```
 
-
-
-
     array([[2, 3],
            [4, 5]])
-
-
 
 ### Dot Product
 
@@ -1427,11 +1213,6 @@ A key distinction to make with arithmetic is the case of matrix multiplication u
 I’ve added matrix dimensions at the bottom of this figure to stress that the two matrices have to have the same dimension on the side they face each other with. You can visualize this operation as looking like this:
 
 <div align="center"><img src="img/dot1.jpg" alt="Itrtype" width="800px"></div>
-
-
-
-
-
 
 ```python
 # A = np.random.randint(0,5,(3,4))
@@ -1449,21 +1230,12 @@ print(B)
      [   100   1000]
      [ 10000 100000]]
 
-
-
 ```python
 # Dot product
 A.dot(B)
 ```
 
-
-
-
     array([ 30201, 302010])
-
-
-
-## Basic Reductions
 
 ### Matrix Aggregation
 
@@ -1474,8 +1246,6 @@ We can aggregate matrices the same way we aggregated vectors:
 Not only can we aggregate all the values in a matrix, but we can also aggregate across the rows or columns by using the `axis` parameter:
 
 <div align="center"><img src="img/agg1.jpg" alt="Itrtype" width="800px"></div>
-
-
 
 ```python
 print("1:------------\n",np.sum(B))
@@ -1502,35 +1272,21 @@ print("6:------------\n",np.mean(B,axis=0))
     6:------------
      [ 3367. 33670.]
 
-
 ### Logical Operations
-
 
 ```python
 np.all([True, True, False])
 
 ```
 
-
-
-
     False
-
-
-
 
 ```python
 np.any([True, False, False])
 
 ```
 
-
-
-
     True
-
-
-
 
 ```python
 #Note: can be used for array comparisions
@@ -1539,26 +1295,14 @@ np.any(a != 0)
 
 ```
 
-
-
-
     False
-
-
-
 
 ```python
 np.all(a == a)
 
 ```
 
-
-
-
     True
-
-
-
 
 ```python
 a = np.array([1, 2, 3, 2])
@@ -1568,68 +1312,74 @@ c = np.array([6, 4, 4, 5])
 
 ```
 
-
-
-
     True
 
-
-
-### Statistics
-
+## Statistics
 
 ```python
 x = np.array([1, 2, 3, 1])
 y = np.array([[1, 2, 3], [5, 6, 1]])
 x.mean()
-
 ```
-
-
-
 
     1.75
 
-
-
-
 ```python
 np.median(x)
-
 ```
-
-
-
 
     1.5
 
-
-
-
 ```python
 np.median(y, axis=-1)  # last axis
-
 ```
-
-
-
 
     array([2., 5.])
 
-
-
-
 ```python
 x.std()          # full population standard dev.
-
 ```
-
-
-
 
     0.82915619758885
 
+## Miscellaneous Operations
 
+### Unique Items and Count
+
+```python
+a= [[1,4,5,2,2,5],
+   [4,4,1,7,4,5]]
+u_val,count = np.unique(a,return_counts=True)
+```
+
+```python
+print(u_val)
+print(count)
+```
+
+    [1 2 4 5 7]
+    [2 2 4 3 1]
+
+### Reversing Rows and Columns
+
+```python
+a =np.array([[1,2,3],
+ [5,6,7]])
+```
+
+```python
+a[::-1]
+```
+
+    array([[5, 6, 7],
+           [1, 2, 3]])
+
+```python
+a[::-1, ::-1]
+```
+
+    array([[7, 6, 5],
+           [3, 2, 1]])
 
 ## Broadcasting
 
@@ -1637,7 +1387,7 @@ Broadcasting is a process performed by NumPy that allows mathematical operations
 
 - First rule of Numpy: 2 Array can perform operaiton only when they have same shapes
 - `Broadcasting` let two Arrays of different shapes to do some operaitons.
-    - The `small` Array will repeat itself, and convert to the same shape as of another array.
+  - The `small` Array will repeat itself, and convert to the same shape as of another array.
 
 <div align="center"><img src="img/Matrix Arithmetic 2.jpg" alt="Itrtype" width="800px"></div>
 
@@ -1645,99 +1395,61 @@ Broadcasting is a process performed by NumPy that allows mathematical operations
 
 <div align="center"><img src="img/broadcasting.png" alt="Itrtype" width="600px"></div>
 
-
 ```python
 A = np.array([[1,2,1],[2,3,1],[3,4,1]])
 a = np.array([[1,2,3]])
 ```
 
-
 ```python
 A + 4
 ```
-
-
-
 
     array([[5, 6, 5],
            [6, 7, 5],
            [7, 8, 5]])
 
-
-
-
 ```python
 A + a
 ```
-
-
-
 
     array([[2, 4, 4],
            [3, 5, 4],
            [4, 6, 4]])
 
-
-
-
 ```python
 a.T
 ```
-
-
-
 
     array([[1],
            [2],
            [3]])
 
-
-
-
 ```python
 A + a.T
 ```
-
-
-
 
     array([[2, 3, 2],
            [4, 5, 3],
            [6, 7, 4]])
 
-
-
-## Shape Manipulation - Transposing, Reshaping, Stacking etc...
-
+## Shape Manipulation - Transposing, Reshaping, Stacking etc
 
 ```python
 A = np.array([[1,2,3],[4,5,6]])
 ```
 
-
-
-
     array([[1, 2, 3],
            [4, 5, 6]])
 
-
-
 ### flatten()
-
 
 ```python
 A.flatten()
 ```
 
-
-
-
     array([1, 2, 3, 4, 5, 6])
 
-
-
 ### reshape()
-
 
 ```python
 print(A.reshape(2,3))
@@ -1752,7 +1464,6 @@ print(A.reshape(3,2))
      [3 4]
      [5 6]]
 
-
 <div align="center"><img src="img/reshape.jpg" alt="dfgdfg" width="800px"></div>
 
 ### Transpose
@@ -1760,7 +1471,6 @@ print(A.reshape(3,2))
 A common need when dealing with matrices is the need to **rotate** them. This is often the case when we need to take the dot product of two matrices and need to align the dimension they share. NumPy arrays have a convenient property called T to get the `transpose` of a matrix:
 
 <div align="center"><img src="img/trans.jpg" alt="dfgdfg" width="800px"></div>
-
 
 ```python
 print(A.flatten())
@@ -1796,7 +1506,6 @@ print("Y.T=X:-----------\n",Y.T)
      [[1 3 5]
      [2 4 6]]
 
-
 ### Adding a Dimension
 
 Indexing with the np.newaxis object allows us to add an axis to an array
@@ -1809,40 +1518,26 @@ Indexing with the np.newaxis object allows us to add an axis to an array
 
 3D array will become 4D array and so on
 
-
-
 ```python
 z = np.array([1, 2, 3])
 z
 
 ```
 
-
-
-
     array([1, 2, 3])
-
-
-
 
 ```python
 z[:, np.newaxis]
 
 ```
 
-
-
-
     array([[1],
            [2],
            [3]])
 
-
-
 ### Stacking of Array
 
 <div align="center"><img src="img/stack.jpg" alt="dfgdfg" width="800px"></div>
-
 
 ```python
 a = np.arange(0,5)
@@ -1863,8 +1558,7 @@ print('Horizontal stacking :','\n',np.hstack((a,b)))
     Horizontal stacking :
      [0 1 2 3 4 5 6 7 8 9]
 
-
-## Vectorization
+## 🌟Vectorization🌟
 
 - performing operation directly on Arrays
 
@@ -1874,13 +1568,11 @@ Vectorization is the process of modifying code to utilize array operation method
 
 - Vectorized code can often be more compact. Having fewer lines of code to write can potentially speed-up the code-writing process, make code more readable, and reduce the risk of errors
 
-
 ```python
 # find the distance between any two points (x1, y1) and (x2, y2)
 p1 = np.array([1,2,3,4])  # [x1,x2,x3.....,xn]
 p2 = np.array([5,5,3,4])  # [y1,y2,x3.....,xn]
 ```
-
 
 ```python
 s=0
@@ -1892,8 +1584,6 @@ print(s**0.5)
 
     5.0
 
-
-
 ```python
 # efficient
 def point_distance(p1,p2):
@@ -1903,7 +1593,6 @@ print(point_distance(p1,p2))
 ```
 
     5.0
-
 
 ### Machine Learning context
 
@@ -1920,8 +1609,6 @@ For instance, `x2` might represent the price of gas. The model might find that g
 Furthermore, let's assume we have a set of `m` test examples. In other words, we have `m` sets of `x` for which we would like to obtain the model's prediction. The linear expression, `h`, is to be calculated for each of the test examples. There will be a total of `m` individual hypothesis outputs.
 
 First, define a `10x4` array (x) in which each row is a training set. Here, m=10 and n=4:
-
-
 
 ```python
 x = np.arange(1,41).reshape(10,4)
@@ -1941,9 +1628,7 @@ print('x:\n', x)
      [33 34 35 36]
      [37 38 39 40]]
 
-
 Now, add a column of ones to represent `x0`, known in machine learning as the `bias` term. `x` is now a `10x5` array:
-
 
 ```python
 # print(np.full((4,1),1)) # uncomment before run
@@ -1978,9 +1663,7 @@ print('x.shape[1] : \n', x.shape[1])
     x.shape[1] :
      5
 
-
 Now let's initialize our model parameters as a `5x1` array
-
 
 ```python
 theta = np.arange(1,6).reshape(5,1)
@@ -1994,17 +1677,15 @@ print('theta:\n', theta)
      [4]
      [5]]
 
-
 Armed with our matrix `x` and vector `θ`, we'll proceed to define vectorized and non-vectorized versions of evaluating the linear expressions to compare the computation time.
-
 
 ```python
 #Non-vectorized version
 def non_vectorized_output(x, theta):
     h = []
-    for i in range(x.shape[0]): # range(10) row
+    for i in range(x.shape[0]):  # number of elements in axis=0
         total = 0
-        for j in range(x.shape[1]): # range(5) column
+        for j in range(x.shape[1]):  # number of elements in axis=1
             total = total + x[i, j] * theta[j, 0]
             # ∑Xeach_row_all_colum_el.θeach_row`~~`h=θo+x1.θ1+x2.θ2+...+xn.θn`
         h.append(total)
@@ -2014,8 +1695,8 @@ def non_vectorized_output(x, theta):
 def vectorized_output(x, theta):
     h = np.matmul(x, theta) # NumPy's matrix multiplication function
     return h
-```
 
+```
 
 ```python
 print(vectorized_output(x,theta))
@@ -2032,25 +1713,17 @@ print(vectorized_output(x,theta))
      [489]
      [545]]
 
-
-<div align="center"><img src="img/vectorization.jpg" alt="dfgdfg" width="800px"></div>
-
-
 ```python
 nv_time = %timeit -o non_vectorized_output(x, theta)
 ```
 
     80.5 µs ± 11 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 
-
-
 ```python
 v_time = %timeit -o vectorized_output(x, theta)
 ```
 
     4.62 µs ± 280 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
-
-
 
 ```python
 print('Non-vectorized version:', f'{1E6 * nv_time.average:0.2f}', 'microseconds per execution, average')
@@ -2063,7 +1736,6 @@ print('Computation was', "%.0f" % (nv_time.average / v_time.average), 'times fas
     Non-vectorized version: 80.53 microseconds per execution, average
     Vectorized version: 4.62 microseconds per execution, average
     Computation was 17 times faster using vectorization
-
 
 Note that in both examples, NumPy's vectorized calculations significantly outperformed native Python calculations using loops. The improved performance is substantial.
 
