@@ -4404,15 +4404,19 @@ us_cities
 
 
 ### Operations on `DataFrame`s
+
 Although `DataFrame`s do not try to mimick NumPy arrays, there are a few similarities. Let's create a `DataFrame` to demonstrate this:
 
 
 ```python
-grades_array = np.array([[8,8,9],[10,9,9],[4, 8, 2], [9, 10, 10]])
-grades = pd.DataFrame(grades_array,
-	columns=["sep", "oct", "nov"],
-	index=["alice","bob","charles","darwin"])
-grades
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id': np.random.randint(1000, 2000, size=5),
+	'marks': np.random.randint(50, 100, size=5)
+}
+df = pd.DataFrame(data)
+df
+
 ```
 
 
@@ -4424,35 +4428,41 @@ grades
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>8</td>
-      <td>8</td>
-      <td>9</td>
+      <th>0</th>
+      <td>83</td>
+      <td>1930</td>
+      <td>83</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>10</td>
-      <td>9</td>
-      <td>9</td>
+      <th>1</th>
+      <td>45</td>
+      <td>1954</td>
+      <td>57</td>
     </tr>
     <tr>
-      <th>charles</th>
-      <td>4</td>
-      <td>8</td>
-      <td>2</td>
+      <th>2</th>
+      <td>92</td>
+      <td>1638</td>
+      <td>67</td>
     </tr>
     <tr>
-      <th>darwin</th>
-      <td>9</td>
-      <td>10</td>
-      <td>10</td>
+      <th>3</th>
+      <td>92</td>
+      <td>1126</td>
+      <td>91</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>56</td>
+      <td>1369</td>
+      <td>96</td>
     </tr>
   </tbody>
 </table>
@@ -4460,11 +4470,110 @@ grades
 
 
 
-You can apply NumPy mathematical functions on a `DataFrame`: the function is applied to all values:
+
+```python
+df['marks'].sum()
+```
+
+
+
+
+    394
+
+
 
 
 ```python
-np.sqrt(grades)
+df['marks'].mean()
+```
+
+
+
+
+    78.8
+
+
+
+
+```python
+df['marks'].cumsum()
+```
+
+
+
+
+    0     83
+    1    140
+    2    207
+    3    298
+    4    394
+    Name: marks, dtype: int32
+
+
+
+
+```python
+df['roll_no'].count()
+```
+
+
+
+
+    5
+
+
+
+
+```python
+df['marks'].min()
+```
+
+
+
+
+    57
+
+
+
+
+```python
+df['marks'].max()
+```
+
+
+
+
+    96
+
+
+
+
+```python
+df['marks'].var()
+```
+
+
+
+
+    269.2
+
+
+
+
+```python
+df['marks'].std()
+```
+
+
+
+
+    16.407315441594946
+
+
+
+
+```python
+df.corr()
 ```
 
 
@@ -4476,35 +4585,29 @@ np.sqrt(grades)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>2.828427</td>
-      <td>2.828427</td>
-      <td>3.000000</td>
+      <th>roll_no</th>
+      <td>1.000000</td>
+      <td>-0.352082</td>
+      <td>0.25746</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>3.162278</td>
-      <td>3.000000</td>
-      <td>3.000000</td>
+      <th>ppr_id</th>
+      <td>-0.352082</td>
+      <td>1.000000</td>
+      <td>-0.70311</td>
     </tr>
     <tr>
-      <th>charles</th>
-      <td>2.000000</td>
-      <td>2.828427</td>
-      <td>1.414214</td>
-    </tr>
-    <tr>
-      <th>darwin</th>
-      <td>3.000000</td>
-      <td>3.162278</td>
-      <td>3.162278</td>
+      <th>marks</th>
+      <td>0.257460</td>
+      <td>-0.703110</td>
+      <td>1.00000</td>
     </tr>
   </tbody>
 </table>
@@ -4516,7 +4619,7 @@ Similarly, adding a single value to a `DataFrame` will add that value to all ele
 
 
 ```python
-grades + 1
+df + 1
 ```
 
 
@@ -4528,35 +4631,41 @@ grades + 1
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>9</td>
-      <td>9</td>
-      <td>10</td>
+      <th>0</th>
+      <td>84</td>
+      <td>1931</td>
+      <td>84</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>11</td>
-      <td>10</td>
-      <td>10</td>
+      <th>1</th>
+      <td>46</td>
+      <td>1955</td>
+      <td>58</td>
     </tr>
     <tr>
-      <th>charles</th>
-      <td>5</td>
-      <td>9</td>
-      <td>3</td>
+      <th>2</th>
+      <td>93</td>
+      <td>1639</td>
+      <td>68</td>
     </tr>
     <tr>
-      <th>darwin</th>
-      <td>10</td>
-      <td>11</td>
-      <td>11</td>
+      <th>3</th>
+      <td>93</td>
+      <td>1127</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>57</td>
+      <td>1370</td>
+      <td>97</td>
     </tr>
   </tbody>
 </table>
@@ -4568,7 +4677,7 @@ Of course, the same is true for all other binary operations, including arithmeti
 
 
 ```python
-grades >= 5
+df >= 500
 ```
 
 
@@ -4580,35 +4689,41 @@ grades >= 5
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>True</td>
-      <td>True</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>bob</th>
-      <td>True</td>
-      <td>True</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>charles</th>
+      <th>0</th>
       <td>False</td>
       <td>True</td>
       <td>False</td>
     </tr>
     <tr>
-      <th>darwin</th>
+      <th>1</th>
+      <td>False</td>
       <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>False</td>
       <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>False</td>
       <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -4620,15 +4735,15 @@ Aggregation operations, such as computing the `max`, the `sum` or the `mean` of 
 
 
 ```python
-grades.mean()
+df.mean()
 ```
 
 
 
 
-    sep    7.75
-    oct    8.75
-    nov    7.50
+    roll_no      73.6
+    ppr_id     1603.4
+    marks        78.8
     dtype: float64
 
 
@@ -4637,15 +4752,15 @@ The `all` method is also an aggregation operation: it checks whether all values 
 
 
 ```python
-(grades > 5).all()
+(df > 50).all()
 ```
 
 
 
 
-    sep    False
-    oct     True
-    nov    False
+    roll_no    False
+    ppr_id      True
+    marks       True
     dtype: bool
 
 
@@ -4654,16 +4769,17 @@ Most of these functions take an optional `axis` parameter which lets you specify
 
 
 ```python
-(grades > 5).all(axis = 1)
+(df > 50).all(axis = 1)
 ```
 
 
 
 
-    alice       True
-    bob         True
-    charles    False
-    darwin      True
+    0     True
+    1    False
+    2     True
+    3     True
+    4     True
     dtype: bool
 
 
@@ -4672,16 +4788,17 @@ The `any` method returns `True` if any value is True. Let's see who got at least
 
 
 ```python
-(grades == 10).any(axis = 1)
+(df == 92).any(axis = 1)
 ```
 
 
 
 
-    alice      False
-    bob         True
-    charles    False
-    darwin      True
+    0    False
+    1    False
+    2     True
+    3     True
+    4    False
     dtype: bool
 
 
@@ -4690,7 +4807,7 @@ If you add a `Series` object to a `DataFrame` (or execute any other binary opera
 
 
 ```python
-grades - grades.mean()  # equivalent to: grades - [7.75, 8.75, 7.50]
+df - df.mean()
 ```
 
 
@@ -4702,87 +4819,41 @@ grades - grades.mean()  # equivalent to: grades - [7.75, 8.75, 7.50]
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>0.25</td>
-      <td>-0.75</td>
-      <td>1.5</td>
+      <th>0</th>
+      <td>9.4</td>
+      <td>326.6</td>
+      <td>4.2</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>2.25</td>
-      <td>0.25</td>
-      <td>1.5</td>
+      <th>1</th>
+      <td>-28.6</td>
+      <td>350.6</td>
+      <td>-21.8</td>
     </tr>
     <tr>
-      <th>charles</th>
-      <td>-3.75</td>
-      <td>-0.75</td>
-      <td>-5.5</td>
+      <th>2</th>
+      <td>18.4</td>
+      <td>34.6</td>
+      <td>-11.8</td>
     </tr>
     <tr>
-      <th>darwin</th>
-      <td>1.25</td>
-      <td>1.25</td>
-      <td>2.5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-We subtracted `7.75` from all September grades, `8.75` from October grades and `7.50` from November grades. It is equivalent to subtracting this `DataFrame`:
-
-
-```python
-pd.DataFrame([[7.75, 8.75, 7.50]]*4, index=grades.index, columns=grades.columns)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>alice</th>
-      <td>7.75</td>
-      <td>8.75</td>
-      <td>7.5</td>
+      <th>3</th>
+      <td>18.4</td>
+      <td>-477.4</td>
+      <td>12.2</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>7.75</td>
-      <td>8.75</td>
-      <td>7.5</td>
-    </tr>
-    <tr>
-      <th>charles</th>
-      <td>7.75</td>
-      <td>8.75</td>
-      <td>7.5</td>
-    </tr>
-    <tr>
-      <th>darwin</th>
-      <td>7.75</td>
-      <td>8.75</td>
-      <td>7.5</td>
+      <th>4</th>
+      <td>-17.6</td>
+      <td>-234.4</td>
+      <td>17.2</td>
     </tr>
   </tbody>
 </table>
@@ -4794,7 +4865,7 @@ If you want to subtract the global mean from every grade, here is one way to do 
 
 
 ```python
-grades - grades.values.mean() # subtracts the global mean (8.00) from all grades
+df - df.values.mean() # subtracts the global mean
 ```
 
 
@@ -4806,35 +4877,41 @@ grades - grades.values.mean() # subtracts the global mean (8.00) from all grades
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sep</th>
-      <th>oct</th>
-      <th>nov</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
+      <th>0</th>
+      <td>-502.266667</td>
+      <td>1344.733333</td>
+      <td>-502.266667</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>2.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
+      <th>1</th>
+      <td>-540.266667</td>
+      <td>1368.733333</td>
+      <td>-528.266667</td>
     </tr>
     <tr>
-      <th>charles</th>
-      <td>-4.0</td>
-      <td>0.0</td>
-      <td>-6.0</td>
+      <th>2</th>
+      <td>-493.266667</td>
+      <td>1052.733333</td>
+      <td>-518.266667</td>
     </tr>
     <tr>
-      <th>darwin</th>
-      <td>1.0</td>
-      <td>2.0</td>
-      <td>2.0</td>
+      <th>3</th>
+      <td>-493.266667</td>
+      <td>540.733333</td>
+      <td>-494.266667</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-529.266667</td>
+      <td>783.733333</td>
+      <td>-489.266667</td>
     </tr>
   </tbody>
 </table>
