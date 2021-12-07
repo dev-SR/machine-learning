@@ -10,20 +10,23 @@
   - [`DataFrame` objects](#dataframe-objects)
     - [Creating a `DataFrame`](#creating-a-dataframe)
       - [from numpy array](#from-numpy-array)
-      - [dictionary of `Series` objects:](#dictionary-of-series-objects)
+      - [dictionary of `pd.Series` or `List` objects:](#dictionary-of-pdseries-or-list-objects)
       - [`DataFrame(columns=[],index=[])` constructor](#dataframecolumnsindex-constructor)
     - [Indexing, Masking, Query](#indexing-masking-query)
       - [Extracting Columns](#extracting-columns)
       - [Extracting Rows](#extracting-rows)
         - [`loc()` - label location](#loc---label-location)
         - [`iloc()` - integer location](#iloc---integer-location)
+      - [Extracting Rows with Columns using slice](#extracting-rows-with-columns-using-slice)
       - [Masking - Boolean Indexing](#masking---boolean-indexing)
       - [Querying a `DataFrame`](#querying-a-dataframe)
-    - [Adding and removing columns](#adding-and-removing-columns)
-      - [direct assignment](#direct-assignment)
-      - [`insert(position,column,value)`](#insertpositioncolumnvalue)
-      - [`assign()`: Assigning new columns](#assign-assigning-new-columns)
-      - [`drop` and `pop`](#drop-and-pop)
+    - [Adding and Removing Row/Columns](#adding-and-removing-rowcolumns)
+      - [Adding Column](#adding-column)
+        - [direct assignment](#direct-assignment)
+        - [`insert(position,column,value)`](#insertpositioncolumnvalue)
+        - [`assign()`: Assigning new columns](#assign-assigning-new-columns)
+      - [Adding Row](#adding-row)
+      - [Removing Rows/Columns](#removing-rowscolumns)
     - [Handy Methods and Properties](#handy-methods-and-properties)
       - [`shape` , `dtypes` , `info()`, `describe()`](#shape--dtypes--info-describe)
       - [`head` and `tail`](#head-and-tail)
@@ -39,6 +42,10 @@
     - [Operations on `DataFrame`s](#operations-on-dataframes)
     - [Aggregating with `groupby`](#aggregating-with-groupby)
     - [Handling Missing Data](#handling-missing-data)
+      - [`isnull()` and `notnull()`](#isnull-and-notnull)
+      - [`fillna`](#fillna)
+      - [`dropna`](#dropna)
+    - [Handling String Data - Converting Reality to Numbers](#handling-string-data---converting-reality-to-numbers)
 
 # Pandas
 
@@ -595,7 +602,63 @@ type(df[0])
 
 
 
-#### dictionary of `Series` objects:
+#### dictionary of `pd.Series` or `List` objects:
+
+
+```python
+data = {
+	'roll_no': [10,3,2,4],
+	'sid':[111,112,113,114],
+	'marks':[90,80,70,60]
+}
+df = pd.DataFrame(data)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>sid</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>111</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>112</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>113</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>114</td>
+      <td>60</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -1016,45 +1079,45 @@ df
   <tbody>
     <tr>
       <th>0</th>
+      <td>31</td>
+      <td>86</td>
+      <td>98</td>
       <td>71</td>
-      <td>34</td>
-      <td>51</td>
-      <td>84</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>26</td>
-      <td>36</td>
-      <td>56</td>
-      <td>54</td>
+      <td>31</td>
+      <td>13</td>
+      <td>43</td>
+      <td>20</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>95</td>
-      <td>46</td>
-      <td>40</td>
-      <td>25</td>
+      <td>22</td>
+      <td>24</td>
+      <td>81</td>
+      <td>85</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>95</td>
-      <td>41</td>
-      <td>46</td>
-      <td>62</td>
+      <td>57</td>
+      <td>77</td>
+      <td>83</td>
+      <td>99</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>80</td>
-      <td>86</td>
-      <td>79</td>
-      <td>59</td>
+      <td>22</td>
+      <td>13</td>
+      <td>97</td>
+      <td>49</td>
     </tr>
     <tr>
       <th>5</th>
+      <td>91</td>
+      <td>87</td>
       <td>36</td>
-      <td>39</td>
-      <td>96</td>
-      <td>82</td>
+      <td>88</td>
     </tr>
   </tbody>
 </table>
@@ -1070,12 +1133,30 @@ df['c']
 
 
 
-    0    51
-    1    56
-    2    40
-    3    46
-    4    79
-    5    96
+    0    98
+    1    43
+    2    81
+    3    83
+    4    97
+    5    36
+    Name: c, dtype: int32
+
+
+
+
+```python
+df.c
+```
+
+
+
+
+    0    98
+    1    43
+    2    81
+    3    83
+    4    97
+    5    36
     Name: c, dtype: int32
 
 
@@ -1104,39 +1185,39 @@ df[['b','c','a']]
   <tbody>
     <tr>
       <th>0</th>
-      <td>34</td>
-      <td>51</td>
-      <td>71</td>
+      <td>86</td>
+      <td>98</td>
+      <td>31</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>36</td>
-      <td>56</td>
-      <td>26</td>
+      <td>13</td>
+      <td>43</td>
+      <td>31</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>46</td>
-      <td>40</td>
-      <td>95</td>
+      <td>24</td>
+      <td>81</td>
+      <td>22</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>41</td>
-      <td>46</td>
-      <td>95</td>
+      <td>77</td>
+      <td>83</td>
+      <td>57</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>86</td>
-      <td>79</td>
-      <td>80</td>
+      <td>13</td>
+      <td>97</td>
+      <td>22</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>39</td>
-      <td>96</td>
+      <td>87</td>
       <td>36</td>
+      <td>91</td>
     </tr>
   </tbody>
 </table>
@@ -1145,6 +1226,121 @@ df[['b','c','a']]
 
 
 #### Extracting Rows
+
+
+```python
+arr = np.random.randint(10, 100, size=(6, 4))
+df = pd.DataFrame(data=arr)
+df.columns = ["a", "b", "c", "d"]
+df.index = "p q r s t u".split()
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>p</th>
+      <td>88</td>
+      <td>61</td>
+      <td>34</td>
+      <td>34</td>
+    </tr>
+    <tr>
+      <th>q</th>
+      <td>11</td>
+      <td>68</td>
+      <td>61</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>r</th>
+      <td>91</td>
+      <td>54</td>
+      <td>20</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <th>s</th>
+      <td>63</td>
+      <td>63</td>
+      <td>82</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>t</th>
+      <td>82</td>
+      <td>41</td>
+      <td>76</td>
+      <td>98</td>
+    </tr>
+    <tr>
+      <th>u</th>
+      <td>73</td>
+      <td>52</td>
+      <td>58</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+##### `loc()` - label location
+
+The `loc` attribute lets you access rows instead of columns. The result is a `Series` object in which the `DataFrame`'s column names are mapped to row index labels:
+
+
+```python
+df.loc["p"]
+```
+
+
+
+
+    a    88
+    b    61
+    c    34
+    d    34
+    Name: p, dtype: int32
+
+
+
+##### `iloc()` - integer location
+
+You can also access rows by integer location using the `iloc` attribute:
+
+
+```python
+df.iloc[2]
+```
+
+
+
+
+    a    91
+    b    54
+    c    20
+    d    58
+    Name: r, dtype: int32
+
+
+
+#### Extracting Rows with Columns using slice
 
 
 ```python
@@ -1174,45 +1370,45 @@ df
   <tbody>
     <tr>
       <th>p</th>
-      <td>64</td>
-      <td>81</td>
-      <td>95</td>
-      <td>79</td>
+      <td>60</td>
+      <td>53</td>
+      <td>17</td>
+      <td>23</td>
     </tr>
     <tr>
       <th>q</th>
-      <td>17</td>
-      <td>52</td>
-      <td>83</td>
-      <td>41</td>
+      <td>62</td>
+      <td>68</td>
+      <td>79</td>
+      <td>49</td>
     </tr>
     <tr>
       <th>r</th>
-      <td>81</td>
-      <td>76</td>
-      <td>54</td>
-      <td>29</td>
+      <td>52</td>
+      <td>99</td>
+      <td>19</td>
+      <td>47</td>
     </tr>
     <tr>
       <th>s</th>
-      <td>96</td>
-      <td>58</td>
-      <td>22</td>
-      <td>98</td>
+      <td>13</td>
+      <td>51</td>
+      <td>64</td>
+      <td>31</td>
     </tr>
     <tr>
       <th>t</th>
-      <td>83</td>
-      <td>27</td>
-      <td>67</td>
-      <td>95</td>
+      <td>98</td>
+      <td>79</td>
+      <td>80</td>
+      <td>21</td>
     </tr>
     <tr>
       <th>u</th>
-      <td>16</td>
-      <td>34</td>
-      <td>60</td>
-      <td>11</td>
+      <td>61</td>
+      <td>41</td>
+      <td>81</td>
+      <td>25</td>
     </tr>
   </tbody>
 </table>
@@ -1220,51 +1416,10 @@ df
 
 
 
-##### `loc()` - label location
-
-The `loc` attribute lets you access rows instead of columns. The result is a `Series` object in which the `DataFrame`'s column names are mapped to row index labels:
-
 
 ```python
-df.loc["p"]
-```
-
-
-
-
-    a    64
-    b    81
-    c    95
-    d    79
-    Name: p, dtype: int32
-
-
-
-##### `iloc()` - integer location
-
-You can also access rows by integer location using the `iloc` attribute:
-
-
-```python
-df.iloc[2]
-```
-
-
-
-
-    a    81
-    b    76
-    c    54
-    d    29
-    Name: r, dtype: int32
-
-
-
-You can also get a slice of rows, and this returns a `DataFrame` object:
-
-
-```python
-df.iloc[1:3]
+# df.iloc[1:3]
+df.iloc[1:3,:]
 ```
 
 
@@ -1285,17 +1440,17 @@ df.iloc[1:3]
   <tbody>
     <tr>
       <th>q</th>
-      <td>17</td>
-      <td>52</td>
-      <td>83</td>
-      <td>41</td>
+      <td>62</td>
+      <td>68</td>
+      <td>79</td>
+      <td>49</td>
     </tr>
     <tr>
       <th>r</th>
-      <td>81</td>
-      <td>76</td>
-      <td>54</td>
-      <td>29</td>
+      <td>52</td>
+      <td>99</td>
+      <td>19</td>
+      <td>47</td>
     </tr>
   </tbody>
 </table>
@@ -1305,8 +1460,7 @@ df.iloc[1:3]
 
 
 ```python
-df.iloc[1:3][['a','b']]
-
+df.iloc[1:3,0:2]
 ```
 
 
@@ -1325,13 +1479,48 @@ df.iloc[1:3][['a','b']]
   <tbody>
     <tr>
       <th>q</th>
-      <td>17</td>
-      <td>52</td>
+      <td>62</td>
+      <td>68</td>
     </tr>
     <tr>
       <th>r</th>
-      <td>81</td>
-      <td>76</td>
+      <td>52</td>
+      <td>99</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.iloc[1:3][['a','b']]
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>q</th>
+      <td>62</td>
+      <td>68</td>
+    </tr>
+    <tr>
+      <th>r</th>
+      <td>52</td>
+      <td>99</td>
     </tr>
   </tbody>
 </table>
@@ -1342,7 +1531,6 @@ df.iloc[1:3][['a','b']]
 
 ```python
 df.iloc[1:3,:2]
-
 ```
 
 
@@ -1589,7 +1777,7 @@ This is most useful when combined with boolean expressions:
 
 
 ```python
-df['a'] <50
+df['a'] <50 # d.a < 50
 ```
 
 
@@ -1727,7 +1915,9 @@ people.query("age > 30 and pets == 0")
 
 
 
-### Adding and removing columns
+### Adding and Removing Row/Columns
+
+####  Adding Column
 
 
 ```python
@@ -1785,7 +1975,7 @@ people
 
 
 
-#### direct assignment
+##### direct assignment
 
 
 ```python
@@ -1923,7 +2113,7 @@ people
 
 
 
-#### `insert(position,column,value)`
+##### `insert(position,column,value)`
 
 When adding a new column, it is added at the end (on the right) by default. You can also insert a column anywhere else using the `insert()` method:
 
@@ -1992,7 +2182,7 @@ people
 
 
 
-#### `assign()`: Assigning new columns
+##### `assign()`: Assigning new columns
 
 You can also create new columns by calling the `assign()` method. Note that this returns a new `DataFrame` object, **the original is not modified:**
 
@@ -2321,7 +2511,104 @@ But fear not, there is a simple solution. You can pass a function to the `assign
 
 Problem solved!
 
-#### `drop` and `pop`
+#### Adding Row
+
+
+```python
+arr= np.random.randint(10, 100, size=(6,4))
+df = pd.DataFrame(data=arr,columns=["a", "b", "c", "d"])
+df.index = "p q r s t u".split()
+```
+
+
+```python
+print(df.loc['p'])
+print(df.iloc[0])
+```
+
+    a    81
+    b    86
+    c    65
+    d    23
+    Name: p, dtype: int32
+    a    81
+    b    86
+    c    65
+    d    23
+    Name: p, dtype: int32
+
+
+
+```python
+df.loc['x'] = [1,2,3,4]
+df.tail()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>r</th>
+      <td>79</td>
+      <td>12</td>
+      <td>25</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>s</th>
+      <td>10</td>
+      <td>99</td>
+      <td>54</td>
+      <td>73</td>
+    </tr>
+    <tr>
+      <th>t</th>
+      <td>98</td>
+      <td>55</td>
+      <td>14</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>u</th>
+      <td>61</td>
+      <td>62</td>
+      <td>63</td>
+      <td>55</td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+#### Removing Rows/Columns
+
+- `drop` method:
+  - `drop(columns,axis=1)`
+  - `drop(index,axis=0)`
+  - `drop(labels,axis=1)`
+  - `drop(labels,axis=0)`
+-  `pop`
 
 
 ```python
@@ -2356,55 +2643,55 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>10</td>
-      <td>60</td>
-      <td>21</td>
-      <td>41</td>
-      <td>85</td>
-      <td>27</td>
-      <td>92</td>
-      <td>49</td>
-      <td>70</td>
-      <td>600</td>
+      <td>53</td>
+      <td>98</td>
+      <td>47</td>
+      <td>62</td>
+      <td>69</td>
+      <td>88</td>
+      <td>48</td>
+      <td>22</td>
+      <td>151</td>
+      <td>5194</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>43</td>
-      <td>60</td>
-      <td>50</td>
-      <td>74</td>
-      <td>90</td>
-      <td>86</td>
-      <td>87</td>
-      <td>65</td>
-      <td>103</td>
-      <td>2580</td>
+      <td>58</td>
+      <td>11</td>
+      <td>46</td>
+      <td>71</td>
+      <td>46</td>
+      <td>26</td>
+      <td>61</td>
+      <td>49</td>
+      <td>69</td>
+      <td>638</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>55</td>
-      <td>62</td>
-      <td>23</td>
-      <td>58</td>
-      <td>83</td>
-      <td>80</td>
-      <td>90</td>
-      <td>72</td>
-      <td>117</td>
-      <td>3410</td>
+      <td>85</td>
+      <td>97</td>
+      <td>64</td>
+      <td>76</td>
+      <td>38</td>
+      <td>56</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
+      <td>8245</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>47</td>
-      <td>97</td>
-      <td>11</td>
-      <td>13</td>
-      <td>91</td>
-      <td>92</td>
-      <td>49</td>
-      <td>35</td>
-      <td>144</td>
-      <td>4559</td>
+      <td>53</td>
+      <td>51</td>
+      <td>29</td>
+      <td>23</td>
+      <td>60</td>
+      <td>36</td>
+      <td>46</td>
+      <td>28</td>
+      <td>104</td>
+      <td>2703</td>
     </tr>
   </tbody>
 </table>
@@ -2441,47 +2728,47 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>10</td>
-      <td>60</td>
-      <td>85</td>
-      <td>27</td>
-      <td>92</td>
-      <td>49</td>
-      <td>70</td>
-      <td>600</td>
+      <td>53</td>
+      <td>98</td>
+      <td>69</td>
+      <td>88</td>
+      <td>48</td>
+      <td>22</td>
+      <td>151</td>
+      <td>5194</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>43</td>
-      <td>60</td>
-      <td>90</td>
-      <td>86</td>
-      <td>87</td>
-      <td>65</td>
-      <td>103</td>
-      <td>2580</td>
+      <td>58</td>
+      <td>11</td>
+      <td>46</td>
+      <td>26</td>
+      <td>61</td>
+      <td>49</td>
+      <td>69</td>
+      <td>638</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>55</td>
-      <td>62</td>
-      <td>83</td>
-      <td>80</td>
-      <td>90</td>
-      <td>72</td>
-      <td>117</td>
-      <td>3410</td>
+      <td>85</td>
+      <td>97</td>
+      <td>38</td>
+      <td>56</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
+      <td>8245</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>47</td>
-      <td>97</td>
-      <td>91</td>
-      <td>92</td>
-      <td>49</td>
-      <td>35</td>
-      <td>144</td>
-      <td>4559</td>
+      <td>53</td>
+      <td>51</td>
+      <td>60</td>
+      <td>36</td>
+      <td>46</td>
+      <td>28</td>
+      <td>104</td>
+      <td>2703</td>
     </tr>
   </tbody>
 </table>
@@ -2491,7 +2778,7 @@ df
 
 
 ```python
-df.drop(columns=['e','f','a-b'])
+df.drop(columns=['e','f','a-b']) # removes columns e, f, a-b
 ```
 
 
@@ -2513,35 +2800,35 @@ df.drop(columns=['e','f','a-b'])
   <tbody>
     <tr>
       <th>0</th>
-      <td>10</td>
-      <td>60</td>
-      <td>92</td>
-      <td>49</td>
-      <td>70</td>
+      <td>53</td>
+      <td>98</td>
+      <td>48</td>
+      <td>22</td>
+      <td>151</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>43</td>
-      <td>60</td>
-      <td>87</td>
-      <td>65</td>
-      <td>103</td>
+      <td>58</td>
+      <td>11</td>
+      <td>61</td>
+      <td>49</td>
+      <td>69</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>55</td>
-      <td>62</td>
-      <td>90</td>
-      <td>72</td>
-      <td>117</td>
+      <td>85</td>
+      <td>97</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>47</td>
-      <td>97</td>
-      <td>49</td>
-      <td>35</td>
-      <td>144</td>
+      <td>53</td>
+      <td>51</td>
+      <td>46</td>
+      <td>28</td>
+      <td>104</td>
     </tr>
   </tbody>
 </table>
@@ -2576,47 +2863,47 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>10</td>
-      <td>60</td>
-      <td>85</td>
-      <td>27</td>
-      <td>92</td>
-      <td>49</td>
-      <td>70</td>
-      <td>600</td>
+      <td>53</td>
+      <td>98</td>
+      <td>69</td>
+      <td>88</td>
+      <td>48</td>
+      <td>22</td>
+      <td>151</td>
+      <td>5194</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>43</td>
-      <td>60</td>
-      <td>90</td>
-      <td>86</td>
-      <td>87</td>
-      <td>65</td>
-      <td>103</td>
-      <td>2580</td>
+      <td>58</td>
+      <td>11</td>
+      <td>46</td>
+      <td>26</td>
+      <td>61</td>
+      <td>49</td>
+      <td>69</td>
+      <td>638</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>55</td>
-      <td>62</td>
-      <td>83</td>
-      <td>80</td>
-      <td>90</td>
-      <td>72</td>
-      <td>117</td>
-      <td>3410</td>
+      <td>85</td>
+      <td>97</td>
+      <td>38</td>
+      <td>56</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
+      <td>8245</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>47</td>
-      <td>97</td>
-      <td>91</td>
-      <td>92</td>
-      <td>49</td>
-      <td>35</td>
-      <td>144</td>
-      <td>4559</td>
+      <td>53</td>
+      <td>51</td>
+      <td>60</td>
+      <td>36</td>
+      <td>46</td>
+      <td>28</td>
+      <td>104</td>
+      <td>2703</td>
     </tr>
   </tbody>
 </table>
@@ -2627,7 +2914,6 @@ df
 
 ```python
 df.drop(columns=['e', 'f', 'a-b'], inplace=True)  # original df is modified
-
 ```
 
 
@@ -2654,35 +2940,137 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>10</td>
-      <td>60</td>
-      <td>92</td>
-      <td>49</td>
-      <td>70</td>
+      <td>53</td>
+      <td>98</td>
+      <td>48</td>
+      <td>22</td>
+      <td>151</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>43</td>
-      <td>60</td>
-      <td>87</td>
-      <td>65</td>
-      <td>103</td>
+      <td>58</td>
+      <td>11</td>
+      <td>61</td>
+      <td>49</td>
+      <td>69</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>55</td>
-      <td>62</td>
-      <td>90</td>
-      <td>72</td>
-      <td>117</td>
+      <td>85</td>
+      <td>97</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>47</td>
+      <td>53</td>
+      <td>51</td>
+      <td>46</td>
+      <td>28</td>
+      <td>104</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.drop(1,inplace=True) # removes row 1
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>g</th>
+      <th>h</th>
+      <th>a+b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>53</td>
+      <td>98</td>
+      <td>48</td>
+      <td>22</td>
+      <td>151</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>85</td>
       <td>97</td>
-      <td>49</td>
-      <td>35</td>
-      <td>144</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>53</td>
+      <td>51</td>
+      <td>46</td>
+      <td>28</td>
+      <td>104</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.index
+```
+
+
+
+
+    Int64Index([0, 2, 3], dtype='int64')
+
+
+
+
+```python
+df.drop(df.index[[0,2]])
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>g</th>
+      <th>h</th>
+      <th>a+b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>85</td>
+      <td>97</td>
+      <td>67</td>
+      <td>94</td>
+      <td>182</td>
     </tr>
   </tbody>
 </table>
@@ -2698,7 +3086,6 @@ arr = np.random.randint(10, 100, size=(6, 4))
 df = pd.DataFrame(data=arr)
 df.columns = 'a b c d'.split()
 df
-
 ```
 
 
@@ -2719,45 +3106,45 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>49</td>
-      <td>73</td>
-      <td>76</td>
-      <td>47</td>
+      <td>20</td>
+      <td>34</td>
+      <td>45</td>
+      <td>36</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>84</td>
-      <td>25</td>
-      <td>87</td>
-      <td>59</td>
+      <td>22</td>
+      <td>37</td>
+      <td>11</td>
+      <td>65</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>79</td>
       <td>36</td>
-      <td>76</td>
-      <td>69</td>
+      <td>17</td>
+      <td>68</td>
+      <td>48</td>
     </tr>
     <tr>
       <th>3</th>
+      <td>77</td>
+      <td>69</td>
+      <td>99</td>
       <td>46</td>
-      <td>88</td>
-      <td>43</td>
-      <td>41</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>95</td>
-      <td>24</td>
-      <td>15</td>
-      <td>37</td>
+      <td>83</td>
+      <td>28</td>
+      <td>34</td>
+      <td>67</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>59</td>
-      <td>49</td>
-      <td>36</td>
-      <td>23</td>
+      <td>46</td>
+      <td>24</td>
+      <td>28</td>
+      <td>11</td>
     </tr>
   </tbody>
 </table>
@@ -2843,52 +3230,52 @@ df.describe()
     </tr>
     <tr>
       <th>mean</th>
-      <td>68.666667</td>
-      <td>49.166667</td>
-      <td>55.500000</td>
-      <td>46.000000</td>
+      <td>47.333333</td>
+      <td>34.833333</td>
+      <td>47.500000</td>
+      <td>45.500000</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>20.146133</td>
-      <td>26.331856</td>
-      <td>28.317839</td>
-      <td>16.334014</td>
+      <td>27.097355</td>
+      <td>18.192489</td>
+      <td>31.538865</td>
+      <td>20.637345</td>
     </tr>
     <tr>
       <th>min</th>
-      <td>46.000000</td>
-      <td>24.000000</td>
-      <td>15.000000</td>
-      <td>23.000000</td>
+      <td>20.000000</td>
+      <td>17.000000</td>
+      <td>11.000000</td>
+      <td>11.000000</td>
     </tr>
     <tr>
       <th>25%</th>
-      <td>51.500000</td>
-      <td>27.750000</td>
-      <td>37.750000</td>
-      <td>38.000000</td>
+      <td>25.500000</td>
+      <td>25.000000</td>
+      <td>29.500000</td>
+      <td>38.500000</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>69.000000</td>
-      <td>42.500000</td>
-      <td>59.500000</td>
-      <td>44.000000</td>
+      <td>41.000000</td>
+      <td>31.000000</td>
+      <td>39.500000</td>
+      <td>47.000000</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>82.750000</td>
-      <td>67.000000</td>
-      <td>76.000000</td>
-      <td>56.000000</td>
+      <td>69.250000</td>
+      <td>36.250000</td>
+      <td>62.250000</td>
+      <td>60.750000</td>
     </tr>
     <tr>
       <th>max</th>
-      <td>95.000000</td>
-      <td>88.000000</td>
-      <td>87.000000</td>
+      <td>83.000000</td>
       <td>69.000000</td>
+      <td>99.000000</td>
+      <td>67.000000</td>
     </tr>
   </tbody>
 </table>
@@ -2924,50 +3311,70 @@ df.describe().T
     <tr>
       <th>a</th>
       <td>6.0</td>
-      <td>68.666667</td>
-      <td>20.146133</td>
-      <td>46.0</td>
-      <td>51.50</td>
-      <td>69.0</td>
-      <td>82.75</td>
-      <td>95.0</td>
+      <td>47.333333</td>
+      <td>27.097355</td>
+      <td>20.0</td>
+      <td>25.5</td>
+      <td>41.0</td>
+      <td>69.25</td>
+      <td>83.0</td>
     </tr>
     <tr>
       <th>b</th>
       <td>6.0</td>
-      <td>49.166667</td>
-      <td>26.331856</td>
-      <td>24.0</td>
-      <td>27.75</td>
-      <td>42.5</td>
-      <td>67.00</td>
-      <td>88.0</td>
+      <td>34.833333</td>
+      <td>18.192489</td>
+      <td>17.0</td>
+      <td>25.0</td>
+      <td>31.0</td>
+      <td>36.25</td>
+      <td>69.0</td>
     </tr>
     <tr>
       <th>c</th>
       <td>6.0</td>
-      <td>55.500000</td>
-      <td>28.317839</td>
-      <td>15.0</td>
-      <td>37.75</td>
-      <td>59.5</td>
-      <td>76.00</td>
-      <td>87.0</td>
+      <td>47.500000</td>
+      <td>31.538865</td>
+      <td>11.0</td>
+      <td>29.5</td>
+      <td>39.5</td>
+      <td>62.25</td>
+      <td>99.0</td>
     </tr>
     <tr>
       <th>d</th>
       <td>6.0</td>
-      <td>46.000000</td>
-      <td>16.334014</td>
-      <td>23.0</td>
-      <td>38.00</td>
-      <td>44.0</td>
-      <td>56.00</td>
-      <td>69.0</td>
+      <td>45.500000</td>
+      <td>20.637345</td>
+      <td>11.0</td>
+      <td>38.5</td>
+      <td>47.0</td>
+      <td>60.75</td>
+      <td>67.0</td>
     </tr>
   </tbody>
 </table>
 </div>
+
+
+
+
+```python
+df['a'].describe()
+```
+
+
+
+
+    count     6.000000
+    mean     47.333333
+    std      27.097355
+    min      20.000000
+    25%      25.500000
+    50%      41.000000
+    75%      69.250000
+    max      83.000000
+    Name: a, dtype: float64
 
 
 
@@ -3761,6 +4168,9 @@ df['a'].apply(lambda x:x*10)
     5    870
     Name: a, dtype: int64
 
+
+
+More in [Handling String Data - Converting Reality to Numbers](#handling-string-data---converting-reality-to-numbers)
 
 
 ### Saving & loading files
@@ -4727,7 +5137,13 @@ iris[iris['species'] == 'setosa']['sepal_length'].mean()
 
 
 ```python
-iris.head()
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id':np.random.randint(1000, 2000, size=5),
+	'marks':np.random.randint(50,100,size=5)
+}
+df = pd.DataFrame(data)
+df
 ```
 
 
@@ -4739,53 +5155,41 @@ iris.head()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sepal_length</th>
-      <th>sepal_width</th>
-      <th>petal_length</th>
-      <th>petal_width</th>
-      <th>species</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>5.1</td>
-      <td>3.5</td>
-      <td>1.4</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>37</td>
+      <td>1690</td>
+      <td>56</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>4.9</td>
-      <td>3.0</td>
-      <td>1.4</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>15</td>
+      <td>1700</td>
+      <td>87</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>4.7</td>
-      <td>3.2</td>
-      <td>1.3</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>53</td>
+      <td>1364</td>
+      <td>55</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>4.6</td>
-      <td>3.1</td>
-      <td>1.5</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>94</td>
+      <td>1372</td>
+      <td>90</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>5.0</td>
-      <td>3.6</td>
-      <td>1.4</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>44</td>
+      <td>1291</td>
+      <td>76</td>
     </tr>
   </tbody>
 </table>
@@ -4795,16 +5199,452 @@ iris.head()
 
 
 ```python
-nan_idx = np.random.randint(0,150,20)
-iris['sepal_length'][nan_idx] = np.nan
+nan_idx = np.random.randint(0,5,3)
+df['marks'][nan_idx] = np.nan
+# df['marks'][[1,4,3]] = np.nan
+df
 ```
 
-    <ipython-input-82-8496a87f94dc>:2: SettingWithCopyWarning:
-    A value is trying to be set on a copy of a slice from a DataFrame
 
-    See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-      iris['sepal_length'][nan_idx] = np.nan
 
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+#### `isnull()` and `notnull()`
+
+
+```python
+df.isnull()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.isnull().sum()
+```
+
+
+
+
+    roll_no    0
+    ppr_id     0
+    marks      3
+    dtype: int64
+
+
+
+
+```python
+df['marks'].isnull()
+```
+
+
+
+
+    0    False
+    1     True
+    2    False
+    3     True
+    4     True
+    Name: marks, dtype: bool
+
+
+
+#### `fillna`
+
+
+```python
+df.fillna("FILLED")
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>FILLED</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df = df.fillna("FILLED")
+df.fillna("FILLED",inplace=True)
+df
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>FILLED</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id': np.random.randint(1000, 2000, size=5),
+	'marks': np.random.randint(50, 100, size=5)
+}
+df = pd.DataFrame(data)
+nan_idx = np.random.randint(0, 5, 3)
+df['marks'][nan_idx] = np.nan
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>60</td>
+      <td>1764</td>
+      <td>53.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>58</td>
+      <td>1443</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>1603</td>
+      <td>96.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>18</td>
+      <td>1626</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>21</td>
+      <td>1656</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.marks.fillna(df.marks.mean(), inplace=True)
+```
+
+
+```python
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>60</td>
+      <td>1764</td>
+      <td>53.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>58</td>
+      <td>1443</td>
+      <td>74.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>1603</td>
+      <td>96.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>18</td>
+      <td>1626</td>
+      <td>74.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>21</td>
+      <td>1656</td>
+      <td>74.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+#### `dropna`
 
 
 ```python
@@ -4814,68 +5654,16 @@ warnings.filterwarnings('ignore')
 
 
 ```python
-nan_idx = np.random.randint(0, 150, 20)
-iris['sepal_length'][nan_idx] = np.nan
-```
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id': np.random.randint(1000, 2000, size=5),
+	'marks': np.random.randint(50, 100, size=5)
+}
+df = pd.DataFrame(data)
+df['marks'][[0, 2, 4]] = np.nan
+df['roll_no'][[0, 2]] = np.nan
+df
 
-
-```python
-iris['sepal_length'][:20]
-```
-
-
-
-
-    0     5.1
-    1     4.9
-    2     4.7
-    3     4.6
-    4     5.0
-    5     5.4
-    6     4.6
-    7     5.0
-    8     4.4
-    9     4.9
-    10    NaN
-    11    NaN
-    12    4.8
-    13    4.3
-    14    NaN
-    15    5.7
-    16    NaN
-    17    NaN
-    18    NaN
-    19    5.1
-    Name: sepal_length, dtype: float64
-
-
-
-
-```python
-nan_idx = np.random.randint(0, 150, 20)
-iris['petal_width'][nan_idx] = np.nan
-```
-
-
-```python
-iris.isna().sum()
-```
-
-
-
-
-    sepal_length    63
-    sepal_width      0
-    petal_length     0
-    petal_width     20
-    species          0
-    dtype: int64
-
-
-
-
-```python
-iris.dropna()
 ```
 
 
@@ -4887,174 +5675,193 @@ iris.dropna()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>sepal_length</th>
-      <th>sepal_width</th>
-      <th>petal_length</th>
-      <th>petal_width</th>
-      <th>species</th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>5.1</td>
-      <td>3.5</td>
-      <td>1.4</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>NaN</td>
+      <td>1074</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>4.9</td>
-      <td>3.0</td>
-      <td>1.4</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>4.0</td>
+      <td>1867</td>
+      <td>60.0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>4.7</td>
-      <td>3.2</td>
-      <td>1.3</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>NaN</td>
+      <td>1103</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>4.6</td>
-      <td>3.1</td>
-      <td>1.5</td>
-      <td>0.2</td>
-      <td>setosa</td>
+      <td>90.0</td>
+      <td>1699</td>
+      <td>54.0</td>
     </tr>
     <tr>
-      <th>5</th>
-      <td>5.4</td>
-      <td>3.9</td>
-      <td>1.7</td>
-      <td>0.4</td>
-      <td>setosa</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>138</th>
-      <td>6.0</td>
-      <td>3.0</td>
-      <td>4.8</td>
-      <td>1.8</td>
-      <td>virginica</td>
-    </tr>
-    <tr>
-      <th>141</th>
-      <td>6.9</td>
-      <td>3.1</td>
-      <td>5.1</td>
-      <td>2.3</td>
-      <td>virginica</td>
-    </tr>
-    <tr>
-      <th>144</th>
-      <td>6.7</td>
-      <td>3.3</td>
-      <td>5.7</td>
-      <td>2.5</td>
-      <td>virginica</td>
-    </tr>
-    <tr>
-      <th>145</th>
-      <td>6.7</td>
-      <td>3.0</td>
-      <td>5.2</td>
-      <td>2.3</td>
-      <td>virginica</td>
-    </tr>
-    <tr>
-      <th>149</th>
-      <td>5.9</td>
-      <td>3.0</td>
-      <td>5.1</td>
-      <td>1.8</td>
-      <td>virginica</td>
+      <th>4</th>
+      <td>70.0</td>
+      <td>1372</td>
+      <td>NaN</td>
     </tr>
   </tbody>
 </table>
-<p>75 rows × 5 columns</p>
 </div>
 
 
 
 
 ```python
-iris['sepal_length'].fillna(value="FILLED")[:20]
+df.dropna()
 ```
 
 
 
 
-    0        5.1
-    1        4.9
-    2        4.7
-    3        4.6
-    4        5.0
-    5        5.4
-    6        4.6
-    7        5.0
-    8        4.4
-    9        4.9
-    10    FILLED
-    11    FILLED
-    12       4.8
-    13       4.3
-    14    FILLED
-    15       5.7
-    16    FILLED
-    17    FILLED
-    18    FILLED
-    19       5.1
-    Name: sepal_length, dtype: object
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>4.0</td>
+      <td>1867</td>
+      <td>60.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>90.0</td>
+      <td>1699</td>
+      <td>54.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Handling String Data - Converting Reality to Numbers
+
+
+```python
+people_dict = {
+	# panda series from a list of A to D
+	"name":pd.Series(['A','B','C','D']),
+	"gender":pd.Series(['Female','Male','Female','Female'])
+}
+people = pd.DataFrame(people_dict)
+people
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>gender</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>Female</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>Male</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>Female</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>D</td>
+      <td>Female</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
 
 ```python
-iris['sepal_length'] = iris['sepal_length'].fillna(value=round(iris['sepal_length'].mean(),1))
+def f(g):
+	if g == 'Male':
+		return 0
+	else:
+		return 1
+
+
+people['sex'] = people.gender.apply(f)
+people
 ```
 
 
-```python
-iris['sepal_length'][:20]
-```
 
 
+<div>
 
-
-    0     5.1
-    1     4.9
-    2     4.7
-    3     4.6
-    4     5.0
-    5     5.4
-    6     4.6
-    7     5.0
-    8     4.4
-    9     4.9
-    10    5.8
-    11    5.8
-    12    4.8
-    13    4.3
-    14    5.8
-    15    5.7
-    16    5.8
-    17    5.8
-    18    5.8
-    19    5.1
-    Name: sepal_length, dtype: float64
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>gender</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>Female</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>Male</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>Female</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>D</td>
+      <td>Female</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
