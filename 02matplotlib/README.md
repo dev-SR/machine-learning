@@ -16,14 +16,20 @@
   - [Polar projection](#polar-projection)
   - [Animations](#animations)
   - [Saving animations to video files](#saving-animations-to-video-files)
+
 # Matplotlib
 
 
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+from IPython import display
+display.set_matplotlib_formats('svg')
 # jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
 # "background: #22272E;"
+
 ```
 
 ## Line Plots
@@ -43,12 +49,13 @@ y2=2*x+3
 ```python
 plt.plot(x,y1)
 plt.plot(x,y2)
+plt.plot(x,y2,'*')
 plt.show()
 ```
 
 
 
-![png](README_files/README_4_0.png)
+![svg](README_files/README_4_0.svg)
 
 
 
@@ -80,13 +87,15 @@ plt.legend(['iPhone','Android'])
 # plt.plot(x, y1, label='iPhone')
 # plt.plot(x, y2, label='Android')
 # plt.lagend()
+
+plt.annotate(xy=[6,40],s='iPhone')
 plt.show()
 
 ```
 
 
 
-![png](README_files/README_8_0.png)
+![svg](README_files/README_8_0.svg)
 
 
 
@@ -102,13 +111,13 @@ plt.scatter(x,y1)
 
 
 
-    <matplotlib.collections.PathCollection at 0x29025603910>
+    <matplotlib.collections.PathCollection at 0x1f586c09f10>
 
 
 
 
 
-![png](README_files/README_11_1.png)
+![svg](README_files/README_11_1.svg)
 
 
 
@@ -125,7 +134,7 @@ plt.show()
 
 
 
-![png](README_files/README_12_0.png)
+![svg](README_files/README_12_0.svg)
 
 
 
@@ -150,7 +159,7 @@ plt.show()
 
 
 
-![png](README_files/README_14_0.png)
+![svg](README_files/README_14_0.svg)
 
 
 
@@ -163,7 +172,7 @@ plt.show()
 
 
 
-![png](README_files/README_15_0.png)
+![svg](README_files/README_15_0.svg)
 
 
 
@@ -171,7 +180,7 @@ You may also optionally provide the scale of each point.
 
 
 ```python
-x, y, scale = rand(3, 100)
+x, y, scale = np.random.rand(3, 100)
 scale = 500 * scale ** 5
 plt.scatter(x, y, s=scale)
 plt.show()
@@ -180,7 +189,7 @@ plt.show()
 
 
 
-![png](README_files/README_17_0.png)
+![svg](README_files/README_17_0.svg)
 
 
 
@@ -190,8 +199,8 @@ And as usual there are a number of other attributes you can set, such as the fil
 ```python
 for color in ['red', 'green', 'blue']:
     n = 100
-    x, y = rand(2, n)
-    scale = 500.0 * rand(n) ** 5
+    x, y = np.random.rand(2, n)
+    scale = 500.0 * np.random.rand(n) ** 5
     plt.scatter(x, y, s=scale, c=color, alpha=0.3, edgecolors='blue')
 
 plt.grid(True)
@@ -202,7 +211,7 @@ plt.show()
 
 
 
-![png](README_files/README_19_0.png)
+![svg](README_files/README_19_0.svg)
 
 
 
@@ -232,7 +241,7 @@ plt.bar(x,y,width=0.5,tick_label=['A','B','C','D'])
 
 
 
-![png](README_files/README_22_2.png)
+![svg](README_files/README_22_2.svg)
 
 
 
@@ -259,7 +268,7 @@ plt.bar(x, y2, width=0.5, tick_label=['A', 'B', 'C', 'D'])
 
 
 
-![png](README_files/README_23_2.png)
+![svg](README_files/README_23_2.svg)
 
 
 
@@ -283,7 +292,7 @@ plt.show()
 
 
 
-![png](README_files/README_24_1.png)
+![svg](README_files/README_24_1.svg)
 
 
 
@@ -307,7 +316,7 @@ plt.show()
 
 
 
-![png](README_files/README_27_0.png)
+![svg](README_files/README_27_0.svg)
 
 
 
@@ -333,7 +342,7 @@ plt.show()
 
 
 
-![png](README_files/README_28_0.png)
+![svg](README_files/README_28_0.svg)
 
 
 
@@ -363,15 +372,15 @@ plt.hist(data,bins=10)
 
 
 
-    (array([  4.,   7.,  26.,  60., 103., 113.,  94.,  54.,  28.,  11.]),
-     array([45. , 49.6, 54.2, 58.8, 63.4, 68. , 72.6, 77.2, 81.8, 86.4, 91. ]),
+    (array([  3.,   9.,  26.,  53., 123., 148.,  72.,  46.,  15.,   5.]),
+     array([43. , 48.2, 53.4, 58.6, 63.8, 69. , 74.2, 79.4, 84.6, 89.8, 95. ]),
      <BarContainer object of 10 artists>)
 
 
 
 
 
-![png](README_files/README_32_1.png)
+![svg](README_files/README_32_1.svg)
 
 
 
@@ -397,7 +406,7 @@ plt.show()
 
 
 
-![png](README_files/README_35_0.png)
+![svg](README_files/README_35_0.svg)
 
 
 
@@ -418,7 +427,7 @@ plt.show()
 
 
 
-![png](README_files/README_38_0.png)
+![svg](README_files/README_38_0.svg)
 
 
 
@@ -439,7 +448,7 @@ plt.show()
 
 
 
-![png](README_files/README_40_0.png)
+![svg](README_files/README_40_0.svg)
 
 
 
@@ -648,7 +657,7 @@ plt.savefig("my_square_function.png", transparent=True)
 
 
 
-![png](README_files/README_62_0.png)
+![svg](README_files/README_62_0.svg)
 
 
 
@@ -26734,4 +26743,5 @@ Matplotlib relies on 3rd-party libraries to write videos such as [FFMPEG](https:
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 line_ani.save('my_wiggly_animation.mp4', writer=writer)
+
 ```
