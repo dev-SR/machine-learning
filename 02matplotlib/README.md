@@ -21,15 +21,20 @@
 
 
 ```python
+"""
+jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
+"""
+# interactive plotting in separate window
+# %matplotlib qt
+#normal charts inside notebooks
+# %matplotlib inline
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 from IPython import display
 display.set_matplotlib_formats('svg')
-# jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
 # "background: #22272E;"
-
 ```
 
 ## Line Plots
