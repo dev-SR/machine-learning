@@ -19,6 +19,7 @@
     - [Vector Span](#vector-span)
   - [Resources](#resources)
 
+
 ```python
 """
 jupyter nbconvert --to markdown la.ipynb --output README.md
@@ -49,7 +50,7 @@ display.set_matplotlib_formats('svg')
   - Hence, these can be used very effectively in solving complex computational problems. In Machine Learning, the whole set of features, or the weights and biases on a neural network can be expressed as a tensor.
 
 <div align="center">
-<img src="img/svmt.png" alt="svmt.png" width="500px">
+<img src="img/np-array-represtation.jpg" alt="np-array-represtation.jpg" width="1000px">
 </div>
 
 ## Vectors
@@ -71,17 +72,18 @@ Elements of `R^n` are sets of real numbers. This type of representation is argua
 <img src="img/alg_v.jpg" alt="alg_v.jpg" width="600px">
 </div>
 
+column vector
+
 
 ```python
 x = np.array([[1],
               [2],
               [3]])
-
 ```
 
 
 ```python
-x.shape  # (3 dimensions, 1 element on each)
+x.shape  # (on axis=0 No. of element is 3, on axis=1 is 1)
 ```
 
 
@@ -93,13 +95,35 @@ x.shape  # (3 dimensions, 1 element on each)
 
 
 ```python
-print(f'A 3-dimensional vector:\n{x}')
+print("dimension of x:", x.ndim)
 ```
 
-    A 3-dimensional vector:
-    [[1]
-     [2]
-     [3]]
+    dimension of x: 2
+
+
+row vector
+
+
+```python
+x = np.array([[1, 2, 3]])  # (on axis=0 No. of element is 1, on axis=1 is 3)
+x.shape
+
+```
+
+
+
+
+    (1, 3)
+
+
+
+
+```python
+print("dimension of x:", x.ndim)
+
+```
+
+    dimension of x: 2
 
 
 #### Geometric Vector
@@ -121,7 +145,7 @@ plt.show()
 
 
 
-![svg](README_files/README_13_0.svg)
+![svg](README_files/README_17_0.svg)
 
 
 
@@ -211,7 +235,7 @@ plt.show()
 
 
 
-![svg](README_files/README_20_1.svg)
+![svg](README_files/README_24_1.svg)
 
 
 
@@ -270,7 +294,7 @@ plt.show()
 
 
 
-![svg](README_files/README_24_0.svg)
+![svg](README_files/README_28_0.svg)
 
 
 
