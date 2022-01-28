@@ -19,7 +19,6 @@
     - [Vector Span](#vector-span)
   - [Resources](#resources)
 
-
 ```python
 """
 jupyter nbconvert --to markdown la.ipynb --output README.md
@@ -63,6 +62,10 @@ Linear algebra is the study of vectors. At the most general level, vectors are o
 
 - `Vector`: An ordered list of numbers.
 - `Dimension`: The number of elements in a vector.
+
+<div align="center">
+<img src="img/vec.jpg" alt="vec.jpg" width="600px">
+</div>
 
 **Elements of R**
 
@@ -184,6 +187,11 @@ plt.show()
 
 
 We used vector-vector addition to define vectors without defining vector-vector addition. Vector-vector addition is an **element-wise operation**, only defined for vectors of the same size (i.e., number of elements). Consider two vectors of the same size, then:
+
+Given: `A = Axi + Ayj + AZk`
+and `B = Bxi + Byj + BZk`
+Vector Addition
+Resultant `R = A + B`= `(Ax + Bx)i + (Ay + By )j + (AZ + BZ) k`
 
 <div align="center">
 <img src="img/v_add.jpg" alt="v_add.jpg" width="500px">
