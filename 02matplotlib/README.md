@@ -1,5 +1,27 @@
 # Matplotlib
 
+
+```python
+"""
+jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
+"""
+# interactive plotting in separate window
+# %matplotlib qt
+#normal charts inside notebooks
+# %matplotlib inline
+import matplotlib.pyplot as plt
+plt.style.use('default')
+import numpy as np
+
+import warnings
+warnings.filterwarnings('ignore')
+
+from IPython import display
+display.set_matplotlib_formats('svg')
+# "background: #22272E;"
+
+```
+
 - [Matplotlib](#matplotlib)
   - [Line Plots](#line-plots)
     - [`plt.plot` and `plt.show()`](#pltplot-and-pltshow)
@@ -26,28 +48,6 @@
     - [cropping](#cropping)
     - [RGB Channel](#rgb-channel)
   - [Saving a figure](#saving-a-figure)
-
-
-```python
-"""
-jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
-"""
-# interactive plotting in separate window
-# %matplotlib qt
-#normal charts inside notebooks
-# %matplotlib inline
-import matplotlib.pyplot as plt
-plt.style.use('default')
-import numpy as np
-
-import warnings
-warnings.filterwarnings('ignore')
-
-from IPython import display
-display.set_matplotlib_formats('svg')
-# "background: #22272E;"
-
-```
 
 
 ```python
@@ -522,6 +522,7 @@ In an annotation, there are two points to consider:
 
 Both of these arguments are (x, y) tuples and **arrow** is drawn between the positions `xy` and `xytext`
 
+
 ```python
 t = np.arange(0.0, 5.0, 0.001)
 s = np.cos(3 * np.pi * t)
@@ -674,6 +675,82 @@ plt.show()
 
 
 
+[weight-height-dataset](https://www.kaggle.com/sonalisingh1411/linear-regression-using-weight-height/data)
+
+
+```python
+import pandas as pd
+df = pd.read_csv('weight-height-min.csv')
+df.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Gender</th>
+      <th>Height</th>
+      <th>Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Male</td>
+      <td>73.847017</td>
+      <td>241.893563</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Male</td>
+      <td>68.781904</td>
+      <td>162.310473</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Male</td>
+      <td>74.110105</td>
+      <td>212.740856</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Male</td>
+      <td>71.730978</td>
+      <td>220.042470</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Male</td>
+      <td>69.881796</td>
+      <td>206.349801</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+plt.scatter(x=df['Height'], y=df["Weight"])
+plt.xlabel('Height')
+plt.ylabel('Weight')
+plt.title('Height vs Weight')
+plt.show()
+
+```
+
+
+
+![svg](README_files/README_60_0.svg)
+
+
+
 You may also optionally provide the scale of each point.
 
 
@@ -687,7 +764,7 @@ plt.show()
 
 
 
-![svg](README_files/README_59_0.svg)
+![svg](README_files/README_62_0.svg)
 
 
 
@@ -709,7 +786,7 @@ plt.show()
 
 
 
-![svg](README_files/README_61_0.svg)
+![svg](README_files/README_64_0.svg)
 
 
 
@@ -733,7 +810,7 @@ plt.show()
 
 
 
-![svg](README_files/README_63_0.svg)
+![svg](README_files/README_66_0.svg)
 
 
 
@@ -763,7 +840,7 @@ plt.bar(x,y,width=0.5,tick_label=['A','B','C','D'])
 
 
 
-![svg](README_files/README_66_2.svg)
+![svg](README_files/README_69_2.svg)
 
 
 
@@ -790,7 +867,7 @@ plt.bar(x, y2, width=0.5, tick_label=['A', 'B', 'C', 'D'])
 
 
 
-![svg](README_files/README_67_2.svg)
+![svg](README_files/README_70_2.svg)
 
 
 
@@ -814,7 +891,7 @@ plt.show()
 
 
 
-![svg](README_files/README_68_1.svg)
+![svg](README_files/README_71_1.svg)
 
 
 
@@ -861,7 +938,7 @@ plt.show()
 
 
 
-![svg](README_files/README_70_0.svg)
+![svg](README_files/README_73_0.svg)
 
 
 
@@ -885,7 +962,7 @@ plt.show()
 
 
 
-![svg](README_files/README_73_0.svg)
+![svg](README_files/README_76_0.svg)
 
 
 
@@ -911,7 +988,7 @@ plt.show()
 
 
 
-![svg](README_files/README_74_0.svg)
+![svg](README_files/README_77_0.svg)
 
 
 
@@ -949,7 +1026,7 @@ plt.hist(data,bins=10)
 
 
 
-![svg](README_files/README_78_1.svg)
+![svg](README_files/README_81_1.svg)
 
 
 
@@ -975,7 +1052,7 @@ plt.show()
 
 
 
-![svg](README_files/README_81_0.svg)
+![svg](README_files/README_84_0.svg)
 
 
 
@@ -996,7 +1073,7 @@ plt.show()
 
 
 
-![svg](README_files/README_84_0.svg)
+![svg](README_files/README_87_0.svg)
 
 
 
@@ -1017,7 +1094,7 @@ plt.show()
 
 
 
-![svg](README_files/README_86_0.svg)
+![svg](README_files/README_89_0.svg)
 
 
 
@@ -1067,7 +1144,7 @@ fig.gca(projection='3d')
 
 
 
-![png](README_files/README_91_1.png)
+![png](README_files/README_94_1.png)
 
 
 
@@ -1088,7 +1165,7 @@ plt.show()
 
 
 
-![png](README_files/README_93_0.png)
+![png](README_files/README_96_0.png)
 
 
 
@@ -1128,7 +1205,7 @@ plt.imshow(img)
 
 
 
-![png](README_files/README_98_1.png)
+![png](README_files/README_101_1.png)
 
 
 
@@ -1141,7 +1218,7 @@ plt.show()
 
 
 
-![png](README_files/README_99_0.png)
+![png](README_files/README_102_0.png)
 
 
 
@@ -1170,7 +1247,7 @@ plt.show()
 
 
 
-![png](README_files/README_102_0.png)
+![png](README_files/README_105_0.png)
 
 
 
@@ -1210,7 +1287,7 @@ plt.show()
 
 
 
-![png](README_files/README_106_0.png)
+![png](README_files/README_109_0.png)
 
 
 
@@ -1226,6 +1303,6 @@ plt.savefig("my_square_function.png", transparent=True)
 
 
 
-![svg](README_files/README_108_0.svg)
+![svg](README_files/README_111_0.svg)
 
 
