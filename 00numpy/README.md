@@ -1,5 +1,14 @@
 # NumPy
 
+
+```python
+"""
+jupyter nbconvert --to markdown numpy.ipynb --output README.md
+"""
+import numpy as np
+
+```
+
 - [NumPy](#numpy)
   - [NumPy arrays](#numpy-arrays)
     - [Array Dimension](#array-dimension)
@@ -24,8 +33,8 @@
       - [`np.diag()` , `np.identity()` and `np.eye()`](#npdiag--npidentity-and-npeye)
     - [Random number generation and sampling](#random-number-generation-and-sampling)
       - [`random.rand()`](#randomrand)
-      - [`random.randn()`](#randomrandn)
       - [`randint()`](#randint)
+      - [`random.randn()` and `random.normal()`](#randomrandn-and-randomnormal)
       - [`choice`](#choice)
       - [Setting a seed for reproducibility](#setting-a-seed-for-reproducibility)
   - [Indexing and Masking](#indexing-and-masking)
@@ -83,13 +92,6 @@
     - [Machine Learning context](#machine-learning-context)
   - [Resources](#resources)
 
-```python
-"""
-jupyter nbconvert --to markdown numpy.ipynb --output README.md
-"""
-import numpy as np
-
-```
 
 ## NumPy arrays
 
@@ -1137,9 +1139,108 @@ print(r)
      [0.96199799 0.77233877]]
 
 
-#### `random.randn()`
+#### `randint()`
+
+Generating an array of random integers using `rand()`.
+
+
+```python
+s = 5
+e = 10
+randomNums = np.random.rand(100) * e+s
+randomInts = np.floor(randomNums)
+randomInts
+
+```
+
+
+
+
+    array([11., 14.,  6.,  7.,  8.,  5.,  7.,  7.,  8.,  8.,  9.,  9., 12.,
+            8., 13.,  6.,  6.,  7.,  5.,  8., 12.,  6.,  6., 14., 11.,  8.,
+           11., 12., 12., 12.,  7., 12.,  9., 11., 12., 13., 12., 13.,  8.,
+           10., 12.,  5., 10.,  9.,  8., 11., 12., 14., 10.,  5., 10., 12.,
+            7.,  7.,  8., 13., 11.,  6.,  9., 11., 10.,  5.,  5., 10.,  8.,
+           14., 13., 10., 14.,  5., 12.,  5.,  6.,  6.,  5.,  6., 14.,  8.,
+            7.,  8.,  6., 12.,  9.,  9.,  6.,  7.,  8., 10., 14.,  5., 13.,
+           10., 13.,  8., 10., 13.,  5., 14.,  6., 13.])
+
+
+
+Alternatively:
+
+- We can use the `randint()` function to generate an array of integers.
+- The `randint()` function can take up to 3 arguments;
+    - the low(inclusive),
+    - high(exclusive)
+    - size of the array.
+
+
+```python
+print(np.arange(10))  # Remember!! not random but sequential
+print(np.random.randint(20))  # generates a random integer exclusive of 20
+print()
+# generates 1 random integer including 2 but excluding 20
+print(np.random.randint(2, 20))
+print()
+# generates 7 random integers including 2 but excluding 20
+print(np.random.randint(2, 20, 7))
+print()
+print(np.random.randint(2, 20, (2, 3)))  # generates 2D array of shape 2,3
+```
+
+    [0 1 2 3 4 5 6 7 8 9]
+    15
+
+    18
+
+    [ 9 14  2 12  8  7 11]
+
+    [[11  9 11]
+     [ 8  4 17]]
+
+
+
+
+
+    6
+
+
+
+#### `random.randn()` and `random.normal()`
 
 - Using `randn()`, we can generate random samples from **Standard, normal or Gaussian distributioncentered around 0** . For example, let’s generate 7 random numbers:
+
+
+```python
+np.random.randn(100)
+```
+
+
+
+
+    array([-0.3614899 ,  0.61992002, -0.81899306,  0.5597346 , -0.69842678,
+           -1.10341849,  0.60009591, -0.19849157, -0.96945883,  0.24886778,
+           -0.8221463 , -0.61736156,  0.10923973, -0.64572419,  1.83666219,
+           -1.09222327,  0.59906901, -1.2106451 , -0.56185519, -0.80355863,
+            0.61203993,  0.67333876, -1.43365291, -0.81315673, -0.74114243,
+           -0.08063148,  1.34222607,  2.17400434, -0.10810503,  1.8685854 ,
+           -0.75899791, -0.36442177, -0.08593771,  0.74434067,  0.22885863,
+           -1.16889105, -0.58590705,  1.04832189,  0.76148084,  0.06747364,
+            0.01204344,  0.26440331,  1.33591303,  0.60597311,  1.96391443,
+           -0.7735585 ,  1.71440306,  2.34752693,  0.64626332, -0.65285576,
+           -0.95856418,  0.10018449, -1.03344648,  0.28576619, -0.32557142,
+            0.24176193,  0.1498766 , -1.25343047, -0.15559337,  0.89513823,
+            1.34432922, -1.18712654, -0.43285232,  0.74600572, -1.34526112,
+           -0.00588216,  0.77291594,  0.87437671, -0.45775305,  0.81400561,
+           -0.85307578, -2.16185924, -0.28103173,  0.15001287,  1.16040504,
+           -0.31481882,  0.11257005, -0.24675071, -0.74760369, -1.53069464,
+           -0.26905523, -0.83893937,  0.42501343, -0.48903115,  1.27919486,
+           -1.23346517,  0.18932659, -1.04301141, -0.65068497,  0.52856365,
+            1.34967198,  0.66819414,  1.56857528,  1.25025443, -1.9558503 ,
+           -1.13701265, -1.46386432, -0.32294535, -0.10042653,  0.29906629])
+
+
 
 
 ```python
@@ -1177,47 +1278,54 @@ plt.show()
 
 
 
-![svg](README_files/README_106_0.svg)
+![svg](README_files/README_112_0.svg)
 
 
 
-#### `randint()`
+`randn` seems to give a distribution from some **standardized normal distribution** (mean 0 and variance 1). `normal` takes more parameters for more control. So `randn` seems to simply be a convenience function.
 
-- Lastly, we can use the `randint()` function to generate an array of integers.
-- The `randint()` function can take up to 3 arguments;
-    - the low(inclusive),
-    - high(exclusive)
-    - size of the array.
+
 
 
 ```python
-print(np.arange(10))  # Remember!! not random but sequential
-print(np.random.randint(20))  # generates a random integer exclusive of 20
-print()
-# generates 1 random integer including 2 but excluding 20
-print(np.random.randint(2, 20))
-print()
-# generates 7 random integers including 2 but excluding 20
-print(np.random.randint(2, 20, 7))
-print()
-print(np.random.randint(2, 20, (2, 3)))  # generates 2D array of shape 2,3
+np.random.normal(loc=0.0, scale=1.0, size=(10,))
+
 ```
 
-    [0 1 2 3 4 5 6 7 8 9]
-    15
 
-    18
 
-    [ 9 14  2 12  8  7 11]
 
-    [[11  9 11]
-     [ 8  4 17]]
+    array([ 0.82568769,  0.19124701,  0.06701997,  0.53760613, -2.72269938,
+            1.76775545, -1.47150379,  0.06819547,  0.85028911, -0.81503108])
 
 
 
 
+```python
+np.random.normal(loc=10, scale=1.0, size=(10,))
 
-    6
+```
+
+
+
+
+    array([ 9.17580685, 10.07913585, 10.36891076, 10.24278277,  9.73299089,
+            9.55017388,  9.16834682,  9.05820677,  9.25025099,  9.8336638 ])
+
+
+
+equivalent to:
+
+
+```python
+np.random.randn(10)+10
+```
+
+
+
+
+    array([ 9.69332601,  9.59079965,  9.22760526, 10.08452443,  9.16150081,
+            8.73582941,  9.4521861 , 10.69172902, 10.58660354,  8.67882242])
 
 
 
@@ -1540,6 +1648,8 @@ another_slice
     array([  -1, 3000,   -1,    7])
 
 
+
+For more see [shallow-and-deep-copies]()
 
 ### Indexing: Two-dimensional array
 
