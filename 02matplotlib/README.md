@@ -1,27 +1,5 @@
 # Matplotlib
 
-
-```python
-"""
-jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
-"""
-# interactive plotting in separate window
-# %matplotlib qt
-#normal charts inside notebooks
-# %matplotlib inline
-import matplotlib.pyplot as plt
-plt.style.use('default')
-import numpy as np
-
-import warnings
-warnings.filterwarnings('ignore')
-
-from IPython import display
-display.set_matplotlib_formats('svg')
-# "background: #22272E;"
-
-```
-
 - [Matplotlib](#matplotlib)
   - [Line Plots](#line-plots)
     - [`plt.plot` and `plt.show()`](#pltplot-and-pltshow)
@@ -48,6 +26,28 @@ display.set_matplotlib_formats('svg')
     - [cropping](#cropping)
     - [RGB Channel](#rgb-channel)
   - [Saving a figure](#saving-a-figure)
+
+```python
+"""
+cd .\02matplotlib\
+jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
+"""
+# interactive plotting in separate window
+# %matplotlib qt
+#normal charts inside notebooks
+# %matplotlib inline
+import matplotlib.pyplot as plt
+plt.style.use('default')
+import numpy as np
+
+import warnings
+warnings.filterwarnings('ignore')
+
+from IPython import display
+display.set_matplotlib_formats('svg')
+# "background: #22272E;"
+
+```
 
 
 ```python
