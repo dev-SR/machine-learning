@@ -20,6 +20,7 @@
     - [🚀Index-based selection - `iloc[row_indexer,col_indexer]`](#index-based-selection---ilocrow_indexercol_indexer)
     - [🚀Label-based selection - `loc[row_indexer,col_indexer]`](#label-based-selection---locrow_indexercol_indexer)
       - [Choosing between loc and iloc](#choosing-between-loc-and-iloc)
+    - [🚀🚀 Split Input and Output Features and convert to NumPy arrays](#-split-input-and-output-features-and-convert-to-numpy-arrays)
     - [🚀🚀Masking - Boolean Indexing](#masking---boolean-indexing)
       - [`isin`](#isin)
       - [`isnull`](#isnull)
@@ -69,11 +70,13 @@
 
 ```python
 """
+cd .\01pandas\
 jupyter nbconvert --to markdown pandas.ipynb --output README.md
 
  """
 import pandas as pd
 import numpy as np
+
 ```
 
 ## `Series` objects
@@ -1034,7 +1037,19 @@ people[["birthyear", "hobby"]]
 
 
 <div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
 
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1255,7 +1270,19 @@ d3
 
 
 <div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
 
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2077,6 +2104,117 @@ equivalent to:
 cols_idx = [0, 11]
 df = reviews.iloc[:100, cols_idx]
 
+### 🚀🚀 Split Input and Output Features and convert to NumPy arrays
+
+
+
+```python
+data = pd.read_csv("weight-height-min.csv")
+data.head()
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Gender</th>
+      <th>Height</th>
+      <th>Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Male</td>
+      <td>73.847017</td>
+      <td>241.893563</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Male</td>
+      <td>68.781904</td>
+      <td>162.310473</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Male</td>
+      <td>74.110105</td>
+      <td>212.740856</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Male</td>
+      <td>71.730978</td>
+      <td>220.042470</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Male</td>
+      <td>69.881796</td>
+      <td>206.349801</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+X = data['Height']
+print("Type of X:", type(X))
+print("Shape of X:", X.shape)
+
+X = data[['Height']]
+print("Type of X:", type(X))
+print("Shape of X:", X.shape)
+
+X = data['Height'].values
+print("Type of X:", type(X))
+print("Shape of X:", X.shape)
+
+X = data['Height'].values.reshape(-1,1)
+print("Type of X:", type(X))
+print("Shape of X:", X.shape)
+
+```
+
+    Type of X: <class 'pandas.core.series.Series'>
+    Shape of X: (100,)
+    Type of X: <class 'pandas.core.frame.DataFrame'>
+    Shape of X: (100, 1)
+    Type of X: <class 'numpy.ndarray'>
+    Shape of X: (100,)
+    Type of X: <class 'numpy.ndarray'>
+    Shape of X: (100, 1)
+
+
+
+```python
+X = data.iloc[:, 1].values
+print("Shape of X:", X.shape)
+X =  X.reshape(-1, 1)
+y = data.iloc[:, 2].values
+print("Shape of X:", X.shape)
+print("Shape of y:", y.shape)
+print("Type of X:", type(X))
+print("Type of y:", type(y))
+
+```
+
+    Shape of X: (100,)
+    Shape of X: (100, 1)
+    Shape of y: (100,)
+    Type of X: <class 'numpy.ndarray'>
+    Type of y: <class 'numpy.ndarray'>
+
+
 ### 🚀🚀Masking - Boolean Indexing
 
 
@@ -2749,7 +2887,19 @@ people.query("age > 30 and pets == 0")
 
 
 <div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
 
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
