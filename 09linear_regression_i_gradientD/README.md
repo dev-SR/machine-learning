@@ -3,10 +3,15 @@
 - [Basic Linear Regression using Gradient Descent](#basic-linear-regression-using-gradient-descent)
   - [Gradient Descent Algorithm](#gradient-descent-algorithm)
   - [Prepare Data](#prepare-data)
+    - [Load Data](#load-data)
     - [Normalization](#normalization)
     - [Train and Test Split](#train-and-test-split)
   - [Gradient Descent Update Rule for Regression](#gradient-descent-update-rule-for-regression)
   - [Prediction](#prediction)
+  - [R-Score](#r-score)
+    - [Using `sklearn`](#using-sklearn)
+    - [Using `Np.corrcoef(actual, predicted)`](#using-npcorrcoefactual-predicted)
+    - [Custom](#custom)
 
 ```python
 """
@@ -107,6 +112,8 @@ for i in range(50):
 
 ## Prepare Data
 
+### Load Data
+
 
 ```python
 data = pd.read_csv("weight-height.csv")
@@ -117,19 +124,6 @@ data.head()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -203,7 +197,7 @@ plt.show()
 
 
 
-![svg](README_files/README_11_0.svg)
+![svg](README_files/README_12_0.svg)
 
 
 
@@ -280,7 +274,7 @@ plt.show()
 
 
 
-![svg](README_files/README_17_0.svg)
+![svg](README_files/README_18_0.svg)
 
 
 
@@ -337,23 +331,29 @@ def GradientDescent(X,Y,max_step=100,learning_rate=0.1):
 
 	theta = np.zeros((2,))
 	cost_error = []
+	# for ploting
+	theta_list = []
 	for i in range(max_step):
 		# compute the gradient
 		grad = gradient(X,Y,theta)
 		# also error
-		e = costError(X,Y,theta)
-		cost_error.append(e)
+		e = costError(X, Y, theta)
+
 		# update theta
 		theta[0] = theta[0] - learning_rate * grad[0]
 		theta[1] = theta[1] - learning_rate * grad[1]
 
-	return theta, cost_error
+		cost_error.append(e)
+		theta_list.append((theta[0],theta[1]))
+
+
+	return theta, cost_error, theta_list
 
 ```
 
 
 ```python
-theta, cost_error = GradientDescent(X_train, y_train)
+theta, cost_error, theta_list = GradientDescent(X_train, y_train)
 
 ```
 
@@ -365,7 +365,7 @@ theta
 
 
 
-    array([161.49121284,  29.67841874])
+    array([161.52807238,  29.66001707])
 
 
 
@@ -377,13 +377,13 @@ plt.plot(cost_error)
 
 
 
-    [<matplotlib.lines.Line2D at 0x1a74de407c0>]
+    [<matplotlib.lines.Line2D at 0x1a703a2fd30>]
 
 
 
 
 
-![svg](README_files/README_24_1.svg)
+![svg](README_files/README_25_1.svg)
 
 
 
@@ -447,6 +447,109 @@ plt.plot(X_test, Y_pred, 'r')
 
 
 
-![svg](README_files/README_30_1.svg)
+![svg](README_files/README_31_1.svg)
 
 
+
+## R-Score
+
+Watch Out Dimension of the Data
+
+
+```python
+y_test, Y_pred
+```
+
+
+
+
+    (array([151.44973742, 173.70750424, 186.50354996, ..., 170.27624778,
+            210.20447889, 158.90043432]),
+     array([[150.79410844],
+            [167.23908258],
+            [173.1744441 ],
+            ...,
+            [173.97877262],
+            [200.68862213],
+            [146.78664404]]))
+
+
+
+
+```python
+Y_pred[:,0]
+
+```
+
+
+
+
+    array([150.79410844, 167.23908258, 173.1744441 , ..., 173.97877262,
+           200.68862213, 146.78664404])
+
+
+
+### Using `sklearn`
+
+
+```python
+from sklearn.metrics import r2_score
+r2_score(y_test, Y_pred[:, 0])
+r2_score(y_test, Y_pred)*100
+# Both way is possible
+```
+
+
+
+
+    85.15479340383303
+
+
+
+### Using `Np.corrcoef(actual, predicted)`
+
+
+```python
+# corr_matrix = np.corrcoef(y_test, Y_pred) #not working
+corr_matrix = np.corrcoef(y_test, Y_pred[:, 0])
+corr = corr_matrix[0, 1]
+R_sq = corr**2
+R_sq*100
+
+```
+
+
+
+
+    85.15944115733068
+
+
+
+### Custom
+
+
+```python
+def r2_score_1(Y,Y_):
+	# instead of loop, np.sum() is recommended as it is fast
+	num = ((Y-Y_)**2).sum()
+	# or num = np.sum((Y-Y_)**2)
+	denom = ((Y - Y.mean())**2).sum()
+	score = (1 - num/denom)
+	return score*100
+
+```
+
+
+```python
+v = r2_score_1(y_test, Y_pred[:, 0])
+print(v)
+v = r2_score_1(y_test, Y_pred)
+print(v)
+
+```
+
+    85.15479340383303
+    -462167.7956591363
+
+
+Watch Out Dimension of the Data
