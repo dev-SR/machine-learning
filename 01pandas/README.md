@@ -32,15 +32,17 @@
     - [`unique` and `nunique`](#unique-and-nunique)
     - [`value_counts()`](#value_counts)
     - [Maps](#maps)
-  - [Modifying, Adding, Removing, Renaming and Combining Row/Columns](#modifying-adding-removing-renaming-and-combining-rowcolumns)
+  - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
     - [Adding Column](#adding-column)
         - [direct assignment](#direct-assignment)
         - [`insert(position,column,value)`](#insertpositioncolumnvalue)
         - [`assign()`: Assigning new columns](#assign-assigning-new-columns)
     - [Adding Row](#adding-row)
     - [Removing Rows/Columns](#removing-rowscolumns)
-    - [Renaming](#renaming)
-    - [Combining](#combining)
+    - [Renaming Columns](#renaming-columns)
+    - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
+      - [Using `pd.sample()`](#using-pdsample)
+      - [Using `sklearn.utils.shuffle()`](#using-sklearnutilsshuffle)
   - [Data Types and Missing Values](#data-types-and-missing-values)
     - [`dtypes`, `astype()`](#dtypes-astype)
     - [Missing data](#missing-data)
@@ -57,6 +59,8 @@
     - [Sorting](#sorting)
     - [More example:](#more-example)
   - [Handling String Data - Converting Reality to Numbers](#handling-string-data---converting-reality-to-numbers)
+    - [Method 1:](#method-1)
+    - [Handling Multiple Items with Pandas.factorize()](#handling-multiple-items-with-pandasfactorize)
 
 ## Introduction
 
@@ -1037,19 +1041,7 @@ people[["birthyear", "hobby"]]
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
 
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1270,19 +1262,7 @@ d3
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
 
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2887,19 +2867,7 @@ people.query("age > 30 and pets == 0")
 
 
 <div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
 
-    .dataframe thead th {
-        text-align: left;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3831,7 +3799,7 @@ star_ratings
 
 
 
-## Modifying, Adding, Removing, Renaming and Combining Row/Columns
+## Edit Whole Row/Columns
 
 ###  Adding Column
 
@@ -5285,9 +5253,460 @@ df.drop(df.index[[0,2]])
 
 
 
-### Renaming
 
-### Combining
+
+### Renaming Columns
+
+
+```python
+data = pd.read_csv('spam.csv')
+data.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+      <th>Unnamed: 2</th>
+      <th>Unnamed: 3</th>
+      <th>Unnamed: 4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+data.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], inplace=True)
+```
+
+
+```python
+data.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+data.rename(columns={'v1': 'label', 'v2': 'messages'}, inplace=True)
+```
+
+
+```python
+data.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>label</th>
+      <th>messages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### 👉Shuffle a DataFrame rows
+
+#### Using `pd.sample()`
+
+The first option you have for shuffling pandas DataFrames is the `panads.DataFrame.sample` method that **returns a random sample of items**. In this method you can specify either the exact number or the fraction of records that you wish to sample. Since we want to shuffle the whole DataFrame, we are going to use `frac=1 `so that all records are returned.
+
+
+
+```python
+original = pd.DataFrame({
+    'colA': [10, 20, 30, 40, 50],
+    'colB': ['a', 'b', 'c', 'd', 'e'],
+    'colC': [True, False, False, True, False],
+    'colD': [0.5, 1.2, 2.4, 3.3, 5.5],
+})
+original
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+a = original.sample(frac=1)
+a
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+b = original.sample(frac=1, random_state=42).reset_index(drop=True)
+b
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+- `frac=1` means all rows of a dataframe
+- `random_state=42` means keeping same order in each execution
+- `reset_index(drop=True)` means reinitialize index for randomized dataframe
+
+#### Using `sklearn.utils.shuffle()`
+
+
+```python
+from sklearn.utils import shuffle
+c = shuffle(original, random_state=42)
+c
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 ## Data Types and Missing Values
@@ -6376,6 +6795,7 @@ my_df_loaded_index_false.head()
 - Loading from file saved without `index=False`, without `Unnamed: 0` column
 
 The `pd.read_csv()` function is well-endowed, with over 30 optional parameters you can specify. For example, you can see in this dataset that the CSV file has a built-in index, which pandas did not pick up on automatically. To make pandas use that column for the index (instead of creating a new one from scratch), we can specify an `index_col`.
+
 
 
 ```python
@@ -8093,10 +8513,15 @@ country_variety_counts
 
 ## Handling String Data - Converting Reality to Numbers
 
+Sometimes we need to convert string values in a pandas dataframe to a unique integer so that the algorithms can perform better. So we assign unique numeric value to a string value in Pandas DataFrame.
+
+
+
+### Method 1:
+
 
 ```python
 people_dict = {
-	# panda series from a list of A to D
 	"name":pd.Series(['A','B','C','D']),
 	"gender":pd.Series(['Female','Male','Female','Female'])
 }
@@ -8194,6 +8619,155 @@ people
       <th>3</th>
       <td>D</td>
       <td>Female</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Handling Multiple Items with Pandas.factorize()
+
+`pandas.factorize()` method helps to get the numeric representation of an array by identifying distinct values. It returns a tuple of two arrays, the first containing **numeric representation of the values in the original array** and the second containing **unique values**.
+
+**Parameters**:
+- `values` : 1D sequence.
+- `sort` : [bool, Default is False] Sort uniques and shuffle labels.
+- `na_sentinel` : [ int, default -1] Missing Values to mark ‘not found’.
+
+**Return**: Numeric representation of array
+
+
+```python
+arr= ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
+labels, uniques = pd.factorize(arr)
+
+print("Original Array:\n",arr )
+print("Numeric Representation : \n", labels)
+print("Unique Values : \n", uniques)
+
+```
+
+    Original Array:
+     ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
+    Numeric Representation :
+     [0 1 1 2 3 2 3 0]
+    Unique Values :
+     ['b' 'd' 'c' 'a']
+
+
+
+```python
+arr= ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
+labels, uniques = pd.factorize(arr,sort=True)
+
+print("Original Array:\n",arr )
+print("Numeric Representation : \n", labels)
+print("Unique Values : \n", uniques)
+
+```
+
+    Original Array:
+     ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
+    Numeric Representation :
+     [1 3 3 2 0 2 0 1]
+    Unique Values :
+     ['a' 'b' 'c' 'd']
+
+
+
+```python
+values = {
+	"class":pd.Series(['A','B','C','D','A','A','C','B']),
+}
+data = pd.DataFrame(values)
+```
+
+
+```python
+q =data["class"].unique()
+q
+```
+
+
+
+
+    array(['A', 'B', 'C', 'D'], dtype=object)
+
+
+
+
+```python
+data["class"].factorize()
+```
+
+
+
+
+    (array([0, 1, 2, 3, 0, 0, 2, 1], dtype=int64),
+     Index(['A', 'B', 'C', 'D'], dtype='object'))
+
+
+
+
+```python
+data["Y"] = data["class"].factorize()[0]
+data
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>class</th>
+      <th>Y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>D</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>A</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>A</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>C</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
       <td>1</td>
     </tr>
   </tbody>
