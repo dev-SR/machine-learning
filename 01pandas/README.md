@@ -9037,7 +9037,7 @@ Over your learning curve in AI and Machine Learning, one thing you would notice 
 There are many ways to convert categorical values into numerical values. Each approach has its own trade-offs and impact on the feature set. Hereby, I would focus on 2 main methods:` One-Hot-Encoding` and `Label-Encoder`.
 
 <div align="center">
-<img src="img/encoding.jpg" alt="encoding.jpg" width="800px">
+<img src="img/len.jpg" alt="encoding.jpg" width="800px">
 </div>
 
 
