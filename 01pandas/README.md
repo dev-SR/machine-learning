@@ -39,6 +39,8 @@
         - [`assign()`: Assigning new columns](#assign-assigning-new-columns)
     - [Adding Row](#adding-row)
     - [Removing Rows/Columns](#removing-rowscolumns)
+      - [`drop()`](#drop)
+      - [Conditional Drop](#conditional-drop)
     - [Renaming Columns](#renaming-columns)
     - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
       - [Using `pd.sample()`](#using-pdsample)
@@ -80,7 +82,6 @@ jupyter nbconvert --to markdown pandas.ipynb --output README.md
  """
 import pandas as pd
 import numpy as np
-
 ```
 
 ## `Series` objects
@@ -4778,6 +4779,8 @@ df.tail()
 
 ### Removing Rows/Columns
 
+#### `drop()`
+
 - `drop` method:
   - `drop(columns,axis=1)`
   - `drop(index,axis=0)`
@@ -5086,6 +5089,8 @@ df
 
 
 
+`drop` creates a new copy for you with the required changes. To modify the original Dataframe use `inplace=True` options.
+
 
 ```python
 df.drop(columns=['e', 'f', 'a-b'], inplace=True)  # original df is modified
@@ -5252,6 +5257,253 @@ df.drop(df.index[[0,2]])
 </div>
 
 
+
+#### Conditional Drop
+
+
+```python
+df = pd.read_csv("spam_small.csv")
+df.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+      <th>Unnamed: 2</th>
+      <th>Unnamed: 3</th>
+      <th>Unnamed: 4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df = df.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'])
+df.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df['len'] = df['v2'].apply(len)
+df.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+      <th>len</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+      <td>111</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+      <td>29</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+      <td>155</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+      <td>61</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df[df["len"] <100].index
+```
+
+
+
+
+    Int64Index([1, 3, 4, 6], dtype='int64')
+
+
+
+
+```python
+# df = df.drop(index=df[df["len"] <100].index)
+df = df.drop(df[df["len"] <100].index)
+df.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+      <th>len</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+      <td>111</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+      <td>155</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>spam</td>
+      <td>FreeMsg Hey there darling it's been 3 week's n...</td>
+      <td>147</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>ham</td>
+      <td>As per your request 'Melle Melle (Oru Minnamin...</td>
+      <td>160</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>spam</td>
+      <td>WINNER!! As a valued network customer you have...</td>
+      <td>157</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
