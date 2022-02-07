@@ -38,6 +38,9 @@
         - [`insert(position,column,value)`](#insertpositioncolumnvalue)
         - [`assign()`: Assigning new columns](#assign-assigning-new-columns)
     - [Adding Row](#adding-row)
+    - [Combine Dataframes](#combine-dataframes)
+        - [`concat()`](#concat)
+      - [`join()`](#join)
     - [Removing Rows/Columns](#removing-rowscolumns)
       - [`drop()`](#drop)
       - [Conditional Drop](#conditional-drop)
@@ -60,9 +63,17 @@
     - [Groupwise analysis](#groupwise-analysis)
     - [Sorting](#sorting)
     - [More example:](#more-example)
-  - [Handling String Data - Converting Reality to Numbers](#handling-string-data---converting-reality-to-numbers)
-    - [Method 1:](#method-1)
-    - [Handling Multiple Items with Pandas.factorize()](#handling-multiple-items-with-pandasfactorize)
+  - [Categorical encoding](#categorical-encoding)
+    - [Introduction](#introduction-1)
+    - [Label Encoding](#label-encoding)
+      - [Custom Map Function](#custom-map-function)
+      - [Using Pandas.factorize()](#using-pandasfactorize)
+        - [Reverse the process - Decoding](#reverse-the-process---decoding)
+      - [Using  🌟`sklearn.LabelEncoder()`🌟](#using--sklearnlabelencoder)
+        - [Decoding](#decoding)
+    - [One-Hot-Encoding](#one-hot-encoding)
+        - [Using `Pandas.get_dummies()`](#using-pandasget_dummies)
+      - [Using 🌟`sklearn.OneHotEncoder()`🌟](#using-sklearnonehotencoder)
 
 ## Introduction
 
@@ -4109,7 +4120,6 @@ find_Bob_in_b
 df.loc[find_Bob_in_b,'b'] = 'FOUND'
 # Not df.loc[find_Bob_in_b] = 'FOUND' => it will replace all Row
 df
-
 ```
 
 
@@ -4770,6 +4780,259 @@ df.tail()
       <td>2</td>
       <td>3</td>
       <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Combine Dataframes
+
+[https://www.datacamp.com/community/tutorials/joining-dataframes-pandas](https://www.datacamp.com/community/tutorials/joining-dataframes-pandas)
+
+##### `concat()`
+
+
+```python
+df1 = pd.DataFrame({'id': ['A01', 'A02', 'A03', 'A04'],
+                    'Name': ['ABC', 'PQR', 'DEF', 'GHI']})
+df2 = pd.DataFrame({'id': ['B05', 'B06', 'B07', 'B08'],
+                    'Name': ['XYZ', 'TUV', 'MNO', 'JKL']})
+frames = [df1, df2]
+pd.concat(frames)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A01</td>
+      <td>ABC</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A02</td>
+      <td>PQR</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A03</td>
+      <td>DEF</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A04</td>
+      <td>GHI</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>B05</td>
+      <td>XYZ</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B06</td>
+      <td>TUV</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>B07</td>
+      <td>MNO</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>B08</td>
+      <td>JKL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.concat(frames,ignore_index = True)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A01</td>
+      <td>ABC</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A02</td>
+      <td>PQR</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A03</td>
+      <td>DEF</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A04</td>
+      <td>GHI</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B05</td>
+      <td>XYZ</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B06</td>
+      <td>TUV</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>B07</td>
+      <td>MNO</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B08</td>
+      <td>JKL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+result = pd.concat(frames,axis=1)
+result
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>Name</th>
+      <th>id</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A01</td>
+      <td>ABC</td>
+      <td>B05</td>
+      <td>XYZ</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A02</td>
+      <td>PQR</td>
+      <td>B06</td>
+      <td>TUV</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A03</td>
+      <td>DEF</td>
+      <td>B07</td>
+      <td>MNO</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A04</td>
+      <td>GHI</td>
+      <td>B08</td>
+      <td>JKL</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+#### `join()`
+
+
+```python
+data1 = {
+    "name": ["Sally", "Mary", "John"],
+    "age": [50, 40, 30]
+}
+data2 = {
+    "qualified": [True, False, False]
+}
+df1 = pd.DataFrame(data1)
+df2 = pd.DataFrame(data2)
+df1.join(df2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>age</th>
+      <th>qualified</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sally</td>
+      <td>50</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Mary</td>
+      <td>40</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>John</td>
+      <td>30</td>
+      <td>False</td>
     </tr>
   </tbody>
 </table>
@@ -8763,19 +9026,31 @@ country_variety_counts
 
 
 
-## Handling String Data - Converting Reality to Numbers
+## Categorical encoding
 
-Sometimes we need to convert string values in a pandas dataframe to a unique integer so that the algorithms can perform better. So we assign unique numeric value to a string value in Pandas DataFrame.
+### Introduction
+
+In many Machine-learning or Data Science activities, the**data set might contain text or categorical values** (basically non-numerical values). For example, color feature having values like red, orange, blue, white etc. Meal plan having values like breakfast, lunch, snacks, dinner, tea etc. Few algorithms such as CATBOAST, decision-trees can handle categorical values very well but **most of the algorithms expect numerical values** to achieve state-of-the-art results.
+
+Over your learning curve in AI and Machine Learning, one thing you would notice that **most of the algorithms work better with numerical inputs**. *Therefore, the main challenge faced by an analyst is to convert text/categorical data into numerical data and still make an algorithm/model to make sense out of it*. **Neural networks, which is a base of deep-learning, expects input values to be numerical.**
+
+There are many ways to convert categorical values into numerical values. Each approach has its own trade-offs and impact on the feature set. Hereby, I would focus on 2 main methods:` One-Hot-Encoding` and `Label-Encoder`.
+
+<div align="center">
+<img src="img/encoding.jpg" alt="encoding.jpg" width="800px">
+</div>
 
 
+[More](https://towardsdatascience.com/categorical-encoding-using-label-encoding-and-one-hot-encoder-911ef77fb5bd)
 
-### Method 1:
+### Label Encoding
+
+#### Custom Map Function
 
 
 ```python
 people_dict = {
-	"name":pd.Series(['A','B','C','D']),
-	"gender":pd.Series(['Female','Male','Female','Female'])
+	"gender":pd.Series(['Female','Male','Female','Female',"Other"])
 }
 people = pd.DataFrame(people_dict)
 people
@@ -8790,30 +9065,29 @@ people
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>name</th>
       <th>gender</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>A</td>
       <td>Female</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>B</td>
       <td>Male</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>C</td>
       <td>Female</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>D</td>
       <td>Female</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Other</td>
     </tr>
   </tbody>
 </table>
@@ -8826,11 +9100,12 @@ people
 def f(g):
 	if g == 'Male':
 		return 0
-	else:
+	elif g == "Female":
 		return 1
+	else:
+		return 2
 
-
-people['sex'] = people.gender.apply(f)
+people['label'] = people.gender.apply(f)
 people
 ```
 
@@ -8843,35 +9118,35 @@ people
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>name</th>
       <th>gender</th>
-      <th>sex</th>
+      <th>label</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>A</td>
       <td>Female</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>B</td>
       <td>Male</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>C</td>
       <td>Female</td>
       <td>1</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>D</td>
       <td>Female</td>
       <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Other</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
@@ -8879,7 +9154,7 @@ people
 
 
 
-### Handling Multiple Items with Pandas.factorize()
+#### Using Pandas.factorize()
 
 `pandas.factorize()` method helps to get the numeric representation of an array by identifying distinct values. It returns a tuple of two arrays, the first containing **numeric representation of the values in the original array** and the second containing **unique values**.
 
@@ -8964,7 +9239,8 @@ data["class"].factorize()
 
 
 ```python
-data["Y"] = data["class"].factorize()[0]
+Y,label = data["class"].factorize()
+data["Y"] = Y
 data
 ```
 
@@ -9021,6 +9297,499 @@ data
       <th>7</th>
       <td>B</td>
       <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+##### Reverse the process - Decoding
+
+Sometimes, you might want to convert the numeric representation back to the original values. For example, if the predicted class is 1, you might want to know what the original class was.
+
+
+```python
+Y,label = data["class"].factorize()
+Y,label
+```
+
+
+
+
+    (array([0, 1, 2, 3, 0, 0, 2, 1], dtype=int64),
+     Index(['A', 'B', 'C', 'D'], dtype='object'))
+
+
+
+
+```python
+predicted_class = 1
+```
+
+
+```python
+label[predicted_class]
+```
+
+
+
+
+    'B'
+
+
+
+#### Using  🌟`sklearn.LabelEncoder()`🌟
+
+
+
+```python
+from sklearn.preprocessing import LabelEncoder
+# creating initial dataframe
+gender_types = ['male','female','other']
+gender_df = pd.DataFrame(gender_types, columns=['gender'])
+gender_df
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>other</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# creating instance of labelencoder
+labelencoder = LabelEncoder()
+```
+
+
+```python
+# Assigning numerical values and storing in another column
+gender_df['label'] = labelencoder.fit_transform( gender_df['gender'])
+gender_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>other</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+##### Decoding
+
+
+```python
+labelencoder.inverse_transform([0])
+```
+
+
+
+
+    array(['female'], dtype=object)
+
+
+
+
+```python
+labelencoder.inverse_transform([0,0,1,1,1,2])
+```
+
+
+
+
+    array(['female', 'female', 'male', 'male', 'male', 'other'], dtype=object)
+
+
+
+### One-Hot-Encoding
+
+Though label encoding is straight but it has the disadvantage that the numeric values can be misinterpreted by algorithms as having some sort of hierarchy/order in them. This ordering issue is addressed in another common alternative approach called ‘One-Hot Encoding’. In this strategy, each category value is converted into a new column and assigned a 1 or 0 (notation for true/false) value to the column.
+
+##### Using `Pandas.get_dummies()`
+
+
+```python
+gender_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>other</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.get_dummies(gender_df.gender)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>female</th>
+      <th>male</th>
+      <th>other</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.get_dummies(gender_df.gender,prefix='Sex')
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Sex_female</th>
+      <th>Sex_male</th>
+      <th>Sex_other</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Attaching to the DataFrame:
+
+
+```python
+dummies = pd.get_dummies(gender_df.gender,prefix='Sex')
+gender_df = pd.concat([gender_df, dummies], axis=1)
+gender_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>label</th>
+      <th>Sex_female</th>
+      <th>Sex_male</th>
+      <th>Sex_other</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>other</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Multiple Columns can be transform at a time : i.e df = pd.get_dummies(df, columns=['Sex', 'Embarked'])
+
+
+[More](https://towardsdatascience.com/what-is-one-hot-encoding-and-how-to-use-pandas-get-dummies-function-922eb9bd4970)
+
+#### Using 🌟`sklearn.OneHotEncoder()`🌟
+
+
+```python
+gender_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>other</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+from sklearn.preprocessing import OneHotEncoder
+# creating instance of one-hot-encoder
+enc = OneHotEncoder(handle_unknown='ignore')
+# passing bridge-types-cat column (label encoded values of bridge_types)
+enc_df = pd.DataFrame(enc.fit_transform(gender_df[['label']]).toarray())
+enc_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# merge with main df gender_df on key values
+gender_df = gender_df.join(enc_df)
+gender_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>label</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>1</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>other</td>
+      <td>2</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
     </tr>
   </tbody>
 </table>
