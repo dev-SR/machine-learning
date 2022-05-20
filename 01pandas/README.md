@@ -46,7 +46,7 @@
       - [Using `pd.sample()`](#using-pdsample)
       - [Using `sklearn.utils.shuffle()`](#using-sklearnutilsshuffle)
   - [Indexing](#indexing-1)
-    - [🚀Extracting Columns - Native accessors: `df[col]`, `df[[col1,col2,..]]`](#extracting-columns---native-accessors-dfcol-dfcol1col2)
+    - [🚀Extracting Columns `df[col]`, `df[[col1,col2,..]]` + `.values` property](#extracting-columns-dfcol-dfcol1col2--values-property)
     - [🚀Index-based selection - `iloc[row_indexer,col_indexer]`](#index-based-selection---ilocrow_indexercol_indexer)
     - [🚀Label-based selection - `loc[row_indexer,col_indexer]`](#label-based-selection---locrow_indexercol_indexer)
       - [Choosing between loc and iloc](#choosing-between-loc-and-iloc)
@@ -92,7 +92,6 @@
     - [One-Hot-Encoding](#one-hot-encoding)
         - [Using `Pandas.get_dummies()`](#using-pandasget_dummies)
       - [Using 🌟`sklearn.OneHotEncoder()`🌟](#using-sklearnonehotencoder)
-
 
 ## Introduction
 
@@ -3733,7 +3732,7 @@ c
 
 ## Indexing
 
-### 🚀Extracting Columns - Native accessors: `df[col]`, `df[[col1,col2,..]]`
+### 🚀Extracting Columns `df[col]`, `df[[col1,col2,..]]` + `.values` property
 
 
 ```python
@@ -3867,6 +3866,20 @@ df['c'][0]
 
 
 
+use `.values` to get the values in a array
+
+
+```python
+df['c'].values
+```
+
+
+
+
+    array([74, 18, 46, 98, 88, 87])
+
+
+
 multiple columns can be extracted at once:
 
 
@@ -3930,6 +3943,24 @@ df[['b','c','a']]
   </tbody>
 </table>
 </div>
+
+
+
+
+```python
+df[['b', 'c', 'a']].values
+
+```
+
+
+
+
+    array([[25, 74, 19],
+           [39, 18, 99],
+           [50, 46, 10],
+           [64, 98, 21],
+           [82, 88, 43],
+           [64, 87, 61]])
 
 
 
