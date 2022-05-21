@@ -39,7 +39,8 @@
         - [`concat()`](#concat)
       - [`join()`](#join)
     - [Removing Rows/Columns](#removing-rowscolumns)
-      - [`drop()`](#drop)
+      - [`drop()` - column](#drop---column)
+      - [`drop()` - row](#drop---row)
       - [Conditional Drop](#conditional-drop)
     - [Renaming Columns](#renaming-columns)
     - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
@@ -2606,23 +2607,16 @@ df1.join(df2)
 
 ### Removing Rows/Columns
 
-#### `drop()`
-
-- `drop` method:
-  - `drop(columns,axis=1)`
-  - `drop(index,axis=0)`
-  - `drop(labels,axis=1)`
-  - `drop(labels,axis=0)`
--  `pop`
+#### `drop()` - column
 
 
 ```python
 arr = np.random.randint(10, 100, size=(4,8))
 df = pd.DataFrame(data=arr,columns=["a", "b", "c", "d", "e", "f", "g", "h"])
-df['a+b'] = df['a'] + df['b']
-df['a-b'] = df['a'] * df['b']
 df
 ```
+
+
 
 
 <div>
@@ -2639,66 +2633,57 @@ df
       <th>f</th>
       <th>g</th>
       <th>h</th>
-      <th>a+b</th>
-      <th>a-b</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>53</td>
-      <td>98</td>
-      <td>47</td>
-      <td>62</td>
-      <td>69</td>
-      <td>88</td>
-      <td>48</td>
-      <td>22</td>
-      <td>151</td>
-      <td>5194</td>
+      <td>11</td>
+      <td>51</td>
+      <td>81</td>
+      <td>84</td>
+      <td>63</td>
+      <td>65</td>
+      <td>36</td>
+      <td>18</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>58</td>
-      <td>11</td>
-      <td>46</td>
-      <td>71</td>
-      <td>46</td>
-      <td>26</td>
-      <td>61</td>
-      <td>49</td>
-      <td>69</td>
-      <td>638</td>
+      <td>56</td>
+      <td>16</td>
+      <td>48</td>
+      <td>10</td>
+      <td>15</td>
+      <td>52</td>
+      <td>63</td>
+      <td>81</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>64</td>
-      <td>76</td>
-      <td>38</td>
-      <td>56</td>
-      <td>67</td>
+      <td>25</td>
+      <td>27</td>
+      <td>99</td>
+      <td>24</td>
+      <td>77</td>
       <td>94</td>
-      <td>182</td>
-      <td>8245</td>
+      <td>11</td>
+      <td>79</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>53</td>
-      <td>51</td>
-      <td>29</td>
-      <td>23</td>
-      <td>60</td>
-      <td>36</td>
-      <td>46</td>
+      <td>39</td>
+      <td>61</td>
+      <td>11</td>
+      <td>31</td>
+      <td>93</td>
+      <td>97</td>
       <td>28</td>
-      <td>104</td>
-      <td>2703</td>
+      <td>16</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 
@@ -2709,6 +2694,8 @@ df
 ```
 
 
+
+
 <div>
 
 <table border="1" class="dataframe">
@@ -2721,54 +2708,44 @@ df
       <th>f</th>
       <th>g</th>
       <th>h</th>
-      <th>a+b</th>
-      <th>a-b</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>53</td>
-      <td>98</td>
-      <td>69</td>
-      <td>88</td>
-      <td>48</td>
-      <td>22</td>
-      <td>151</td>
-      <td>5194</td>
+      <td>11</td>
+      <td>51</td>
+      <td>63</td>
+      <td>65</td>
+      <td>36</td>
+      <td>18</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>58</td>
-      <td>11</td>
-      <td>46</td>
-      <td>26</td>
-      <td>61</td>
-      <td>49</td>
-      <td>69</td>
-      <td>638</td>
+      <td>56</td>
+      <td>16</td>
+      <td>15</td>
+      <td>52</td>
+      <td>63</td>
+      <td>81</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>38</td>
-      <td>56</td>
-      <td>67</td>
+      <td>25</td>
+      <td>27</td>
+      <td>77</td>
       <td>94</td>
-      <td>182</td>
-      <td>8245</td>
+      <td>11</td>
+      <td>79</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>53</td>
-      <td>51</td>
-      <td>60</td>
-      <td>36</td>
-      <td>46</td>
+      <td>39</td>
+      <td>61</td>
+      <td>93</td>
+      <td>97</td>
       <td>28</td>
-      <td>104</td>
-      <td>2703</td>
+      <td>16</td>
     </tr>
   </tbody>
 </table>
@@ -2776,9 +2753,12 @@ df
 
 
 
+
 ```python
-df.drop(columns=['e','f','a-b']) # removes columns e, f, a-b
+df.drop(columns=['e','f']) # removes columns e, f
 ```
+
+
 
 
 <div>
@@ -2791,45 +2771,41 @@ df.drop(columns=['e','f','a-b']) # removes columns e, f, a-b
       <th>b</th>
       <th>g</th>
       <th>h</th>
-      <th>a+b</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>53</td>
-      <td>98</td>
-      <td>48</td>
-      <td>22</td>
-      <td>151</td>
+      <td>11</td>
+      <td>51</td>
+      <td>36</td>
+      <td>18</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>58</td>
-      <td>11</td>
-      <td>61</td>
-      <td>49</td>
-      <td>69</td>
+      <td>56</td>
+      <td>16</td>
+      <td>63</td>
+      <td>81</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>67</td>
-      <td>94</td>
-      <td>182</td>
+      <td>25</td>
+      <td>27</td>
+      <td>11</td>
+      <td>79</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>53</td>
-      <td>51</td>
-      <td>46</td>
+      <td>39</td>
+      <td>61</td>
       <td>28</td>
-      <td>104</td>
+      <td>16</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 
@@ -2838,6 +2814,8 @@ df
 ```
 
 
+
+
 <div>
 
 <table border="1" class="dataframe">
@@ -2850,71 +2828,60 @@ df
       <th>f</th>
       <th>g</th>
       <th>h</th>
-      <th>a+b</th>
-      <th>a-b</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>53</td>
-      <td>98</td>
-      <td>69</td>
-      <td>88</td>
-      <td>48</td>
-      <td>22</td>
-      <td>151</td>
-      <td>5194</td>
+      <td>11</td>
+      <td>51</td>
+      <td>63</td>
+      <td>65</td>
+      <td>36</td>
+      <td>18</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>58</td>
-      <td>11</td>
-      <td>46</td>
-      <td>26</td>
-      <td>61</td>
-      <td>49</td>
-      <td>69</td>
-      <td>638</td>
+      <td>56</td>
+      <td>16</td>
+      <td>15</td>
+      <td>52</td>
+      <td>63</td>
+      <td>81</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>38</td>
-      <td>56</td>
-      <td>67</td>
+      <td>25</td>
+      <td>27</td>
+      <td>77</td>
       <td>94</td>
-      <td>182</td>
-      <td>8245</td>
+      <td>11</td>
+      <td>79</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>53</td>
-      <td>51</td>
-      <td>60</td>
-      <td>36</td>
-      <td>46</td>
+      <td>39</td>
+      <td>61</td>
+      <td>93</td>
+      <td>97</td>
       <td>28</td>
-      <td>104</td>
-      <td>2703</td>
+      <td>16</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 `drop` creates a new copy for you with the required changes. To modify the original Dataframe use `inplace=True` options.
 
 
 ```python
-df.drop(columns=['e', 'f', 'a-b'], inplace=True)  # original df is modified
-```
-
-
-```python
+df.drop(columns=['e', 'f'], inplace=True)  # original df is modified
 df
 ```
+
+
 
 
 <div>
@@ -2927,41 +2894,36 @@ df
       <th>b</th>
       <th>g</th>
       <th>h</th>
-      <th>a+b</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>53</td>
-      <td>98</td>
-      <td>48</td>
-      <td>22</td>
-      <td>151</td>
+      <td>11</td>
+      <td>51</td>
+      <td>36</td>
+      <td>18</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>58</td>
-      <td>11</td>
-      <td>61</td>
-      <td>49</td>
-      <td>69</td>
+      <td>56</td>
+      <td>16</td>
+      <td>63</td>
+      <td>81</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>67</td>
-      <td>94</td>
-      <td>182</td>
+      <td>25</td>
+      <td>27</td>
+      <td>11</td>
+      <td>79</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>53</td>
-      <td>51</td>
-      <td>46</td>
+      <td>39</td>
+      <td>61</td>
       <td>28</td>
-      <td>104</td>
+      <td>16</td>
     </tr>
   </tbody>
 </table>
@@ -2969,10 +2931,20 @@ df
 
 
 
+#### `drop()` - row
+
+
 ```python
-df.drop(1,inplace=True) # removes row 1
-df
+data = {'Name': ['Tom', 'nick', 'jhon', 'jack', 'jane', 'jill', 'joe'],
+        'Age': [20, 21, 19, 18, 19, 20, 18]}
+
+df = pd.DataFrame(data)
+
+df.head()
+
 ```
+
+
 
 
 <div>
@@ -2981,41 +2953,96 @@ df
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>g</th>
-      <th>h</th>
-      <th>a+b</th>
+      <th>Name</th>
+      <th>Age</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>53</td>
-      <td>98</td>
-      <td>48</td>
-      <td>22</td>
-      <td>151</td>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>nick</td>
+      <td>21</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>67</td>
-      <td>94</td>
-      <td>182</td>
+      <td>jhon</td>
+      <td>19</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>53</td>
-      <td>51</td>
-      <td>46</td>
-      <td>28</td>
-      <td>104</td>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
     </tr>
   </tbody>
 </table>
 </div>
+
+
+
+
+```python
+df.drop(index=1,inplace=True) # removes row 1
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>joe</td>
+      <td>18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 
@@ -3024,12 +3051,25 @@ df.index
 ```
 
 
-    Int64Index([0, 2, 3], dtype='int64')
+
+
+    Int64Index([0, 2, 3, 4, 5, 6], dtype='int64')
+
 
 
 
 ```python
-df.drop(df.index[[0,2]])
+# drop df['Age'] == 18
+# 1st way: filter
+filteredDf = df[df['Age'] != 18]
+display(filteredDf)
+
+# or 2nd way: find index
+
+idx = df[df['Age'] == 18].index
+print(idx)
+df.drop(index=idx,inplace=True)
+display(df)
 
 ```
 
@@ -3040,21 +3080,70 @@ df.drop(df.index[[0,2]])
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>g</th>
-      <th>h</th>
-      <th>a+b</th>
+      <th>Name</th>
+      <th>Age</th>
     </tr>
   </thead>
   <tbody>
     <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
       <th>2</th>
-      <td>85</td>
-      <td>97</td>
-      <td>67</td>
-      <td>94</td>
-      <td>182</td>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    Int64Index([3, 6], dtype='int64')
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
     </tr>
   </tbody>
 </table>
