@@ -9,7 +9,7 @@
     - [Indexing](#indexing)
       - [Slicing a `Series` also slices the index labels:](#slicing-a-series-also-slices-the-index-labels)
   - [`DataFrame` objects](#dataframe-objects)
-  - [Creating `DataFrame`; `DataFrame(data=,columns=[],index=[])`](#creating-dataframe-dataframedatacolumnsindex)
+  - [Creating `DataFrame`; `DataFrame(data=,columns=,index=)`](#creating-dataframe-dataframedatacolumnsindex)
     - [From Numpy Array](#from-numpy-array)
     - [🚀🚀 lists of lists](#-lists-of-lists)
     - [dict of narray/lists](#dict-of-narraylists)
@@ -17,10 +17,12 @@
     - [🚀using `zip()`; list of tuple](#using-zip-list-of-tuple)
     - [Dicts of series.](#dicts-of-series)
   - [Saving & loading files](#saving--loading-files)
-    - [Saving](#saving)
+    - [Saving: creating new file](#saving-creating-new-file)
+    - [Saving: Append to Existing File](#saving-append-to-existing-file)
     - [Loading](#loading)
-    - [Minimize the size of Large DataSet](#minimize-the-size-of-large-dataset)
-    - [Append DataFrame to Existing CSV File](#append-dataframe-to-existing-csv-file)
+    - [Minimize the size of Large DataSet; `nrows=n`](#minimize-the-size-of-large-dataset-nrowsn)
+  - [Converting to/from `DataFrame`](#converting-tofrom-dataframe)
+    - [to python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
   - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
     - [Adding Column](#adding-column)
         - [`d['new_col'] = list()`](#dnew_col--list)
@@ -41,7 +43,7 @@
     - [Removing Rows/Columns](#removing-rowscolumns)
       - [`drop()` - column](#drop---column)
       - [`drop()` - row](#drop---row)
-      - [Conditional Drop](#conditional-drop)
+        - [🔥Conditional Drop🔥](#conditional-drop)
     - [Renaming Columns](#renaming-columns)
     - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
       - [Using `pd.sample()`](#using-pdsample)
@@ -60,7 +62,8 @@
     - [`SELECT * FROM df WHERE condition1 SORT BY col1`](#select--from-df-where-condition1-sort-by-col1)
     - [Miscellaneous](#miscellaneous)
     - [`isin()` ; `SELECT * FROM df WHERE columnX IN (value1,value2,..)`](#isin--select--from-df-where-columnx-in-value1value2)
-      - [replacing](#replacing)
+    - ["NOT IN" - `df[~df['col_name'].isin(values_list)]`](#not-in---dfdfcol_nameisinvalues_list)
+      - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
     - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
     - [`isnull`](#isnull)
   - [Querying a `DataFrame`](#querying-a-dataframe)
@@ -109,7 +112,8 @@
 cd .\01pandas\
 jupyter nbconvert --to markdown pandas.ipynb --output README.md
 
- """
+
+"""
 import pandas as pd
 import numpy as np
 from IPython.display import display
@@ -418,7 +422,7 @@ A `DataFrame` is a table. It contains an array of individual entries, each of wh
 <img src="img/anatomy.png" alt="anatomy.jpg" width="1000px">
 </div>
 
-## Creating `DataFrame`; `DataFrame(data=,columns=[],index=[])`
+## Creating `DataFrame`; `DataFrame(data=,columns=,index=)`
 
 ### From Numpy Array
 
@@ -1056,7 +1060,9 @@ df.head()
 </div>
 
 
-### Saving
+### Saving: creating new file
+
+
 Let's save it to CSV, HTML and JSON:
 
 
@@ -1068,18 +1074,25 @@ df.to_json("my_df.json")
 
 ```
 
-### Loading
+### Saving: Append to Existing File
 
 
 ```python
-import os
-print(os.getcwd())
-print(os.listdir())
+data = {
+    'Name': [ 'Bob', 'Jessica', 'Mary'],
+    'Run': [50, 63, 15],
+    'Wicket': [0, 2, 3],
+    'Catch': [4, 2, 1]
+}
+
+# Make data frame of above data
+df = pd.DataFrame(data)
+
+# append data frame to CSV file
+df.to_csv('d.csv', mode='a', index=False, header=False)
 ```
 
-    d:\CSE\Others\ML-py\01pandas
-    ['img', 'iris.csv', 'my_df.csv', 'my_df.html', 'my_df.json', 'my_df_index_false.csv', 'pandas.ipynb', 'README.md']
-
+### Loading
 
 Now let's load our CSV file back into a `DataFrame`:
 
@@ -1204,7 +1217,6 @@ my_df_loaded_index_false.head()
 - Loading from file saved without `index=False`, without `Unnamed: 0` column
 
 The `pd.read_csv()` function is well-endowed, with over 30 optional parameters you can specify. For example, you can see in this dataset that the CSV file has a built-in index, which pandas did not pick up on automatically. To make pandas use that column for the index (instead of creating a new one from scratch), we can specify an `index_col`.
-
 
 
 ```python
@@ -1393,7 +1405,7 @@ us_cities
 </div>
 
 
-### Minimize the size of Large DataSet
+### Minimize the size of Large DataSet; `nrows=n`
 
 [wine-reviews-dataset](https://www.kaggle.com/zynicide/wine-reviews)
 
@@ -1475,15 +1487,22 @@ data.head(n=2)
 data.to_csv("winemag-data-130k-v2-mod.csv")
 ```
 
+## Converting to/from `DataFrame`
+
+### to python list of dicts: `to_dict()`
+
 
 ```python
+data = [
+	{'a': 1, 'b': 2, 'c': 3},
+	{'a': 10, 'b': 20, 'c': 30},
+	{'a': 100, 'b': None, 'c': 300}
+]
 
-new_data = pd.read_csv('winemag-data-130k-v2-mod.csv', index_col=0)
-print(f"Post Shape: {new_data.shape}")
-new_data.head(n=2)
+df = pd.DataFrame(data)
+df
 ```
 
-    Post Shape: (100, 13)
 
 
 
@@ -1493,78 +1512,83 @@ new_data.head(n=2)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>country</th>
-      <th>description</th>
-      <th>designation</th>
-      <th>points</th>
-      <th>price</th>
-      <th>province</th>
-      <th>region_1</th>
-      <th>region_2</th>
-      <th>taster_name</th>
-      <th>taster_twitter_handle</th>
-      <th>title</th>
-      <th>variety</th>
-      <th>winery</th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Italy</td>
-      <td>Aromas include tropical fruit, broom, brimston...</td>
-      <td>Vulkà Bianco</td>
-      <td>87</td>
-      <td>NaN</td>
-      <td>Sicily &amp; Sardinia</td>
-      <td>Etna</td>
-      <td>NaN</td>
-      <td>Kerin O’Keefe</td>
-      <td>@kerinokeefe</td>
-      <td>Nicosia 2013 Vulkà Bianco  (Etna)</td>
-      <td>White Blend</td>
-      <td>Nicosia</td>
+      <td>1</td>
+      <td>2.0</td>
+      <td>3</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Portugal</td>
-      <td>This is ripe and fruity, a wine that is smooth...</td>
-      <td>Avidagos</td>
-      <td>87</td>
-      <td>15.0</td>
-      <td>Douro</td>
+      <td>10</td>
+      <td>20.0</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>100</td>
       <td>NaN</td>
-      <td>NaN</td>
-      <td>Roger Voss</td>
-      <td>@vossroger</td>
-      <td>Quinta dos Avidagos 2011 Avidagos Red (Douro)</td>
-      <td>Portuguese Red</td>
-      <td>Quinta dos Avidagos</td>
+      <td>300</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-### Append DataFrame to Existing CSV File
 
 
 ```python
-data = {
-    'Name': [ 'Bob', 'Jessica', 'Mary'],
-    'Run': [50, 63, 15],
-    'Wicket': [0, 2, 3],
-    'Catch': [4, 2, 1]
-}
+df.to_dict()
+```
 
-# Make data frame of above data
-df = pd.DataFrame(data)
 
-# append data frame to CSV file
-df.to_csv('d.csv', mode='a', index=False, header=False)
 
+
+    {'a': {0: 1, 1: 10, 2: 100},
+     'b': {0: 2.0, 1: 20.0, 2: nan},
+     'c': {0: 3, 1: 30, 2: 300}}
+
+
+
+
+```python
+df.to_dict(orient='records')
+```
+
+
+
+
+    [{'a': 1, 'b': 2.0, 'c': 3},
+     {'a': 10, 'b': 20.0, 'c': 30},
+     {'a': 100, 'b': nan, 'c': 300}]
+
+
+
+Note: With `.to_dict()`, pandas converts `NaN` to `nan` in python dictionary ; How to check if `nan` in python?
+
+
+```python
+# using `pd.isna()`
+d = df.to_dict(orient='records')
+for i, v in enumerate(d):
+    if pd.isna(v['b']):
+        print(i)
 
 ```
+
+    2
+
+
+Pandas `dataframe.isna()` function is used to detect missing values. It return a boolean same-sized object indicating if the values are NA. NA values, such as None or numpy.NaN, gets mapped to True values. Everything else gets mapped to False values. Characters such as empty strings ” or numpy.inf are not considered NA values (unless you set pandas.options.mode.use_inf_as_na = True).
+
+- [with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to](https://stackoverflow.com/questions/72348490/with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to)
+- [https://www.geeksforgeeks.org/python-pandas-dataframe-isna/](https://www.geeksforgeeks.org/python-pandas-dataframe-isna/)
 
 ## Edit Whole Row/Columns
 
@@ -2440,7 +2464,6 @@ pd.concat(frames)
 
 ```python
 pd.concat(frames,ignore_index = True)
-
 ```
 
 
@@ -3047,30 +3070,110 @@ df
 
 
 ```python
-df.index
+df.drop(index=[2,4]) # removes row 2,4
 ```
 
 
 
 
-    Int64Index([0, 2, 3, 4, 5, 6], dtype='int64')
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>joe</td>
+      <td>18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+##### 🔥Conditional Drop🔥
+
+
+```python
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>joe</td>
+      <td>18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
 
 ```python
-# drop df['Age'] == 18
-# 1st way: filter
 filteredDf = df[df['Age'] != 18]
 display(filteredDf)
-
-# or 2nd way: find index
-
-idx = df[df['Age'] == 18].index
-print(idx)
-df.drop(index=idx,inplace=True)
-display(df)
-
 ```
 
 
@@ -3109,11 +3212,58 @@ display(df)
 </table>
 </div>
 
+
+
+```python
+filteredDf = df[~df.Age.isin([18,19])]
+display(filteredDf)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+idx = df.index[df['Age'] == 18]
+# idx = df.index[df['Age'] == 18].tolist()
+# idx = df[df['Age'] == 18].index
+# idx = df[df['Age'] == 18].index.values.tolist()
+print(idx)
+filteredDf = df.drop(index=idx)
+filteredDf
+
+```
 
     Int64Index([3, 6], dtype='int64')
 
 
 
+
+
 <div>
 
 <table border="1" class="dataframe">
@@ -3149,239 +3299,6 @@ display(df)
 </table>
 </div>
 
-
-#### Conditional Drop
-
-
-```python
-df = pd.read_csv("spam_small.csv")
-df.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>v1</th>
-      <th>v2</th>
-      <th>Unnamed: 2</th>
-      <th>Unnamed: 3</th>
-      <th>Unnamed: 4</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ham</td>
-      <td>Ok lar... Joking wif u oni...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ham</td>
-      <td>U dun say so early hor... U c already then say...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ham</td>
-      <td>Nah I don't think he goes to usf, he lives aro...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-df = df.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'])
-df.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>v1</th>
-      <th>v2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ham</td>
-      <td>Ok lar... Joking wif u oni...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ham</td>
-      <td>U dun say so early hor... U c already then say...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ham</td>
-      <td>Nah I don't think he goes to usf, he lives aro...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-df['len'] = df['v2'].apply(len)
-df.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>v1</th>
-      <th>v2</th>
-      <th>len</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-      <td>111</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ham</td>
-      <td>Ok lar... Joking wif u oni...</td>
-      <td>29</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-      <td>155</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ham</td>
-      <td>U dun say so early hor... U c already then say...</td>
-      <td>49</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ham</td>
-      <td>Nah I don't think he goes to usf, he lives aro...</td>
-      <td>61</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-df[df["len"] <100].index
-```
-
-
-    Int64Index([1, 3, 4, 6], dtype='int64')
-
-
-
-```python
-# df = df.drop(index=df[df["len"] <100].index)
-df = df.drop(df[df["len"] <100].index)
-df.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>v1</th>
-      <th>v2</th>
-      <th>len</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-      <td>111</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-      <td>155</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>spam</td>
-      <td>FreeMsg Hey there darling it's been 3 week's n...</td>
-      <td>147</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>ham</td>
-      <td>As per your request 'Melle Melle (Oru Minnamin...</td>
-      <td>160</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>spam</td>
-      <td>WINNER!! As a valued network customer you have...</td>
-      <td>157</td>
-    </tr>
-  </tbody>
-</table>
-</div>
 
 
 ### Renaming Columns
@@ -5385,18 +5302,29 @@ res.head(n=3)
 
 
 
-Create a DataFrame `top_oceania_wines` containing all reviews with at least `95 points` (out of 100) for wines from `Italy` or `France`.
+### "NOT IN" - `df[~df['col_name'].isin(values_list)]`
+
+- [https://www.statology.org/pandas-not-in/](https://www.statology.org/pandas-not-in/)
+- [https://www.geeksforgeeks.org/how-to-use-not-in-filter-in-pandas/](https://www.geeksforgeeks.org/how-to-use-not-in-filter-in-pandas/)
 
 
 ```python
-top_oceania_wines = reviews.loc[
-    (reviews.country.isin(['Italy', 'France']))
-    & (reviews.points >= 80)
-	,cols
-]
-top_oceania_wines.head(n=3)
+#create DataFrame
+df = pd.DataFrame({'star_team': ['A', 'A', 'B', 'B', 'B', 'B', 'C', 'C'],
+                   'backup_team': ['B', 'B', 'C', 'C', 'D', 'D', 'D', 'E'],
+                   'points': [25, 12, 15, 14, 19, 23, 25, 29],
+                   'assists': [5, 7, 7, 9, 12, 9, 9, 4],
+                   'rebounds': [11, 8, 10, 6, 6, 5, 9, 12]})
+
+#define list of teams we don't want
+values_list = ['A', 'B']
+
+#filter for rows where team name is not in list
+df[~df['star_team'].isin(values_list)]
 
 ```
+
+
 
 
 <div>
@@ -5405,38 +5333,104 @@ top_oceania_wines.head(n=3)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>country</th>
+      <th>star_team</th>
+      <th>backup_team</th>
       <th>points</th>
-      <th>taster_name</th>
+      <th>assists</th>
+      <th>rebounds</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>Italy</td>
-      <td>87</td>
-      <td>Kerin O’Keefe</td>
-    </tr>
-    <tr>
       <th>6</th>
-      <td>Italy</td>
-      <td>87</td>
-      <td>Kerin O’Keefe</td>
+      <td>C</td>
+      <td>D</td>
+      <td>25</td>
+      <td>9</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>France</td>
-      <td>87</td>
-      <td>Roger Voss</td>
+      <td>C</td>
+      <td>E</td>
+      <td>29</td>
+      <td>4</td>
+      <td>12</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-I'm an economical wine buyer. Which wine is the "best bargain"? Create a variable `bargain_wine` with the title of the wine with the highest points-to-price ratio in the dataset.
 
-#### replacing
+Example 2: Perform “NOT IN” Filter with Multiple Columns
+
+
+```python
+#define list of teams we don't want
+values_list = ['C', 'E']
+
+#filter for rows where team name is not in one of several columns
+df[~df[['star_team', 'backup_team']].isin(values_list).any(axis=1)]
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>star_team</th>
+      <th>backup_team</th>
+      <th>points</th>
+      <th>assists</th>
+      <th>rebounds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>B</td>
+      <td>25</td>
+      <td>5</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>B</td>
+      <td>12</td>
+      <td>7</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>D</td>
+      <td>19</td>
+      <td>12</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>D</td>
+      <td>23</td>
+      <td>9</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+#### 🔥🔥Replacing/Updating on condition
 
 DataFrame update can be done in the same statement of selection and filter with a slight change in syntax. You can update values in columns applying different conditions.
 
