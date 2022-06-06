@@ -43,8 +43,10 @@ import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
-from IPython import display
-display.set_matplotlib_formats('svg')
+# from IPython import display
+# display.set_matplotlib_formats('svg')
+from matplotlib_inline.backend_inline import set_matplotlib_formats
+set_matplotlib_formats('svg')
 # "background: #22272E;"
 
 ```
