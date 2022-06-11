@@ -44,6 +44,9 @@
       - [`drop()` - column](#drop---column)
       - [`drop()` - row](#drop---row)
         - [🔥Conditional Drop🔥](#conditional-drop)
+    - [Duplicate Rows](#duplicate-rows)
+      - [Find Duplicates](#find-duplicates)
+      - [Drop Duplicate Rows](#drop-duplicate-rows)
     - [Renaming Columns](#renaming-columns)
     - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
       - [Using `pd.sample()`](#using-pdsample)
@@ -63,7 +66,7 @@
     - [Miscellaneous](#miscellaneous)
     - [`isin()` ; `SELECT * FROM df WHERE columnX IN (value1,value2,..)`](#isin--select--from-df-where-columnx-in-value1value2)
     - ["NOT IN" - `df[~df['col_name'].isin(values_list)]`](#not-in---dfdfcol_nameisinvalues_list)
-      - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
+    - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
     - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
     - [`isnull`](#isnull)
   - [Querying a `DataFrame`](#querying-a-dataframe)
@@ -1758,14 +1761,13 @@ df
 
 
 
-##### `d['new_col'] = range(len(d))`
-
 
 ```python
-df['d'] = range(len(df))
+df['d'] = None
 df
-
 ```
+
+
 
 
 <div>
@@ -1778,7 +1780,65 @@ df
       <th>b</th>
       <th>c</th>
       <th>d</th>
-      <th>e</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+##### `d['new_col'] = range(len(d))`
+
+
+```python
+df['d'] = range(len(df))
+df
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
     </tr>
   </thead>
   <tbody>
@@ -1788,7 +1848,6 @@ df
       <td>Bob</td>
       <td>1</td>
       <td>0</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1796,7 +1855,6 @@ df
       <td>Alice</td>
       <td>2</td>
       <td>1</td>
-      <td>4</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1804,7 +1862,6 @@ df
       <td>Bob</td>
       <td>3</td>
       <td>2</td>
-      <td>6</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1812,11 +1869,68 @@ df
       <td>Alice</td>
       <td>4</td>
       <td>3</td>
-      <td>8</td>
     </tr>
   </tbody>
 </table>
 </div>
+
+
+
+
+```python
+df['d'] = [None]*len(df)
+df
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 ##### `d['new_col'] = d['col1'] + d['col2']` from existing columns
@@ -1917,7 +2031,7 @@ df
       <td>0</td>
       <td>Bob</td>
       <td>1</td>
-      <td>NaN</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1925,7 +2039,7 @@ df
       <td>1</td>
       <td>Alice</td>
       <td>2</td>
-      <td>NaN</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1933,7 +2047,7 @@ df
       <td>2</td>
       <td>Bob</td>
       <td>3</td>
-      <td>NaN</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1941,7 +2055,7 @@ df
       <td>3</td>
       <td>Alice</td>
       <td>4</td>
-      <td>NaN</td>
+      <td>None</td>
     </tr>
   </tbody>
 </table>
@@ -3294,6 +3408,353 @@ filteredDf
       <th>5</th>
       <td>jill</td>
       <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Duplicate Rows
+
+#### Find Duplicates
+
+You can use the `duplicated()` function to find duplicate values in a pandas DataFrame.
+
+
+```python
+#find duplicate rows across all columns
+duplicateRows = df[df.duplicated()]
+duplicateRows = df[df.duplicated(keep='last')]
+
+#find duplicate rows across specific columns
+duplicateRows = df[df.duplicated(['col1', 'col2'])]
+```
+
+
+```python
+#create DataFrame
+df = pd.DataFrame({'team': ['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B','C'],
+                   'points': [10, 10, 12, 12, 15, 17, 20, 20,11],
+                   'assists': [5, 5, 7, 9, 12, 9, 6, 6,4]})
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>12</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>17</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+#identify duplicate rows
+df[df.duplicated()]
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df[df.duplicated(['team', 'points'])]
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+#### Drop Duplicate Rows
+
+The easiest way to drop duplicate rows in a pandas DataFrame is by using the `drop_duplicates()` function, which uses the following syntax:
+
+
+```python
+df.drop_duplicates(subset=None, keep='first', inplace=False)
+```
+
+where:
+
+- `subset`: Which columns to consider for identifying duplicates. Default is all columns.
+- `keep`: Indicates which duplicates (if any) to keep.
+  - `first`: Delete all duplicate rows except first.
+  - `last`: Delete all duplicate rows except last.
+  - `False`: Delete all duplicates.
+- `inplace`: Indicates whether to drop duplicates in place or return a copy of the DataFrame.
+
+
+```python
+df.drop_duplicates(subset=['team'])
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.drop_duplicates(subset=['team'],keep='last')
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# However, we could use the keep=False argument to delete all duplicates entirely:
+df.drop_duplicates(keep=False)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>12</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>17</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
     </tr>
   </tbody>
 </table>
@@ -5430,7 +5891,7 @@ df[~df[['star_team', 'backup_team']].isin(values_list).any(axis=1)]
 
 
 
-#### 🔥🔥Replacing/Updating on condition
+### 🔥🔥Replacing/Updating on condition
 
 DataFrame update can be done in the same statement of selection and filter with a slight change in syntax. You can update values in columns applying different conditions.
 
