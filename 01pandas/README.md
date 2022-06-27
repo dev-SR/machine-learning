@@ -25,26 +25,28 @@
     - [to python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
   - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
     - [Adding Column](#adding-column)
-        - [`d['new_col'] = list()`](#dnew_col--list)
-        - [`d['new_col'] = constant`](#dnew_col--constant)
-        - [`d['new_col'] = range(len(d))`](#dnew_col--rangelend)
-        - [`d['new_col'] = d['col1'] + d['col2']` from existing columns](#dnew_col--dcol1--dcol2-from-existing-columns)
-        - [`insert(position,column,value)`](#insertpositioncolumnvalue)
-        - [`assign(new_col,value)`](#assignnew_colvalue)
+      - [`d['new_col'] = list()`](#dnew_col--list)
+      - [`d['new_col'] = constant`](#dnew_col--constant)
+      - [`d['new_col'] = range(len(d))`](#dnew_col--rangelend)
+      - [`d['new_col'] = d['col1'] + d['col2']` from existing columns](#dnew_col--dcol1--dcol2-from-existing-columns)
+      - [`insert(position,column,value)`](#insertpositioncolumnvalue)
+      - [`assign(new_col,value)`](#assignnew_colvalue)
+    - [Moving Columns Position](#moving-columns-position)
     - [Adding Row](#adding-row)
       - [`append()` dict](#append-dict)
       - [`append()` list](#append-list)
       - [`loc()` - dict](#loc---dict)
       - [`loc()` - list](#loc---list)
       - [`iloc[]` - list](#iloc---list)
-    - [Combine Dataframes](#combine-dataframes)
-        - [`concat()`](#concat)
+    - [Combine Pd Dataframes /Py dict to Pd Dataframe](#combine-pd-dataframes-py-dict-to-pd-dataframe)
+      - [`concat()`](#concat)
+      - [`append()`](#append)
       - [`join()`](#join)
     - [Removing Rows/Columns](#removing-rowscolumns)
       - [`drop()` - column](#drop---column)
       - [`drop()` - row](#drop---row)
         - [🔥Conditional Drop🔥](#conditional-drop)
-    - [Duplicate Rows](#duplicate-rows)
+    - [👫Duplicate Rows👫](#duplicate-rows)
       - [Find Duplicates](#find-duplicates)
       - [Drop Duplicate Rows](#drop-duplicate-rows)
     - [Renaming Columns](#renaming-columns)
@@ -1648,7 +1650,7 @@ df
 
 
 
-##### `d['new_col'] = list()`
+#### `d['new_col'] = list()`
 
 
 ```python
@@ -1703,7 +1705,7 @@ df
 
 
 
-##### `d['new_col'] = constant`
+#### `d['new_col'] = constant`
 
 
 ```python
@@ -1817,7 +1819,7 @@ df
 
 
 
-##### `d['new_col'] = range(len(d))`
+#### `d['new_col'] = range(len(d))`
 
 
 ```python
@@ -1933,7 +1935,7 @@ df
 
 
 
-##### `d['new_col'] = d['col1'] + d['col2']` from existing columns
+#### `d['new_col'] = d['col1'] + d['col2']` from existing columns
 
 
 ```python
@@ -1998,7 +2000,7 @@ more:
 - [Create a new column in Pandas DataFrame based on the existing columns](https://www.geeksforgeeks.org/create-a-new-column-in-pandas-dataframe-based-on-the-existing-columns/?ref=lbp)
 - [Creating a Pandas dataframe column based on a given condition](https://www.geeksforgeeks.org/python-creating-a-pandas-dataframe-column-based-on-a-given-condition/?ref=lbp)
 
-##### `insert(position,column,value)`
+#### `insert(position,column,value)`
 
 When adding a new column, it is added at the end (on the right) by default. You can also insert a column anywhere else using the `insert()` method:
 
@@ -2063,7 +2065,7 @@ df
 
 
 
-##### `assign(new_col,value)`
+#### `assign(new_col,value)`
 
 This method will create a new dataframe with a new column added to the old dataframe. Note that this returns a new `DataFrame` object, **the original is not modified:**
 
@@ -2135,6 +2137,202 @@ df2
 
 
 Note that you cannot access columns created within the same assignment:
+
+### Moving Columns Position
+
+
+```python
+import numpy as np
+import pandas as pd
+
+df = pd.DataFrame(np.random.rand(5, 3))
+df['mean'] = df.mean(1)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.016342</td>
+      <td>0.861809</td>
+      <td>0.225315</td>
+      <td>0.367822</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.226359</td>
+      <td>0.728893</td>
+      <td>0.477359</td>
+      <td>0.477537</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.623582</td>
+      <td>0.774813</td>
+      <td>0.920502</td>
+      <td>0.772966</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.950771</td>
+      <td>0.064937</td>
+      <td>0.622619</td>
+      <td>0.546109</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.392424</td>
+      <td>0.147109</td>
+      <td>0.299565</td>
+      <td>0.279699</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+popped_col = df.pop('mean')
+df.insert(0, 'mean', popped_col)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.367822</td>
+      <td>0.016342</td>
+      <td>0.861809</td>
+      <td>0.225315</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.477537</td>
+      <td>0.226359</td>
+      <td>0.728893</td>
+      <td>0.477359</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.772966</td>
+      <td>0.623582</td>
+      <td>0.774813</td>
+      <td>0.920502</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.546109</td>
+      <td>0.950771</td>
+      <td>0.064937</td>
+      <td>0.622619</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.279699</td>
+      <td>0.392424</td>
+      <td>0.147109</td>
+      <td>0.299565</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.insert(0, 'mean', df.pop('mean'))
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.367822</td>
+      <td>0.016342</td>
+      <td>0.861809</td>
+      <td>0.225315</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.477537</td>
+      <td>0.226359</td>
+      <td>0.728893</td>
+      <td>0.477359</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.772966</td>
+      <td>0.623582</td>
+      <td>0.774813</td>
+      <td>0.920502</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.546109</td>
+      <td>0.950771</td>
+      <td>0.064937</td>
+      <td>0.622619</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.279699</td>
+      <td>0.392424</td>
+      <td>0.147109</td>
+      <td>0.299565</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ### Adding Row
 
@@ -2502,11 +2700,11 @@ display(df)
 </div>
 
 
-### Combine Dataframes
+### Combine Pd Dataframes /Py dict to Pd Dataframe
 
-[https://www.datacamp.com/community/tutorials/joining-dataframes-pandas](https://www.datacamp.com/community/tutorials/joining-dataframes-pandas)
+- [https://realpython.com/pandas-merge-join-and-concat/](https://realpython.com/pandas-merge-join-and-concat/)
 
-##### `concat()`
+#### `concat()`
 
 
 ```python
@@ -2517,6 +2715,8 @@ df2 = pd.DataFrame({'id': ['B05', 'B06', 'B07', 'B08'],
 frames = [df1, df2]
 pd.concat(frames)
 ```
+
+
 
 
 <div>
@@ -2576,9 +2776,12 @@ pd.concat(frames)
 
 
 
+
 ```python
 pd.concat(frames,ignore_index = True)
 ```
+
+
 
 
 <div>
@@ -2638,10 +2841,13 @@ pd.concat(frames,ignore_index = True)
 
 
 
+
 ```python
 result = pd.concat(frames,axis=1)
 result
 ```
+
+
 
 
 <div>
@@ -2688,6 +2894,136 @@ result
   </tbody>
 </table>
 </div>
+
+
+
+#### `append()`
+
+
+```python
+df1 = df = pd.DataFrame({"a":[1, 2, 3, 4],
+                         "b":[5, 6, 7, 8]})
+
+# Creating the Second Dataframe using dictionary
+df2 = pd.DataFrame({"a":[1, 2, 3],
+                    "b":[5, 6, 7]})
+
+# appending multiple DataFrame
+df1.append(df2, ignore_index=True)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>2</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df1 = df = pd.DataFrame({"a": [1, 2, 3, 4],
+                         "b": [5, 6, 7, 8]})
+
+# Creating the Second Dataframe using dictionary
+df2 = {"a": "New a",
+                    "b": "new b"}
+
+# appending multiple DataFrame
+df1.append(df2, ignore_index=True)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>New a</td>
+      <td>new b</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 #### `join()`
@@ -3415,7 +3751,7 @@ filteredDf
 
 
 
-### Duplicate Rows
+### 👫Duplicate Rows👫
 
 #### Find Duplicates
 
