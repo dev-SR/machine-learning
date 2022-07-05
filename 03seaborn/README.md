@@ -51,19 +51,6 @@
 cd .\03seaborn\
 jupyter nbconvert --to markdown sns.ipynb --output README.md
 
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 """
 import numpy as np
 import seaborn as sns
@@ -71,7 +58,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from matplotlib_inline.backend_inline import set_matplotlib_formats
-set_matplotlib_formats('svg')
+set_matplotlib_formats('png')
 
 ```
 
@@ -230,13 +217,14 @@ df.head()
 
 
 ```python
+plt.figure(figsize=(10, 10))
 res = sns.scatterplot(x="name", y="age", data=df)
 plt.show()
 ```
 
 
 
-![svg](README_files/README_14_0.svg)
+![png](README_files/README_14_0.png)
 
 
 
@@ -251,6 +239,7 @@ The seaborn.lineplot() function can be extensively used in situations wherein we
 
 
 ```python
+plt.figure(figsize=(10, 10))
 res = sns.lineplot(x="name", y="age", data=df)
 plt.show()
 
@@ -258,7 +247,7 @@ plt.show()
 
 
 
-![svg](README_files/README_18_0.svg)
+![png](README_files/README_18_0.png)
 
 
 
@@ -275,20 +264,18 @@ These functions can be specified using the ‘kind’ parameter of relplot(). In
 
 ```python
 f = sns.load_dataset("flights")
+plt.figure(figsize=(10, 10))
 sns.relplot(x="passengers", y="month", data=f)
-
+plt.show()
 ```
 
 
-
-
-    <seaborn.axisgrid.FacetGrid at 0x1fb7c8f89d0>
-
+    <Figure size 720x720 with 0 Axes>
 
 
 
 
-![svg](README_files/README_21_1.svg)
+![png](README_files/README_21_1.png)
 
 
 
@@ -301,19 +288,18 @@ However, you can add another dimension using the `‘hue’` semantic. Let’s t
 
 ```python
 f = sns.load_dataset("flights")
+plt.figure(figsize=(10, 10))
 sns.relplot(x="passengers", y="month", hue="year", data=f)
+plt.show()
 ```
 
 
-
-
-    <seaborn.axisgrid.FacetGrid at 0x1fb7cc71640>
-
+    <Figure size 720x720 with 0 Axes>
 
 
 
 
-![svg](README_files/README_23_1.svg)
+![png](README_files/README_23_1.png)
 
 
 
@@ -324,21 +310,20 @@ However, there are many more customizations that you can try out such as colors,
 
 ```python
 sns.set(style="darkgrid")
+plt.figure(figsize=(10, 10))
 f = sns.load_dataset("flights")
 sns.relplot(x="passengers", y="month", hue="year",
             palette="ch:r=-.5,l=.75", data=f)
+plt.show()
 ```
 
 
-
-
-    <seaborn.axisgrid.FacetGrid at 0x1fb7c984e20>
-
+    <Figure size 720x720 with 0 Axes>
 
 
 
 
-![svg](README_files/README_25_1.svg)
+![png](README_files/README_25_1.png)
 
 
 
@@ -349,14 +334,19 @@ This function will allow you to draw a continuous line for your data. You can us
 
 ```python
 g = sns.relplot(x="name", y="age", kind="line", data=df)
+plt.figure(figsize=(10, 10))
 g.fig.autofmt_xdate()
 
 ```
 
 
 
-![svg](README_files/README_27_0.svg)
+![png](README_files/README_27_0.png)
 
+
+
+
+    <Figure size 720x720 with 0 Axes>
 
 
 ## Plotting with Categorical Data
@@ -451,6 +441,7 @@ df.groupby('sex').total_bill.count()
 
 
 ```python
+plt.figure(figsize=(10, 10))
 res = sns.countplot(x='sex',data=df)
 plt.show()
 
@@ -458,7 +449,7 @@ plt.show()
 
 
 
-![svg](README_files/README_36_0.svg)
+![png](README_files/README_36_0.png)
 
 
 
@@ -466,13 +457,15 @@ Or
 
 
 ```python
+plt.figure(figsize=(10, 10))
 res = sns.countplot(x=df['size'])
+
 plt.show()
 ```
 
 
 
-![svg](README_files/README_38_0.svg)
+![png](README_files/README_38_0.png)
 
 
 
@@ -554,8 +547,13 @@ titanic.head(2)
 
 
 
+    <Figure size 720x720 with 0 Axes>
+
+
+
 ```python
 titanic.groupby('class').count()
+
 ```
 
 
@@ -659,8 +657,13 @@ titanic.groupby('class').count()
 
 
 
+    <Figure size 720x720 with 0 Axes>
+
+
+
 ```python
 # create plot
+plt.figure(figsize=(10, 10))
 sns.countplot(x='class', data=titanic, palette='magma')
 plt.title('Survivors')
 plt.show()
@@ -669,7 +672,7 @@ plt.show()
 
 
 
-![svg](README_files/README_41_0.svg)
+![png](README_files/README_41_0.png)
 
 
 
@@ -684,6 +687,7 @@ While the points are plotted in two dimensions, another dimension can be added t
 
 ```python
 # create plot
+plt.figure(figsize=(10, 10))
 sns.countplot(x='class', hue='sex', data=titanic, palette='magma')
 plt.title('Survivors')
 plt.show()
@@ -692,7 +696,7 @@ plt.show()
 
 
 
-![svg](README_files/README_44_0.svg)
+![png](README_files/README_44_0.png)
 
 
 
@@ -1054,14 +1058,16 @@ titanic.groupby(['class', 'who']).count()
 
 ```python
 # create plot
+plt.figure(figsize=(10, 10))
 sns.countplot(x='class', hue='who', data=titanic, palette='magma')
 plt.title('Survivors')
 plt.show()
+
 ```
 
 
 
-![svg](README_files/README_47_0.svg)
+![png](README_files/README_47_0.png)
 
 
 
@@ -1093,13 +1099,14 @@ df.groupby('sex').total_bill.mean()
 
 
 ```python
+plt.figure(figsize=(10, 10))
 sns.barplot(x="sex", y="total_bill", data=df)
 plt.show()
 ```
 
 
 
-![svg](README_files/README_51_0.svg)
+![png](README_files/README_51_0.png)
 
 
 
@@ -1107,6 +1114,7 @@ Horizontal orientation requires numeric `x` variable.
 
 
 ```python
+plt.figure(figsize=(10, 10))
 sns.barplot(y="sex", x="total_bill", data=df,
             palette='PuRd', orient='h',)
 plt.show()
@@ -1115,7 +1123,7 @@ plt.show()
 
 
 
-![svg](README_files/README_53_0.svg)
+![png](README_files/README_53_0.png)
 
 
 
@@ -1138,13 +1146,14 @@ df.groupby('sex').total_bill.std()
 
 
 ```python
+plt.figure(figsize=(10, 10))
 sns.barplot(x="sex", y="total_bill", data=df,estimator=np.std)
 plt.show()
 ```
 
 
 
-![svg](README_files/README_56_0.svg)
+![png](README_files/README_56_0.png)
 
 
 
@@ -1157,6 +1166,7 @@ The seaborn.pointplot() function represents the estimation of the central tenden
 
 ```python
 df = pd.read_csv("user.csv")
+plt.figure(figsize=(10, 10))
 res = sns.pointplot(x=df['name'], y=df['age'])
 plt.show()
 
@@ -1164,7 +1174,7 @@ plt.show()
 
 
 
-![svg](README_files/README_59_0.svg)
+![png](README_files/README_59_0.png)
 
 
 
@@ -1184,6 +1194,8 @@ The seaborn.stripplot() function considers one of the input columns as categoric
 
 
 ```python
+plt.figure(figsize=(10, 10))
+df = sns.load_dataset("tips")
 res = sns.stripplot(x="tip", y="sex", data=df, jitter=0.05)
 plt.show()
 
@@ -1191,7 +1203,7 @@ plt.show()
 
 
 
-![svg](README_files/README_64_0.svg)
+![png](README_files/README_64_0.png)
 
 
 
@@ -1203,17 +1215,16 @@ The seaborn.swarmplot() function resembles the seaborn.stripplot() function with
 
 
 ```python
+plt.figure(figsize=(10, 10))
+
 res = sns.swarmplot(x="tip", y="sex", data=df)
 plt.show()
+
 ```
 
-    C:\Users\soiko\anaconda3\lib\site-packages\seaborn\categorical.py:1296: UserWarning: 10.8% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
 
 
-
-
-![svg](README_files/README_68_1.svg)
+![png](README_files/README_68_0.png)
 
 
 
@@ -1244,13 +1255,14 @@ A box plot is composed of a summary of 5 different data points: the minimum, fir
 
 ```python
 tips = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.boxplot(x="day", y="total_bill", data=tips)
 plt.show()
 ```
 
 
 
-![svg](README_files/README_73_0.svg)
+![png](README_files/README_73_0.png)
 
 
 
@@ -1275,18 +1287,15 @@ While the points are plotted in two dimensions, another dimension can be added t
 
 ```python
 tips = sns.load_dataset("tips")
-print(tips.columns)
-sns.boxplot(x="day", y="total_bill", data=tips,hue='smoker')
+plt.figure(figsize=(10, 10))
+sns.boxplot(x="day", y="total_bill", data=tips, hue='smoker')
 plt.show()
 
 ```
 
-    Index(['total_bill', 'tip', 'sex', 'smoker', 'day', 'time', 'size'], dtype='object')
 
 
-
-
-![svg](README_files/README_77_1.svg)
+![png](README_files/README_77_0.png)
 
 
 
@@ -1304,19 +1313,21 @@ Violin plots also like `boxplots` **summarize** numeric data over a set of categ
 ```python
 
 tips = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 ax = sns.violinplot(x=tips["total_bill"])
 plt.show()
 ```
 
 
 
-![svg](README_files/README_81_0.svg)
+![png](README_files/README_81_0.png)
 
 
 
 
 ```python
 tips = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.violinplot(x="day", y="total_bill", data=tips)
 
 ```
@@ -1330,7 +1341,7 @@ sns.violinplot(x="day", y="total_bill", data=tips)
 
 
 
-![svg](README_files/README_82_1.svg)
+![png](README_files/README_82_1.png)
 
 
 
@@ -1341,6 +1352,7 @@ While the points are plotted in two dimensions, another dimension can be added t
 
 ```python
 tips = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.violinplot(x="day", y="total_bill", hue="sex", data=tips)
 ```
 
@@ -1353,13 +1365,14 @@ sns.violinplot(x="day", y="total_bill", hue="sex", data=tips)
 
 
 
-![svg](README_files/README_85_1.svg)
+![png](README_files/README_85_1.png)
 
 
 
 
 ```python
 tips = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.violinplot(x="day", y="total_bill", hue="sex", data=tips,split=True)
 
 ```
@@ -1373,7 +1386,7 @@ sns.violinplot(x="day", y="total_bill", hue="sex", data=tips,split=True)
 
 
 
-![svg](README_files/README_86_1.svg)
+![png](README_files/README_86_1.png)
 
 
 
@@ -1390,6 +1403,7 @@ The `seaborn.boxenplot()` function represents the distribution of the categorica
 
 ```python
 df = pd.read_csv("user.csv")
+plt.figure(figsize=(10, 10))
 res = sns.boxenplot(x=df['age'])
 plt.show()
 
@@ -1397,7 +1411,7 @@ plt.show()
 
 
 
-![svg](README_files/README_90_0.svg)
+![png](README_files/README_90_0.png)
 
 
 
@@ -1505,6 +1519,7 @@ df.head()
 
 
 ```python
+plt.figure(figsize=(10, 10))
 sns.set(style="ticks", color_codes=True)
 a = sns.load_dataset("tips")
 sns.catplot(x="day", y="total_bill", data=a)
@@ -1514,13 +1529,17 @@ sns.catplot(x="day", y="total_bill", data=a)
 
 
 
-    <seaborn.axisgrid.FacetGrid at 0x1fb7cc23550>
+    <seaborn.axisgrid.FacetGrid at 0x259f8342100>
 
 
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_96_1.svg)
+
+
+
+![png](README_files/README_96_2.png)
 
 
 
@@ -1529,6 +1548,7 @@ As you can see, in the above example I have not set the `‘kind’` parameter. 
 
 
 ```python
+plt.figure(figsize=(10, 10))
 sns.set(style="ticks", color_codes=True)
 a = sns.load_dataset("tips")
 sns.catplot(x="day", y="total_bill", kind="violin", data=a)
@@ -1537,13 +1557,17 @@ sns.catplot(x="day", y="total_bill", kind="violin", data=a)
 
 
 
-    <seaborn.axisgrid.FacetGrid at 0x29ab62a7490>
+    <seaborn.axisgrid.FacetGrid at 0x259f8685c10>
 
 
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_98_1.svg)
+
+
+
+![png](README_files/README_98_2.png)
 
 
 
@@ -1611,26 +1635,36 @@ df.head(2)
 
 
 ```python
+plt.figure(figsize=(10, 10))
 sns.displot(df['total_bill'],kde=True)
 plt.show()
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_104_0.svg)
+
+
+
+![png](README_files/README_104_1.png)
 
 
 
 
 ```python
 df = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.displot(df['total_bill'], kde=False,bins=20)
 plt.show()
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_105_0.svg)
+
+
+
+![png](README_files/README_105_1.png)
 
 
 
@@ -1644,13 +1678,19 @@ plt.show()
 ```python
 df = sns.load_dataset("tips")
 sns.kdeplot(df['total_bill'])
+plt.figure(figsize=(10, 10))
+
 plt.show()
 ```
 
 
 
-![svg](README_files/README_108_0.svg)
+![png](README_files/README_108_0.png)
 
+
+
+
+    <Figure size 720x720 with 0 Axes>
 
 
 ### `histplot()`
@@ -1660,6 +1700,7 @@ plt.show()
 
 ```python
 df = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.histplot(df['total_bill'])
 plt.show()
 
@@ -1667,13 +1708,14 @@ plt.show()
 
 
 
-![svg](README_files/README_111_0.svg)
+![png](README_files/README_111_0.png)
 
 
 
 
 ```python
 df = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 sns.histplot(df['total_bill'],kde=True)
 plt.show()
 
@@ -1681,7 +1723,7 @@ plt.show()
 
 
 
-![svg](README_files/README_112_0.svg)
+![png](README_files/README_112_0.png)
 
 
 
@@ -1689,13 +1731,14 @@ plt.show()
 ```python
 np.random.seed(10)
 a = np.random.normal(loc=5, size=100, scale=2)
+plt.figure(figsize=(10, 10))
 sns.histplot(a, kde=True, stat="density")
 plt.show()
 ```
 
 
 
-![svg](README_files/README_113_0.svg)
+![png](README_files/README_113_0.png)
 
 
 
@@ -1712,14 +1755,19 @@ Syntax:`seaborn.jointplot(x=variable1, y=variable2)`
 ```python
 sns.set_style("darkgrid")
 df = pd.read_csv("user.csv")
+plt.figure(figsize=(10, 10))
 res = sns.jointplot(x=df['age'], y=df['age'])
 plt.show()
 
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_116_0.svg)
+
+
+
+![png](README_files/README_116_1.png)
 
 
 
@@ -1779,40 +1827,55 @@ df.head(2)
 ```python
 sns.set_style("darkgrid")
 # df = pd.read_csv("user.csv")
-res = sns.jointplot(x=df['tip'], y=df['size'])
+plt.figure(figsize=(10, 10))
+sns.jointplot(x=df['tip'], y=df['size'])
 plt.show()
 
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_118_0.svg)
+
+
+
+![png](README_files/README_118_1.png)
 
 
 
 
 ```python
 df = sns.load_dataset("tips")
-res = sns.jointplot(x="total_bill", y="tip", data=df)
+plt.figure(figsize=(10, 10))
+sns.jointplot(x="total_bill", y="tip", data=df)
 plt.show()
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_119_0.svg)
+
+
+
+![png](README_files/README_119_1.png)
 
 
 
 
 ```python
 df = sns.load_dataset("tips")
-res = sns.jointplot(x="total_bill", y="tip", data=df, kind="hex")
+plt.figure(figsize=(10, 10))
+sns.jointplot(x="total_bill", y="tip", data=df, kind="hex")
 plt.show()
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_120_0.svg)
+
+
+
+![png](README_files/README_120_1.png)
 
 
 
@@ -1838,14 +1901,19 @@ Syntax: `seaborn.FacetGird(data, col=value, col_wrap=value)`
 
 ```python
 tips = sns.load_dataset("tips")
+plt.figure(figsize=(10, 10))
 g = sns.FacetGrid(tips, col="time")
 g.map(sns.scatterplot, "total_bill", "tip")
 plt.show()
 ```
 
 
+    <Figure size 720x720 with 0 Axes>
 
-![svg](README_files/README_125_0.svg)
+
+
+
+![png](README_files/README_125_1.png)
 
 
 
@@ -1859,11 +1927,12 @@ plt.show()
 tips = sns.load_dataset("tips")
 sns.pairplot(tips)
 plt.show()
+
 ```
 
 
 
-![svg](README_files/README_128_0.svg)
+![png](README_files/README_128_0.png)
 
 
 
@@ -1876,7 +1945,7 @@ plt.show()
 
 
 
-![svg](README_files/README_129_0.svg)
+![png](README_files/README_129_0.png)
 
 
 
@@ -1889,12 +1958,9 @@ plt.show()
 
 ```
 
-    Index(['total_bill', 'tip', 'sex', 'smoker', 'day', 'time', 'size'], dtype='object')
 
 
-
-
-![svg](README_files/README_130_1.svg)
+![png](README_files/README_130_0.png)
 
 
 
@@ -1919,7 +1985,7 @@ plt.show()
 
 
 
-![svg](README_files/README_133_0.svg)
+![png](README_files/README_133_0.png)
 
 
 
@@ -2491,7 +2557,7 @@ sns.heatmap(flights_pivot, cmap="coolwarm")
 
 
 
-![svg](README_files/README_150_1.svg)
+![png](README_files/README_150_1.png)
 
 
 
@@ -2505,13 +2571,13 @@ sns.clustermap(flights_pivot, linewidths=.5, cmap="coolwarm")
 
 
 
-    <seaborn.matrix.ClusterGrid at 0x29ab8b4c100>
+    <seaborn.matrix.ClusterGrid at 0x259f6a943d0>
 
 
 
 
 
-![svg](README_files/README_152_1.svg)
+![png](README_files/README_152_1.png)
 
 
 
@@ -2537,6 +2603,6 @@ plt.show()
 
 
 
-![svg](README_files/README_155_0.svg)
+![png](README_files/README_155_0.png)
 
 
