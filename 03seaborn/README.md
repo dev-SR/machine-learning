@@ -31,13 +31,14 @@
   - [Depicting bivariate distributions](#depicting-bivariate-distributions)
   - [Multi-Plot grids](#multi-plot-grids)
     - [Facetgrid](#facetgrid)
-    - [Pair Plot](#pair-plot)
+    - [🚀🚀Pair Grid + Pair Plot](#pair-grid--pair-plot)
   - [Heatmap and Correlation](#heatmap-and-correlation)
     - [Correlation](#correlation)
     - [Heatmap](#heatmap)
     - [`pd.pivot_table()`](#pdpivot_table)
     - [`clustermap()`](#clustermap)
   - [Customized Styles and Themes in Seaborn](#customized-styles-and-themes-in-seaborn)
+
 
 ## Initialization
 
@@ -47,16 +48,30 @@
 
 ```python
 """
+cd .\03seaborn\
 jupyter nbconvert --to markdown sns.ipynb --output README.md
 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 """
 import numpy as np
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from IPython import display
-display.set_matplotlib_formats('svg')
+from matplotlib_inline.backend_inline import set_matplotlib_formats
+set_matplotlib_formats('svg')
 
 ```
 
@@ -221,7 +236,7 @@ plt.show()
 
 
 
-![svg](README_files/README_13_0.svg)
+![svg](README_files/README_14_0.svg)
 
 
 
@@ -243,7 +258,7 @@ plt.show()
 
 
 
-![svg](README_files/README_17_0.svg)
+![svg](README_files/README_18_0.svg)
 
 
 
@@ -273,7 +288,7 @@ sns.relplot(x="passengers", y="month", data=f)
 
 
 
-![svg](README_files/README_20_1.svg)
+![svg](README_files/README_21_1.svg)
 
 
 
@@ -298,7 +313,7 @@ sns.relplot(x="passengers", y="month", hue="year", data=f)
 
 
 
-![svg](README_files/README_22_1.svg)
+![svg](README_files/README_23_1.svg)
 
 
 
@@ -323,7 +338,7 @@ sns.relplot(x="passengers", y="month", hue="year",
 
 
 
-![svg](README_files/README_24_1.svg)
+![svg](README_files/README_25_1.svg)
 
 
 
@@ -340,7 +355,7 @@ g.fig.autofmt_xdate()
 
 
 
-![svg](README_files/README_26_0.svg)
+![svg](README_files/README_27_0.svg)
 
 
 
@@ -443,7 +458,7 @@ plt.show()
 
 
 
-![svg](README_files/README_35_0.svg)
+![svg](README_files/README_36_0.svg)
 
 
 
@@ -457,7 +472,7 @@ plt.show()
 
 
 
-![svg](README_files/README_37_0.svg)
+![svg](README_files/README_38_0.svg)
 
 
 
@@ -654,7 +669,7 @@ plt.show()
 
 
 
-![svg](README_files/README_40_0.svg)
+![svg](README_files/README_41_0.svg)
 
 
 
@@ -677,7 +692,7 @@ plt.show()
 
 
 
-![svg](README_files/README_43_0.svg)
+![svg](README_files/README_44_0.svg)
 
 
 
@@ -1046,7 +1061,7 @@ plt.show()
 
 
 
-![svg](README_files/README_46_0.svg)
+![svg](README_files/README_47_0.svg)
 
 
 
@@ -1084,7 +1099,7 @@ plt.show()
 
 
 
-![svg](README_files/README_50_0.svg)
+![svg](README_files/README_51_0.svg)
 
 
 
@@ -1100,7 +1115,7 @@ plt.show()
 
 
 
-![svg](README_files/README_52_0.svg)
+![svg](README_files/README_53_0.svg)
 
 
 
@@ -1129,7 +1144,7 @@ plt.show()
 
 
 
-![svg](README_files/README_55_0.svg)
+![svg](README_files/README_56_0.svg)
 
 
 
@@ -1149,7 +1164,7 @@ plt.show()
 
 
 
-![svg](README_files/README_58_0.svg)
+![svg](README_files/README_59_0.svg)
 
 
 
@@ -1176,7 +1191,7 @@ plt.show()
 
 
 
-![svg](README_files/README_63_0.svg)
+![svg](README_files/README_64_0.svg)
 
 
 
@@ -1198,7 +1213,7 @@ plt.show()
 
 
 
-![svg](README_files/README_67_1.svg)
+![svg](README_files/README_68_1.svg)
 
 
 
@@ -1235,7 +1250,7 @@ plt.show()
 
 
 
-![svg](README_files/README_72_0.svg)
+![svg](README_files/README_73_0.svg)
 
 
 
@@ -1271,7 +1286,7 @@ plt.show()
 
 
 
-![svg](README_files/README_76_1.svg)
+![svg](README_files/README_77_1.svg)
 
 
 
@@ -1295,7 +1310,7 @@ plt.show()
 
 
 
-![svg](README_files/README_80_0.svg)
+![svg](README_files/README_81_0.svg)
 
 
 
@@ -1315,7 +1330,7 @@ sns.violinplot(x="day", y="total_bill", data=tips)
 
 
 
-![svg](README_files/README_81_1.svg)
+![svg](README_files/README_82_1.svg)
 
 
 
@@ -1338,7 +1353,7 @@ sns.violinplot(x="day", y="total_bill", hue="sex", data=tips)
 
 
 
-![svg](README_files/README_84_1.svg)
+![svg](README_files/README_85_1.svg)
 
 
 
@@ -1358,7 +1373,7 @@ sns.violinplot(x="day", y="total_bill", hue="sex", data=tips,split=True)
 
 
 
-![svg](README_files/README_85_1.svg)
+![svg](README_files/README_86_1.svg)
 
 
 
@@ -1382,7 +1397,7 @@ plt.show()
 
 
 
-![svg](README_files/README_89_0.svg)
+![svg](README_files/README_90_0.svg)
 
 
 
@@ -1505,7 +1520,7 @@ sns.catplot(x="day", y="total_bill", data=a)
 
 
 
-![svg](README_files/README_95_1.svg)
+![svg](README_files/README_96_1.svg)
 
 
 
@@ -1528,7 +1543,7 @@ sns.catplot(x="day", y="total_bill", kind="violin", data=a)
 
 
 
-![svg](README_files/README_97_1.svg)
+![svg](README_files/README_98_1.svg)
 
 
 
@@ -1602,7 +1617,7 @@ plt.show()
 
 
 
-![svg](README_files/README_103_0.svg)
+![svg](README_files/README_104_0.svg)
 
 
 
@@ -1615,7 +1630,7 @@ plt.show()
 
 
 
-![svg](README_files/README_104_0.svg)
+![svg](README_files/README_105_0.svg)
 
 
 
@@ -1634,7 +1649,7 @@ plt.show()
 
 
 
-![svg](README_files/README_107_0.svg)
+![svg](README_files/README_108_0.svg)
 
 
 
@@ -1652,7 +1667,7 @@ plt.show()
 
 
 
-![svg](README_files/README_110_0.svg)
+![svg](README_files/README_111_0.svg)
 
 
 
@@ -1666,7 +1681,7 @@ plt.show()
 
 
 
-![svg](README_files/README_111_0.svg)
+![svg](README_files/README_112_0.svg)
 
 
 
@@ -1680,7 +1695,7 @@ plt.show()
 
 
 
-![svg](README_files/README_112_0.svg)
+![svg](README_files/README_113_0.svg)
 
 
 
@@ -1704,7 +1719,7 @@ plt.show()
 
 
 
-![svg](README_files/README_115_0.svg)
+![svg](README_files/README_116_0.svg)
 
 
 
@@ -1771,7 +1786,7 @@ plt.show()
 
 
 
-![svg](README_files/README_117_0.svg)
+![svg](README_files/README_118_0.svg)
 
 
 
@@ -1784,7 +1799,7 @@ plt.show()
 
 
 
-![svg](README_files/README_118_0.svg)
+![svg](README_files/README_119_0.svg)
 
 
 
@@ -1797,7 +1812,7 @@ plt.show()
 
 
 
-![svg](README_files/README_119_0.svg)
+![svg](README_files/README_120_0.svg)
 
 
 
@@ -1807,6 +1822,8 @@ plt.show()
 In order to represent the large data set with categorical values in a precise manner, we can draw multiple plots of the sub-sets of data to visualize it.
 
 ### Facetgrid
+
+
 
 Facet grid forms a matrix of panels defined by row and column by dividing the variables. Due to panels, a single plot looks like multiple plots. It is very helpful to analyze all combinations in two discrete variables.
 
@@ -1828,11 +1845,11 @@ plt.show()
 
 
 
-![svg](README_files/README_123_0.svg)
+![svg](README_files/README_125_0.svg)
 
 
 
-### Pair Plot
+### 🚀🚀Pair Grid + Pair Plot
 
 
 `Pairplot` represents pairwise relation across the entire dataframe and supports an additional argument called `hue` for categorical separation. What it does basically is create a `jointplot` between every possible numerical column and takes a while if the dataframe is really huge. It is plotted using the `pairplot()` method.
@@ -1846,7 +1863,7 @@ plt.show()
 
 
 
-![svg](README_files/README_126_0.svg)
+![svg](README_files/README_128_0.svg)
 
 
 
@@ -1859,7 +1876,50 @@ plt.show()
 
 
 
-![svg](README_files/README_127_0.svg)
+![svg](README_files/README_129_0.svg)
+
+
+
+
+```python
+tips = sns.load_dataset("tips")
+cols = ['total_bill', 'size']
+sns.pairplot(tips,hue='sex', vars=cols)
+plt.show()
+
+```
+
+    Index(['total_bill', 'tip', 'sex', 'smoker', 'day', 'time', 'size'], dtype='object')
+
+
+
+
+![svg](README_files/README_130_1.svg)
+
+
+
+Using PairGrid:
+
+- [https://seaborn.pydata.org/generated/seaborn.PairGrid.html](https://seaborn.pydata.org/generated/seaborn.PairGrid.html)
+
+
+```python
+# cols = ['total_bill', 'size']
+# g = sns.PairGrid(tips,hue='sex', vars=cols)
+
+g = sns.PairGrid(tips,hue='sex')
+# g.map_diag(plt.hist)
+# g.map_offdiag(plt.scatter);
+g.map_diag(sns.histplot)
+g.map_offdiag(sns.scatterplot)
+g.add_legend()
+plt.show()
+
+```
+
+
+
+![svg](README_files/README_133_0.svg)
 
 
 
@@ -2046,7 +2106,7 @@ sns.heatmap(tips_corr)
 
 
 
-![svg](README_files/README_137_1.svg)
+![svg](README_files/README_143_1.svg)
 
 
 
@@ -2065,7 +2125,7 @@ sns.heatmap(tips_corr, cmap="PiYG")
 
 
 
-![svg](README_files/README_138_1.svg)
+![svg](README_files/README_144_1.svg)
 
 
 
@@ -2085,7 +2145,7 @@ sns.heatmap(tips_corr,annot=True)
 
 
 
-![svg](README_files/README_140_1.svg)
+![svg](README_files/README_146_1.svg)
 
 
 
@@ -2431,7 +2491,7 @@ sns.heatmap(flights_pivot, cmap="coolwarm")
 
 
 
-![svg](README_files/README_144_1.svg)
+![svg](README_files/README_150_1.svg)
 
 
 
@@ -2451,7 +2511,7 @@ sns.clustermap(flights_pivot, linewidths=.5, cmap="coolwarm")
 
 
 
-![svg](README_files/README_146_1.svg)
+![svg](README_files/README_152_1.svg)
 
 
 
@@ -2477,6 +2537,6 @@ plt.show()
 
 
 
-![svg](README_files/README_149_0.svg)
+![svg](README_files/README_155_0.svg)
 
 
