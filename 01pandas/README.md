@@ -101,6 +101,7 @@
     - [One-Hot-Encoding](#one-hot-encoding)
         - [Using `Pandas.get_dummies()`](#using-pandasget_dummies)
       - [Using 🌟`sklearn.OneHotEncoder()`🌟](#using-sklearnonehotencoder)
+  - [Discretization](#discretization)
 
 ## Introduction
 
@@ -7550,33 +7551,33 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>96</td>
-      <td>1142</td>
-      <td>91</td>
+      <td>17</td>
+      <td>1020</td>
+      <td>52</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>80</td>
-      <td>1557</td>
-      <td>66</td>
+      <td>19</td>
+      <td>1467</td>
+      <td>52</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>6</td>
-      <td>1402</td>
-      <td>82</td>
+      <td>49</td>
+      <td>1747</td>
+      <td>86</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>93</td>
-      <td>1134</td>
-      <td>62</td>
+      <td>57</td>
+      <td>1187</td>
+      <td>67</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>37</td>
-      <td>1350</td>
-      <td>66</td>
+      <td>77</td>
+      <td>1867</td>
+      <td>74</td>
     </tr>
   </tbody>
 </table>
@@ -7609,33 +7610,33 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>96</td>
-      <td>1142</td>
+      <td>17</td>
+      <td>1020</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>80</td>
-      <td>1557</td>
+      <td>19</td>
+      <td>1467</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>6</td>
-      <td>1402</td>
+      <td>49</td>
+      <td>1747</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>93</td>
-      <td>1134</td>
-      <td>62.0</td>
+      <td>57</td>
+      <td>1187</td>
+      <td>67.0</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>37</td>
-      <td>1350</td>
-      <td>66.0</td>
+      <td>77</td>
+      <td>1867</td>
+      <td>74.0</td>
     </tr>
   </tbody>
 </table>
@@ -8191,6 +8192,7 @@ data = {
 }
 df = pd.DataFrame(data)
 df['marks'][[0, 2, 4]] = np.nan
+df['ppr_id'][[0, 3]] = np.nan
 df['roll_no'][[0, 2]] = np.nan
 df
 
@@ -8214,31 +8216,75 @@ df
     <tr>
       <th>0</th>
       <td>NaN</td>
-      <td>1074</td>
+      <td>NaN</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>4.0</td>
-      <td>1867</td>
-      <td>60.0</td>
+      <td>74.0</td>
+      <td>1647.0</td>
+      <td>82.0</td>
     </tr>
     <tr>
       <th>2</th>
       <td>NaN</td>
-      <td>1103</td>
+      <td>1843.0</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>90.0</td>
-      <td>1699</td>
-      <td>54.0</td>
+      <td>2.0</td>
+      <td>NaN</td>
+      <td>83.0</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>70.0</td>
-      <td>1372</td>
+      <td>1.0</td>
+      <td>1227.0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.dropna(subset=['ppr_id'])
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>74.0</td>
+      <td>1647.0</td>
+      <td>82.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NaN</td>
+      <td>1843.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>1227.0</td>
       <td>NaN</td>
     </tr>
   </tbody>
@@ -8269,15 +8315,9 @@ df.dropna()
   <tbody>
     <tr>
       <th>1</th>
-      <td>4.0</td>
-      <td>1867</td>
-      <td>60.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>90.0</td>
-      <td>1699</td>
-      <td>54.0</td>
+      <td>74.0</td>
+      <td>1647.0</td>
+      <td>82.0</td>
     </tr>
   </tbody>
 </table>
@@ -10408,6 +10448,73 @@ gender_df
       <td>0.0</td>
       <td>0.0</td>
       <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+## Discretization
+
+
+```python
+data = [['Alex',10],['Bob',16],['Clarke',26],['James',24],['John',69]]
+df = pd.DataFrame(data,columns=['name','age'])
+```
+
+
+```python
+category = ['Child', 'Young', 'Adults', 'Senior']
+
+df['category']=pd.cut(x=df['age'], bins=[0,14,24,64,100],labels=category)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>age</th>
+      <th>category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alex</td>
+      <td>10</td>
+      <td>Child</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Bob</td>
+      <td>16</td>
+      <td>Young</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Clarke</td>
+      <td>26</td>
+      <td>Adults</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>James</td>
+      <td>24</td>
+      <td>Young</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>John</td>
+      <td>69</td>
+      <td>Senior</td>
     </tr>
   </tbody>
 </table>
