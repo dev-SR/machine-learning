@@ -93,10 +93,9 @@
   - [Categorical encoding](#categorical-encoding)
     - [Introduction](#introduction-1)
     - [Label Encoding](#label-encoding)
-      - [Custom Map Function](#custom-map-function)
-      - [Using Pandas.factorize()](#using-pandasfactorize)
-        - [Reverse the process - Decoding](#reverse-the-process---decoding)
-      - [Using  🌟`sklearn.LabelEncoder()`🌟](#using--sklearnlabelencoder)
+      - [🌟🌟Custom Map Function](#custom-map-function)
+        - [🚀Unique Values with labels assigned side-by-side🚀](#unique-values-with-labels-assigned-side-by-side)
+      - [🌟🌟`sklearn.LabelEncoder()`](#sklearnlabelencoder)
         - [Decoding](#decoding)
     - [One-Hot-Encoding](#one-hot-encoding)
         - [Using `Pandas.get_dummies()`](#using-pandasget_dummies)
@@ -9703,68 +9702,51 @@ There are many ways to convert categorical values into numerical values. Each ap
 
 ### Label Encoding
 
-#### Custom Map Function
+#### 🌟🌟Custom Map Function
 
 
 ```python
-people_dict = {
-	"gender":pd.Series(['Female','Male','Female','Female',"Other"])
-}
-people = pd.DataFrame(people_dict)
-people
+# creating initial dataframe
+gender_types = ['male','female','other','male','female','male','male','female','other']
+gender_df = pd.DataFrame(gender_types, columns=['gender'])
+gender_df['gender'].unique()
+
 ```
 
 
 
 
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Female</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Male</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Female</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Female</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Other</td>
-    </tr>
-  </tbody>
-</table>
-</div>
+    array(['male', 'female', 'other'], dtype=object)
 
 
 
 
 ```python
 def f(g):
-	if g == 'Male':
+	if g == 'male':
 		return 0
-	elif g == "Female":
+	elif g == "female":
 		return 1
 	else:
 		return 2
 
-people['label'] = people.gender.apply(f)
-people
+gender_df['label'] = gender_df.gender.apply(f)
+gender_df['label'].unique()
+
+```
+
+
+
+
+    array([0, 1, 2], dtype=int64)
+
+
+
+##### 🚀Unique Values with labels assigned side-by-side🚀
+
+
+```python
+gender_df[['gender','label']].drop_duplicates()
 ```
 
 
@@ -9783,267 +9765,48 @@ people
   <tbody>
     <tr>
       <th>0</th>
-      <td>Female</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Male</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Female</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Female</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Other</td>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### Using Pandas.factorize()
-
-`pandas.factorize()` method helps to get the numeric representation of an array by identifying distinct values. It returns a tuple of two arrays, the first containing **numeric representation of the values in the original array** and the second containing **unique values**.
-
-**Parameters**:
-- `values` : 1D sequence.
-- `sort` : [bool, Default is False] Sort uniques and shuffle labels.
-- `na_sentinel` : [ int, default -1] Missing Values to mark ‘not found’.
-
-**Return**: Numeric representation of array
-
-
-```python
-arr= ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
-labels, uniques = pd.factorize(arr)
-
-print("Original Array:\n",arr )
-print("Numeric Representation : \n", labels)
-print("Unique Values : \n", uniques)
-
-```
-
-    Original Array:
-     ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
-    Numeric Representation :
-     [0 1 1 2 3 2 3 0]
-    Unique Values :
-     ['b' 'd' 'c' 'a']
-
-
-
-```python
-arr= ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
-labels, uniques = pd.factorize(arr,sort=True)
-
-print("Original Array:\n",arr )
-print("Numeric Representation : \n", labels)
-print("Unique Values : \n", uniques)
-
-```
-
-    Original Array:
-     ['b', 'd', 'd', 'c', 'a', 'c', 'a', 'b']
-    Numeric Representation :
-     [1 3 3 2 0 2 0 1]
-    Unique Values :
-     ['a' 'b' 'c' 'd']
-
-
-
-```python
-values = {
-	"class":pd.Series(['A','B','C','D','A','A','C','B']),
-}
-data = pd.DataFrame(values)
-```
-
-
-```python
-q =data["class"].unique()
-q
-```
-
-
-
-
-    array(['A', 'B', 'C', 'D'], dtype=object)
-
-
-
-
-```python
-data["class"].factorize()
-```
-
-
-
-
-    (array([0, 1, 2, 3, 0, 0, 2, 1], dtype=int64),
-     Index(['A', 'B', 'C', 'D'], dtype='object'))
-
-
-
-
-```python
-Y,label = data["class"].factorize()
-data["Y"] = Y
-data
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>class</th>
-      <th>Y</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>B</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>C</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>D</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>A</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>A</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>C</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>B</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-##### Reverse the process - Decoding
-
-Sometimes, you might want to convert the numeric representation back to the original values. For example, if the predicted class is 1, you might want to know what the original class was.
-
-
-```python
-Y,label = data["class"].factorize()
-Y,label
-```
-
-
-
-
-    (array([0, 1, 2, 3, 0, 0, 2, 1], dtype=int64),
-     Index(['A', 'B', 'C', 'D'], dtype='object'))
-
-
-
-
-```python
-predicted_class = 1
-```
-
-
-```python
-label[predicted_class]
-```
-
-
-
-
-    'B'
-
-
-
-#### Using  🌟`sklearn.LabelEncoder()`🌟
-
-
-
-```python
-from sklearn.preprocessing import LabelEncoder
-# creating initial dataframe
-gender_types = ['male','female','other']
-gender_df = pd.DataFrame(gender_types, columns=['gender'])
-gender_df
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
       <td>male</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>1</th>
       <td>female</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>2</th>
       <td>other</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
 </div>
+
+
+
+#### 🌟🌟`sklearn.LabelEncoder()`
+
+
+
+```python
+# creating initial dataframe
+gender_types = ['male','female','other','male','female','male','male','female','other']
+gender_df = pd.DataFrame(gender_types, columns=['gender'])
+gender_df['gender'].unique()
+
+```
+
+
+
+
+    array(['male', 'female', 'other'], dtype=object)
 
 
 
 
 ```python
 # creating instance of labelencoder
+from sklearn.preprocessing import LabelEncoder
 labelencoder = LabelEncoder()
 ```
 
@@ -10051,7 +9814,20 @@ labelencoder = LabelEncoder()
 ```python
 # Assigning numerical values and storing in another column
 gender_df['label'] = labelencoder.fit_transform( gender_df['gender'])
-gender_df
+gender_df['label'].unique()
+
+```
+
+
+
+
+    array([1, 0, 2])
+
+
+
+
+```python
+gender_df[['gender','label']].drop_duplicates()
 ```
 
 
