@@ -38,6 +38,7 @@
     - [`pd.pivot_table()`](#pdpivot_table)
     - [`clustermap()`](#clustermap)
   - [Customized Styles and Themes in Seaborn](#customized-styles-and-themes-in-seaborn)
+  - [🚀🚀Seaborn with multiple columns](#seaborn-with-multiple-columns)
 
 
 ## Initialization
@@ -2604,5 +2605,193 @@ plt.show()
 
 
 ![png](README_files/README_155_0.png)
+
+
+
+## 🚀🚀Seaborn with multiple columns
+
+
+```python
+from IPython.display import display
+
+dump = [
+    {
+        'gender':'male',
+        'math_score':80,
+        'english_score':88,
+        'physics_score':77
+    },
+    {
+        'gender':'female',
+        'math_score':82,
+        'english_score':80,
+        'physics_score':67
+    },
+    {
+        'gender':'male',
+        'math_score':83,
+        'english_score':82,
+        'physics_score':70
+    },
+
+]
+dumpdf = pd.DataFrame(dump)
+display(dumpdf)
+# https://stackoverflow.com/questions/71338167/seaborn-with-multiple-columns
+# https://stackoverflow.com/questions/44941082/plot-multiple-columns-of-pandas-dataframe-using-seaborn
+# https://stackoverflow.com/questions/50529022/pandas-melt-unmelt-preserve-index
+# dumpdf = dumpdf.reset_index().melt('gender', var_name='cols',  value_name='vals')
+dumpdf = dumpdf.melt('gender', var_name='cols',  value_name='vals')
+display(dumpdf)
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>math_score</th>
+      <th>english_score</th>
+      <th>physics_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>80</td>
+      <td>88</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>82</td>
+      <td>80</td>
+      <td>67</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>male</td>
+      <td>83</td>
+      <td>82</td>
+      <td>70</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>gender</th>
+      <th>cols</th>
+      <th>vals</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>math_score</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>math_score</td>
+      <td>82</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>male</td>
+      <td>math_score</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>male</td>
+      <td>english_score</td>
+      <td>88</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>female</td>
+      <td>english_score</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>male</td>
+      <td>english_score</td>
+      <td>82</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>male</td>
+      <td>physics_score</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>female</td>
+      <td>physics_score</td>
+      <td>67</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>male</td>
+      <td>physics_score</td>
+      <td>70</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+# plt.figure(figsize=(12,10))
+sns.barplot(data=dumpdf, x='cols', y='vals')
+```
+
+
+
+
+    <AxesSubplot:xlabel='cols', ylabel='vals'>
+
+
+
+
+
+![png](README_files/README_158_1.png)
+
+
+
+
+```python
+# plt.figure(figsize=(10,10))
+sns.barplot(data=dumpdf, x='cols', y='vals', hue='gender')
+```
+
+
+
+
+    <AxesSubplot:xlabel='cols', ylabel='vals'>
+
+
+
+
+
+![png](README_files/README_159_1.png)
 
 
