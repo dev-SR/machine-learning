@@ -1,37 +1,11 @@
 # Machine Learning
 
 - [Machine Learning](#machine-learning)
-	- [Virtual Environment](#virtual-environment)
-		- [Activating Virtual Environment Using Conda](#activating-virtual-environment-using-conda)
-		- [Installing packages inside Conda environment](#installing-packages-inside-conda-environment)
+	- [Jupyter Notebook](#jupyter-notebook)
 		- [Opening Jupyter Notebook](#opening-jupyter-notebook)
 	- [Convert `ipynb` files into html, markdown, pdf and other format files](#convert-ipynb-files-into-html-markdown-pdf-and-other-format-files)
 
-## Virtual Environment
-
-<!-- <div align="center" ><img src="../img/venv-1.jpg" alt="venv 1" width="700px"></div> -->
-
-### Activating Virtual Environment Using Conda
-
-```bash
-conda create --prefix env
-```
-
-After creating the VM, `conda` will show a message to activate the environment.
-
-```bash
-conda activate __dir__\env
-```
-
-<div align="center"><img src="img/venv_1.jpg" alt="dfs" width="800px"></div>
-
-### Installing packages inside Conda environment
-
-Once we are inside `Conda` environment, we use the following command to install `Jupyter Notebook`
-
-```bash
-conda install numpy jupyter
-```
+## Jupyter Notebook
 
 ### Opening Jupyter Notebook
 
