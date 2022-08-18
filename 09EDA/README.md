@@ -5,9 +5,16 @@
   - [Data Collection and Data Cleaning](#data-collection-and-data-cleaning)
     - [Explore data](#explore-data)
     - [Data Cleaning](#data-cleaning)
+      - [Check missing values](#check-missing-values)
+      - [Handle missing values with pandas](#handle-missing-values-with-pandas)
+        - [`fillna()`](#fillna)
+        - [`drop(index, axis)`](#dropindex-axis)
+        - [`dropna()`](#dropna)
+      - [Handle missing values with `sklearn:imputer`](#handle-missing-values-with-sklearnimputer)
     - [Data transformation](#data-transformation)
-      - [Discretization](#discretization)
       - [Handling Categorical values: `Label encoding`](#handling-categorical-values-label-encoding)
+      - [🥇Handling Categorical values: `OneHotEncoding`](#handling-categorical-values-onehotencoding)
+      - [Discretization](#discretization)
   - [Analysis](#analysis)
     - [Univariate Analysis](#univariate-analysis)
     - [Bivariate Analysis](#bivariate-analysis)
@@ -37,6 +44,7 @@
       - [Forward Selection](#forward-selection)
         - [10 best features for LinearRegression model](#10-best-features-for-linearregression-model)
       - [Embedded methods](#embedded-methods)
+
 
 ```python
 """
@@ -675,12 +683,14 @@ Data cleaning refers to the process of removing unwanted variables and values fr
 Now, it’s time to clean the housing dataset. You first need to check to see the number of missing values in each column and the percentage of missing values they contribute to.
 
 
+#### Check missing values
+
 
 ```python
 total = data.isnull().sum().sort_values(ascending=False)
 # percent = (data.isnull().sum() / data.isnull().count()).sort_values(ascending=False) * 100
 # data.isnull().count() returns the total number of rows irrespective of missing values
-percent = (data.isnull().sum() / data.shape[0]).sort_values(ascending=False) * 100
+percent = (data.isnull().sum() / len(data)).sort_values(ascending=False) * 100
 missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
 missing_data.head(20)
 ```
@@ -725,22 +735,12 @@ missing_data.head(20)
       <td>47.260274</td>
     </tr>
     <tr>
-      <th>LotFrontage</th>
-      <td>259</td>
-      <td>17.739726</td>
+      <th>GarageType</th>
+      <td>81</td>
+      <td>5.547945</td>
     </tr>
     <tr>
       <th>GarageYrBlt</th>
-      <td>81</td>
-      <td>5.547945</td>
-    </tr>
-    <tr>
-      <th>GarageCond</th>
-      <td>81</td>
-      <td>5.547945</td>
-    </tr>
-    <tr>
-      <th>GarageType</th>
       <td>81</td>
       <td>5.547945</td>
     </tr>
@@ -755,9 +755,9 @@ missing_data.head(20)
       <td>5.547945</td>
     </tr>
     <tr>
-      <th>BsmtFinType2</th>
-      <td>38</td>
-      <td>2.602740</td>
+      <th>GarageCond</th>
+      <td>81</td>
+      <td>5.547945</td>
     </tr>
     <tr>
       <th>BsmtExposure</th>
@@ -765,7 +765,12 @@ missing_data.head(20)
       <td>2.602740</td>
     </tr>
     <tr>
-      <th>BsmtQual</th>
+      <th>BsmtFinType2</th>
+      <td>38</td>
+      <td>2.602740</td>
+    </tr>
+    <tr>
+      <th>BsmtFinType1</th>
       <td>37</td>
       <td>2.534247</td>
     </tr>
@@ -775,17 +780,17 @@ missing_data.head(20)
       <td>2.534247</td>
     </tr>
     <tr>
-      <th>BsmtFinType1</th>
+      <th>BsmtQual</th>
       <td>37</td>
       <td>2.534247</td>
     </tr>
     <tr>
-      <th>MasVnrArea</th>
+      <th>MasVnrType</th>
       <td>8</td>
       <td>0.547945</td>
     </tr>
     <tr>
-      <th>MasVnrType</th>
+      <th>MasVnrArea</th>
       <td>8</td>
       <td>0.547945</td>
     </tr>
@@ -795,7 +800,12 @@ missing_data.head(20)
       <td>0.068493</td>
     </tr>
     <tr>
-      <th>Id</th>
+      <th>KitchenQual</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>TotRmsAbvGrd</th>
       <td>0</td>
       <td>0.000000</td>
     </tr>
@@ -804,6 +814,184 @@ missing_data.head(20)
 </div>
 
 
+
+#### Handle missing values with pandas
+
+##### `fillna()`
+
+
+```python
+data_num = data.select_dtypes(include=['number'])
+data_num.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Id</th>
+      <th>MSSubClass</th>
+      <th>LotFrontage</th>
+      <th>LotArea</th>
+      <th>OverallQual</th>
+      <th>OverallCond</th>
+      <th>YearBuilt</th>
+      <th>YearRemodAdd</th>
+      <th>MasVnrArea</th>
+      <th>BsmtFinSF1</th>
+      <th>...</th>
+      <th>OpenPorchSF</th>
+      <th>EnclosedPorch</th>
+      <th>3SsnPorch</th>
+      <th>ScreenPorch</th>
+      <th>PoolArea</th>
+      <th>MiscVal</th>
+      <th>MoSold</th>
+      <th>YrSold</th>
+      <th>SalePrice</th>
+      <th>SaleType_Label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>60</td>
+      <td>65.0</td>
+      <td>8450</td>
+      <td>7</td>
+      <td>5</td>
+      <td>2003</td>
+      <td>2003</td>
+      <td>196.0</td>
+      <td>706</td>
+      <td>...</td>
+      <td>61</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2008</td>
+      <td>208500</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>20</td>
+      <td>80.0</td>
+      <td>9600</td>
+      <td>6</td>
+      <td>8</td>
+      <td>1976</td>
+      <td>1976</td>
+      <td>0.0</td>
+      <td>978</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>5</td>
+      <td>2007</td>
+      <td>181500</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>60</td>
+      <td>68.0</td>
+      <td>11250</td>
+      <td>7</td>
+      <td>5</td>
+      <td>2001</td>
+      <td>2002</td>
+      <td>162.0</td>
+      <td>486</td>
+      <td>...</td>
+      <td>42</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>9</td>
+      <td>2008</td>
+      <td>223500</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>70</td>
+      <td>60.0</td>
+      <td>9550</td>
+      <td>7</td>
+      <td>5</td>
+      <td>1915</td>
+      <td>1970</td>
+      <td>0.0</td>
+      <td>216</td>
+      <td>...</td>
+      <td>35</td>
+      <td>272</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2006</td>
+      <td>140000</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>60</td>
+      <td>84.0</td>
+      <td>14260</td>
+      <td>8</td>
+      <td>5</td>
+      <td>2000</td>
+      <td>2000</td>
+      <td>350.0</td>
+      <td>655</td>
+      <td>...</td>
+      <td>84</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>12</td>
+      <td>2008</td>
+      <td>250000</td>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 39 columns</p>
+</div>
+
+
+
+
+```python
+data_num['LotFrontage'].fillna(data_num['LotFrontage'].mean(), inplace=True)
+
+```
+
+##### `drop(index, axis)`
 
 
 ```python
@@ -851,7 +1039,485 @@ data.shape
 
 
 
+##### `dropna()`
+
+- Useful for `Y` dataset
+
+
+```python
+df = pd.read_csv('car-sales-extended-missing-data.csv')
+Y = df['Price']
+Y.isna().sum()
+```
+
+
+
+
+    50
+
+
+
+
+```python
+Y.dropna(inplace=True)
+Y.isna().sum()
+
+```
+
+
+
+
+    0
+
+
+
+#### Handle missing values with `sklearn:imputer`
+
+
+```python
+df = pd.read_csv('car-sales-extended-missing-data.csv')
+X = df.drop('Price',axis=1)
+y = df['Price']
+X.shape,y.shape
+```
+
+
+
+
+    ((1000, 4), (1000,))
+
+
+
+
+```python
+df.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Make</th>
+      <th>Colour</th>
+      <th>Odometer (KM)</th>
+      <th>Doors</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Honda</td>
+      <td>White</td>
+      <td>35431.0</td>
+      <td>4.0</td>
+      <td>15323.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BMW</td>
+      <td>Blue</td>
+      <td>192714.0</td>
+      <td>5.0</td>
+      <td>19943.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Honda</td>
+      <td>White</td>
+      <td>84714.0</td>
+      <td>4.0</td>
+      <td>28343.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Toyota</td>
+      <td>White</td>
+      <td>154365.0</td>
+      <td>4.0</td>
+      <td>13434.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Nissan</td>
+      <td>Blue</td>
+      <td>181577.0</td>
+      <td>3.0</td>
+      <td>14043.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+
+# !Define strategy:
+# Filling categorical missing values with `unknown` & numerical with `mean` value
+cat_imputer = SimpleImputer(strategy='constant',fill_value='unknown')
+num_imputer = SimpleImputer(strategy='mean')
+# Note: value of `Doors` can't be taken as either numeric or categorical
+# nonetheless,we will be treating it a categorical
+door_imputer = SimpleImputer(strategy='constant',fill_value=4)
+
+# !Define columns
+categorical_features = ['Make','Colour']
+numerical_features = ["Odometer (KM)"]
+door_column = ["Doors"]
+
+# *Create an imputer (something that fills missing data)
+imputer = ColumnTransformer(
+	[
+		('cat_imputer_random_skjsdfh',cat_imputer,categorical_features),
+		('num_imputer',num_imputer,numerical_features),
+		('door_imputer',door_imputer,door_column),
+	]
+)
+
+filled_X = imputer.fit_transform(X)
+filled_X
+```
+
+
+
+
+    array([['Honda', 'White', 35431.0, 4.0],
+           ['BMW', 'Blue', 192714.0, 5.0],
+           ['Honda', 'White', 84714.0, 4.0],
+           ...,
+           ['Nissan', 'Blue', 66604.0, 4.0],
+           ['Honda', 'White', 215883.0, 4.0],
+           ['Toyota', 'Blue', 248360.0, 4.0]], dtype=object)
+
+
+
+
+```python
+filled_X = pd.DataFrame(filled_X,columns=X.columns)
+filled_X.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Make</th>
+      <th>Colour</th>
+      <th>Odometer (KM)</th>
+      <th>Doors</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Honda</td>
+      <td>White</td>
+      <td>35431.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BMW</td>
+      <td>Blue</td>
+      <td>192714.0</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Honda</td>
+      <td>White</td>
+      <td>84714.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Toyota</td>
+      <td>White</td>
+      <td>154365.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Nissan</td>
+      <td>Blue</td>
+      <td>181577.0</td>
+      <td>3.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ### Data transformation
+
+#### Handling Categorical values: `Label encoding`
+
+
+```python
+data['SaleType'].unique()
+
+```
+
+
+    array(['WD', 'New', 'COD', 'ConLD', 'ConLI', 'CWD', 'ConLw', 'Con', 'Oth'],
+          dtype=object)
+
+
+
+```python
+from sklearn.preprocessing import LabelEncoder
+label_encoder=LabelEncoder()
+data['SaleType_Label']= label_encoder.fit_transform(data['SaleType'])
+data['SaleType_Label'].unique()
+```
+
+
+    array([8, 6, 0, 3, 4, 1, 5, 2, 7])
+
+
+#### 🥇Handling Categorical values: `OneHotEncoding`
+
+
+```python
+df = pd.read_csv('car-sales-extended-missing-data.csv')
+df.head()
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Make</th>
+      <th>Colour</th>
+      <th>Odometer (KM)</th>
+      <th>Doors</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Honda</td>
+      <td>White</td>
+      <td>35431.0</td>
+      <td>4.0</td>
+      <td>15323.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BMW</td>
+      <td>Blue</td>
+      <td>192714.0</td>
+      <td>5.0</td>
+      <td>19943.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Honda</td>
+      <td>White</td>
+      <td>84714.0</td>
+      <td>4.0</td>
+      <td>28343.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Toyota</td>
+      <td>White</td>
+      <td>154365.0</td>
+      <td>4.0</td>
+      <td>13434.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Nissan</td>
+      <td>Blue</td>
+      <td>181577.0</td>
+      <td>3.0</td>
+      <td>14043.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.isnull().sum()
+```
+
+
+    Make             49
+    Colour           50
+    Odometer (KM)    50
+    Doors            50
+    Price            50
+    dtype: int64
+
+
+
+```python
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+categorical_features = ['Colour','Make','Doors']
+ct = ColumnTransformer([('one_hot',OneHotEncoder(), categorical_features)], remainder='passthrough')
+# remainder: {‘drop’, ‘passthrough’}, default=’drop’ ->drops non-specified columns
+
+transformed = ct.fit_transform(df)
+pd.DataFrame(transformed.toarray()).head()
+
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>10</th>
+      <th>11</th>
+      <th>12</th>
+      <th>13</th>
+      <th>14</th>
+      <th>15</th>
+      <th>16</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>35431.0</td>
+      <td>15323.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>192714.0</td>
+      <td>19943.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>84714.0</td>
+      <td>28343.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>154365.0</td>
+      <td>13434.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>181577.0</td>
+      <td>14043.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 #### Discretization
 
@@ -876,13 +1542,10 @@ data['SalePrice'].agg([min,max,np.mean])
 ```
 
 
-
-
     min      34900.000000
     max     755000.000000
     mean    180930.394791
     Name: SalePrice, dtype: float64
-
 
 
 
@@ -892,8 +1555,6 @@ data[['SalePrice','Price_label']].head()
 ```
 
 
-
-
 <div>
 
 <table border="1" class="dataframe">
@@ -933,203 +1594,6 @@ data[['SalePrice','Price_label']].head()
   </tbody>
 </table>
 </div>
-
-
-
-#### Handling Categorical values: `Label encoding`
-
-
-```python
-data['SaleType'].unique()
-
-```
-
-
-
-
-    array(['WD', 'New', 'COD', 'ConLD', 'ConLI', 'CWD', 'ConLw', 'Con', 'Oth'],
-          dtype=object)
-
-
-
-
-```python
-from sklearn import preprocessing
-label_encoder = preprocessing.LabelEncoder()
-data['SaleType_Label']= label_encoder.fit_transform(data['SaleType'])
-data['SaleType_Label'].unique()
-```
-
-
-
-
-    array([8, 6, 0, 3, 4, 1, 5, 2, 7])
-
-
-
-
-```python
-data.head()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Id</th>
-      <th>MSSubClass</th>
-      <th>MSZoning</th>
-      <th>LotArea</th>
-      <th>Street</th>
-      <th>LotShape</th>
-      <th>LandContour</th>
-      <th>Utilities</th>
-      <th>LotConfig</th>
-      <th>LandSlope</th>
-      <th>...</th>
-      <th>ScreenPorch</th>
-      <th>PoolArea</th>
-      <th>MiscVal</th>
-      <th>MoSold</th>
-      <th>YrSold</th>
-      <th>SaleType</th>
-      <th>SaleCondition</th>
-      <th>SalePrice</th>
-      <th>Price_label</th>
-      <th>SaleType_Label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>60</td>
-      <td>RL</td>
-      <td>8450</td>
-      <td>Pave</td>
-      <td>Reg</td>
-      <td>Lvl</td>
-      <td>AllPub</td>
-      <td>Inside</td>
-      <td>Gtl</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>2008</td>
-      <td>WD</td>
-      <td>Normal</td>
-      <td>208500</td>
-      <td>Medium</td>
-      <td>8</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>20</td>
-      <td>RL</td>
-      <td>9600</td>
-      <td>Pave</td>
-      <td>Reg</td>
-      <td>Lvl</td>
-      <td>AllPub</td>
-      <td>FR2</td>
-      <td>Gtl</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>5</td>
-      <td>2007</td>
-      <td>WD</td>
-      <td>Normal</td>
-      <td>181500</td>
-      <td>Medium</td>
-      <td>8</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>60</td>
-      <td>RL</td>
-      <td>11250</td>
-      <td>Pave</td>
-      <td>IR1</td>
-      <td>Lvl</td>
-      <td>AllPub</td>
-      <td>Inside</td>
-      <td>Gtl</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>9</td>
-      <td>2008</td>
-      <td>WD</td>
-      <td>Normal</td>
-      <td>223500</td>
-      <td>Medium</td>
-      <td>8</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>70</td>
-      <td>RL</td>
-      <td>9550</td>
-      <td>Pave</td>
-      <td>IR1</td>
-      <td>Lvl</td>
-      <td>AllPub</td>
-      <td>Corner</td>
-      <td>Gtl</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>2</td>
-      <td>2006</td>
-      <td>WD</td>
-      <td>Abnorml</td>
-      <td>140000</td>
-      <td>Medium</td>
-      <td>8</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-      <td>60</td>
-      <td>RL</td>
-      <td>14260</td>
-      <td>Pave</td>
-      <td>IR1</td>
-      <td>Lvl</td>
-      <td>AllPub</td>
-      <td>FR2</td>
-      <td>Gtl</td>
-      <td>...</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>12</td>
-      <td>2008</td>
-      <td>WD</td>
-      <td>Normal</td>
-      <td>250000</td>
-      <td>Medium</td>
-      <td>8</td>
-    </tr>
-  </tbody>
-</table>
-<p>5 rows × 65 columns</p>
-</div>
-
 
 
 ## Analysis
@@ -1320,7 +1784,7 @@ data['SalePrice'].plot(kind='hist', bins=50, figsize=(10,6))
 
 
 
-![jpeg](README_files/README_35_1.jpg)
+![jpeg](README_files/README_53_1.jpg)
 
 
 
@@ -1334,7 +1798,7 @@ plt.show()
 
 
 
-![jpeg](README_files/README_36_0.jpg)
+![jpeg](README_files/README_54_0.jpg)
 
 
 
@@ -1413,7 +1877,7 @@ sns.histplot(saleprice_scaled, kde=True)
 
 
 
-![jpeg](README_files/README_44_1.jpg)
+![jpeg](README_files/README_62_1.jpg)
 
 
 
@@ -1458,7 +1922,7 @@ data.LotConfig.value_counts(normalize=True).plot(kind='barh', figsize=(10,6))
 
 
 
-![jpeg](README_files/README_47_1.jpg)
+![jpeg](README_files/README_65_1.jpg)
 
 
 
@@ -1517,7 +1981,7 @@ data[data['SalePrice'] < 180159]['SalePrice'].shape
 
 
 
-![jpeg](README_files/README_51_1.jpg)
+![jpeg](README_files/README_69_1.jpg)
 
 
 
@@ -1544,7 +2008,7 @@ data[['SalePrice', 'LotArea']].loc[:50].plot()
 
 
 
-![jpeg](README_files/README_55_1.jpg)
+![jpeg](README_files/README_73_1.jpg)
 
 
 
@@ -1566,7 +2030,7 @@ data.plot.scatter(x='GrLivArea', y='SalePrice', ylim=(0,800000),figsize=(10,6))
 
 
 
-![jpeg](README_files/README_58_1.jpg)
+![jpeg](README_files/README_76_1.jpg)
 
 
 
@@ -1708,7 +2172,7 @@ data.plot.scatter(x='GrLivArea', y='SalePrice', ylim=(0,800000),figsize=(10,6))
 
 
 
-![jpeg](README_files/README_63_1.jpg)
+![jpeg](README_files/README_81_1.jpg)
 
 
 
@@ -1754,7 +2218,7 @@ sns.heatmap(data[['YrSold','MoSold','LotArea']].corr(),annot=True)
 
 
 
-![jpeg](README_files/README_66_1.jpg)
+![jpeg](README_files/README_84_1.jpg)
 
 
 
@@ -1774,7 +2238,7 @@ plt.show()
 
 
 
-![jpeg](README_files/README_68_0.jpg)
+![jpeg](README_files/README_86_0.jpg)
 
 
 
@@ -1810,7 +2274,7 @@ data.groupby('SaleCondition')['SaleCondition'].size().sort_values(ascending=True
 
 
 
-![jpeg](README_files/README_73_1.jpg)
+![jpeg](README_files/README_91_1.jpg)
 
 
 
@@ -1933,7 +2397,7 @@ data.groupby('SaleCondition')['SalePrice'].mean().sort_values(ascending=False).p
 
 
 
-![jpeg](README_files/README_76_1.jpg)
+![jpeg](README_files/README_94_1.jpg)
 
 
 
@@ -1953,7 +2417,7 @@ data.groupby('SaleCondition')['SalePrice'].count().sort_values(ascending=False).
 
 
 
-![jpeg](README_files/README_77_1.jpg)
+![jpeg](README_files/README_95_1.jpg)
 
 
 
@@ -1973,7 +2437,7 @@ data.groupby('SaleCondition')['SalePrice'].std().sort_values(ascending=False).pl
 
 
 
-![jpeg](README_files/README_78_1.jpg)
+![jpeg](README_files/README_96_1.jpg)
 
 
 
@@ -2212,7 +2676,7 @@ sns.barplot(x='cols', y='vals', data=df,hue='SaleCondition')
 
 
 
-![jpeg](README_files/README_84_1.jpg)
+![jpeg](README_files/README_102_1.jpg)
 
 
 
@@ -2232,7 +2696,7 @@ sns.boxplot(x='SaleCondition', y='SalePrice', data=data)
 
 
 
-![jpeg](README_files/README_86_1.jpg)
+![jpeg](README_files/README_104_1.jpg)
 
 
 
@@ -2753,7 +3217,7 @@ X_train.plot.box(figsize=(20,5), rot=90)
 
 
 
-![png](README_files/README_99_1.png)
+![png](README_files/README_117_1.png)
 
 
 
@@ -2997,7 +3461,7 @@ pd.DataFrame(X_train_norm, columns=X_train.columns).plot.box(figsize=(20,5), rot
 
 
 
-![png](README_files/README_104_1.png)
+![png](README_files/README_122_1.png)
 
 
 
@@ -3224,7 +3688,7 @@ pd.DataFrame(X_train_stand, columns=X_train.columns).plot.box(figsize=(20,5), ro
 
 
 
-![png](README_files/README_108_1.png)
+![png](README_files/README_126_1.png)
 
 
 
@@ -3381,7 +3845,7 @@ df.plot.barh(figsize=[15, 15])
 
 
 
-![png](README_files/README_118_1.png)
+![png](README_files/README_136_1.png)
 
 
 
