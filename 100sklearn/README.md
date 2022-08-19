@@ -17,7 +17,17 @@
     - [Problem Specific Metrics for Classification](#problem-specific-metrics-for-classification)
       - [Accuracy](#accuracy)
       - [Area Under the ROC Curve](#area-under-the-roc-curve)
-
+  - [Putting All Together: PipeLine + GridSearchCV](#putting-all-together-pipeline--gridsearchcv)
+    - [v1: Pipelining up to Single Estimator](#v1-pipelining-up-to-single-estimator)
+      - [1. EDA](#1-eda)
+      - [2. Define numerical and categorical features.](#2-define-numerical-and-categorical-features)
+      - [3. PipeLine 1: For categorical features: fill missing values then label encode](#3-pipeline-1-for-categorical-features-fill-missing-values-then-label-encode)
+      - [4. PipeLine 2: For numerical features: fill missing values then feature scale](#4-pipeline-2-for-numerical-features-fill-missing-values-then-feature-scale)
+      - [5. Combine numerical and categorical transformer using `ColumnTransformer`.](#5-combine-numerical-and-categorical-transformer-using-columntransformer)
+      - [6. (optional) Apply PCA to reduce dimensions.](#6-optional-apply-pca-to-reduce-dimensions)
+      - [7. Final Pipeline With an Estimator](#7-final-pipeline-with-an-estimator)
+      - [Visualizing Pipeline](#visualizing-pipeline)
+  - [Resource](#resource)
 
 ```python
 """
@@ -1059,8 +1069,656 @@ roc_auc_score(y_test, y_probs_positive)
 
 
 
+
+## Putting All Together: PipeLine + GridSearchCV
+
+- [towardsdatascience.com/how-to-use-sklearn-pipelines-for-ridiculously-neat-code](https://towardsdatascience.com/how-to-use-sklearn-pipelines-for-ridiculously-neat-code-a61ab66ca90d)
+- [towardsdatascience.com/are-you-using-pipeline-in-scikit-learn](https://towardsdatascience.com/are-you-using-pipeline-in-scikit-learn-ac4cd85cb27f)
+- [https://medium.com/vickdata/a-simple-guide-to-scikit-learn-pipelines](https://medium.com/vickdata/a-simple-guide-to-scikit-learn-pipelines-4ac0d974bdcf)
+
+### v1: Pipelining up to Single Estimator
+
+
+
 ```python
-# ho
+# getting data ready
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler,StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+
+# modelling
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
+# setup random seed for reproducibility
+import numpy as np
+np.random.seed(42)
+
+```
+
+#### 1. EDA
+
+
+```python
+df = pd.read_csv("house_prices.csv")
+df.head()
 ```
 
 
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Id</th>
+      <th>MSSubClass</th>
+      <th>MSZoning</th>
+      <th>LotFrontage</th>
+      <th>LotArea</th>
+      <th>Street</th>
+      <th>Alley</th>
+      <th>LotShape</th>
+      <th>LandContour</th>
+      <th>Utilities</th>
+      <th>...</th>
+      <th>PoolArea</th>
+      <th>PoolQC</th>
+      <th>Fence</th>
+      <th>MiscFeature</th>
+      <th>MiscVal</th>
+      <th>MoSold</th>
+      <th>YrSold</th>
+      <th>SaleType</th>
+      <th>SaleCondition</th>
+      <th>SalePrice</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>65.0</td>
+      <td>8450</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>Reg</td>
+      <td>Lvl</td>
+      <td>AllPub</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2008</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>208500</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>20</td>
+      <td>RL</td>
+      <td>80.0</td>
+      <td>9600</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>Reg</td>
+      <td>Lvl</td>
+      <td>AllPub</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>5</td>
+      <td>2007</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>181500</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>68.0</td>
+      <td>11250</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>AllPub</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>9</td>
+      <td>2008</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>223500</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>70</td>
+      <td>RL</td>
+      <td>60.0</td>
+      <td>9550</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>AllPub</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2006</td>
+      <td>WD</td>
+      <td>Abnorml</td>
+      <td>140000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>84.0</td>
+      <td>14260</td>
+      <td>Pave</td>
+      <td>NaN</td>
+      <td>IR1</td>
+      <td>Lvl</td>
+      <td>AllPub</td>
+      <td>...</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>12</td>
+      <td>2008</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>250000</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 81 columns</p>
+</div>
+
+
+
+
+```python
+X = df.drop('SalePrice', axis=1)
+y = df.SalePrice
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25,
+                                                      random_state=0)
+print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+```
+
+    (1095, 80) (365, 80) (1095,) (365,)
+
+
+
+```python
+X_train.describe().T.iloc[:10]
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Id</th>
+      <td>1095.0</td>
+      <td>733.713242</td>
+      <td>421.940022</td>
+      <td>1.0</td>
+      <td>366.50</td>
+      <td>747.0</td>
+      <td>1099.5</td>
+      <td>1460.0</td>
+    </tr>
+    <tr>
+      <th>MSSubClass</th>
+      <td>1095.0</td>
+      <td>56.602740</td>
+      <td>42.201335</td>
+      <td>20.0</td>
+      <td>20.00</td>
+      <td>50.0</td>
+      <td>70.0</td>
+      <td>190.0</td>
+    </tr>
+    <tr>
+      <th>LotFrontage</th>
+      <td>896.0</td>
+      <td>69.764509</td>
+      <td>23.116448</td>
+      <td>21.0</td>
+      <td>58.75</td>
+      <td>69.5</td>
+      <td>80.0</td>
+      <td>313.0</td>
+    </tr>
+    <tr>
+      <th>LotArea</th>
+      <td>1095.0</td>
+      <td>10554.273973</td>
+      <td>10059.063819</td>
+      <td>1300.0</td>
+      <td>7734.00</td>
+      <td>9531.0</td>
+      <td>11592.0</td>
+      <td>215245.0</td>
+    </tr>
+    <tr>
+      <th>OverallQual</th>
+      <td>1095.0</td>
+      <td>6.071233</td>
+      <td>1.363015</td>
+      <td>1.0</td>
+      <td>5.00</td>
+      <td>6.0</td>
+      <td>7.0</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>OverallCond</th>
+      <td>1095.0</td>
+      <td>5.568037</td>
+      <td>1.115243</td>
+      <td>1.0</td>
+      <td>5.00</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>9.0</td>
+    </tr>
+    <tr>
+      <th>YearBuilt</th>
+      <td>1095.0</td>
+      <td>1971.006393</td>
+      <td>30.205435</td>
+      <td>1872.0</td>
+      <td>1954.00</td>
+      <td>1972.0</td>
+      <td>2000.0</td>
+      <td>2010.0</td>
+    </tr>
+    <tr>
+      <th>YearRemodAdd</th>
+      <td>1095.0</td>
+      <td>1984.691324</td>
+      <td>20.577087</td>
+      <td>1950.0</td>
+      <td>1966.50</td>
+      <td>1993.0</td>
+      <td>2003.0</td>
+      <td>2010.0</td>
+    </tr>
+    <tr>
+      <th>MasVnrArea</th>
+      <td>1090.0</td>
+      <td>104.244037</td>
+      <td>183.990710</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>170.0</td>
+      <td>1600.0</td>
+    </tr>
+    <tr>
+      <th>BsmtFinSF1</th>
+      <td>1095.0</td>
+      <td>441.032877</td>
+      <td>434.599451</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>381.0</td>
+      <td>716.0</td>
+      <td>2260.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+X_train.describe(include=object).T.iloc[:10]  # All object cols
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>unique</th>
+      <th>top</th>
+      <th>freq</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>MSZoning</th>
+      <td>1095</td>
+      <td>5</td>
+      <td>RL</td>
+      <td>873</td>
+    </tr>
+    <tr>
+      <th>Street</th>
+      <td>1095</td>
+      <td>2</td>
+      <td>Pave</td>
+      <td>1090</td>
+    </tr>
+    <tr>
+      <th>Alley</th>
+      <td>65</td>
+      <td>2</td>
+      <td>Grvl</td>
+      <td>33</td>
+    </tr>
+    <tr>
+      <th>LotShape</th>
+      <td>1095</td>
+      <td>4</td>
+      <td>Reg</td>
+      <td>688</td>
+    </tr>
+    <tr>
+      <th>LandContour</th>
+      <td>1095</td>
+      <td>4</td>
+      <td>Lvl</td>
+      <td>991</td>
+    </tr>
+    <tr>
+      <th>Utilities</th>
+      <td>1095</td>
+      <td>2</td>
+      <td>AllPub</td>
+      <td>1094</td>
+    </tr>
+    <tr>
+      <th>LotConfig</th>
+      <td>1095</td>
+      <td>5</td>
+      <td>Inside</td>
+      <td>795</td>
+    </tr>
+    <tr>
+      <th>LandSlope</th>
+      <td>1095</td>
+      <td>3</td>
+      <td>Gtl</td>
+      <td>1030</td>
+    </tr>
+    <tr>
+      <th>Neighborhood</th>
+      <td>1095</td>
+      <td>25</td>
+      <td>NAmes</td>
+      <td>163</td>
+    </tr>
+    <tr>
+      <th>Condition1</th>
+      <td>1095</td>
+      <td>9</td>
+      <td>Norm</td>
+      <td>959</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+above_0_missing = X_train.isnull().sum() > 0
+missing = X_train.isnull().sum()[above_0_missing]
+missing.shape,missing
+```
+
+
+
+
+    ((19,),
+     LotFrontage      199
+     Alley           1030
+     MasVnrType         5
+     MasVnrArea         5
+     BsmtQual          25
+     BsmtCond          25
+     BsmtExposure      25
+     BsmtFinType1      25
+     BsmtFinType2      26
+     Electrical         1
+     FireplaceQu      521
+     GarageType        56
+     GarageYrBlt       56
+     GarageFinish      56
+     GarageQual        56
+     GarageCond        56
+     PoolQC          1091
+     Fence            896
+     MiscFeature     1048
+     dtype: int64)
+
+
+
+19 features have NaNs
+
+#### 2. Define numerical and categorical features.
+
+
+```python
+numerical_features = X_train.select_dtypes(include='number').columns.tolist()
+print(f'There are {len(numerical_features)} numerical features:', '\n')
+print(numerical_features)
+```
+
+    There are 37 numerical features:
+
+    ['Id', 'MSSubClass', 'LotFrontage', 'LotArea', 'OverallQual', 'OverallCond', 'YearBuilt', 'YearRemodAdd', 'MasVnrArea', 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'GrLivArea', 'BsmtFullBath', 'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr', 'TotRmsAbvGrd', 'Fireplaces', 'GarageYrBlt', 'GarageCars', 'GarageArea', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'PoolArea', 'MiscVal', 'MoSold', 'YrSold']
+
+
+
+```python
+categorical_features = X_train.select_dtypes(exclude='number').columns.tolist()
+print(f'There are {len(categorical_features)} categorical features:', '\n')
+print(categorical_features)
+```
+
+    There are 43 categorical features:
+
+    ['MSZoning', 'Street', 'Alley', 'LotShape', 'LandContour', 'Utilities', 'LotConfig', 'LandSlope', 'Neighborhood', 'Condition1', 'Condition2', 'BldgType', 'HouseStyle', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd', 'MasVnrType', 'ExterQual', 'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2', 'Heating', 'HeatingQC', 'CentralAir', 'Electrical', 'KitchenQual', 'Functional', 'FireplaceQu', 'GarageType', 'GarageFinish', 'GarageQual', 'GarageCond', 'PavedDrive', 'PoolQC', 'Fence', 'MiscFeature', 'SaleType', 'SaleCondition']
+
+
+#### 3. PipeLine 1: For categorical features: fill missing values then label encode
+
+For categoricals, we will use `SimpleImputer` to fill the missing values with the `mode`(value that appears most often) of each column. And then convert the categorical columns to numerical columns using `OneHotEncoder`.
+
+
+```python
+categorical_pipeline = Pipeline(steps=[
+    ('impute', SimpleImputer(strategy='most_frequent')),
+    ('one-hot', OneHotEncoder(handle_unknown='ignore', sparse=False))
+])
+
+```
+
+> Set `handle_unknown` to `ignore` to skip previously unseen labels. Otherwise, `OneHotEncoder` throws an error if there are labels in test set that are not in train set.
+
+#### 4. PipeLine 2: For numerical features: fill missing values then feature scale
+
+For numeric columns, we first fill the missing values with `SimpleImputer` using the `mean` and feature scale using `MinMaxScaler`.
+
+
+```python
+numeric_pipeline = Pipeline(steps=[
+    ('impute', SimpleImputer(strategy='mean')),
+    ('scale', MinMaxScaler())
+])
+
+```
+
+#### 5. Combine numerical and categorical transformer using `ColumnTransformer`.
+
+By default, all `Pipeline` objects have `fit` and `transform` methods which can be used to transform the input array like this:
+
+
+```python
+numeric_pipeline.fit_transform(X_train.select_dtypes(include='number'))
+```
+
+
+
+
+    array([[0.88553804, 0.29411765, 0.13356164, ..., 0.        , 1.        ,
+            0.75      ],
+           [0.69773818, 0.35294118, 0.16700174, ..., 0.        , 0.36363636,
+            0.25      ],
+           [0.83139136, 0.35294118, 0.16700174, ..., 0.        , 0.36363636,
+            0.        ],
+           ...,
+           [0.83344757, 0.41176471, 0.1609589 , ..., 0.        , 0.27272727,
+            1.        ],
+           [0.38313914, 0.58823529, 0.16700174, ..., 0.        , 0.81818182,
+            0.        ],
+           [0.46881426, 0.23529412, 0.12671233, ..., 0.        , 0.45454545,
+            1.        ]])
+
+
+
+But, using the pipelines in this way means we have to call each pipeline separately on selected columns which is not what we want. What we want is to have a single preprocessor that is able to perform both numeric and categorical transformations in a single line of code like this: `full_processor.fit_transform(X_train)`
+
+`ColumnTransformer` helps to define different transformers for different types of inputs and combine them into a single feature space after transformation. Here we are applying numerical transformer and categorical transformer created above for our numerical and categorical features.
+
+
+```python
+data_transformers = ColumnTransformer(transformers=[
+    ('number', numeric_pipeline, numerical_features),
+    ('category', categorical_pipeline, categorical_features)
+])
+
+```
+
+> Remember that `numerical_features` and `categorical_features` contain the respective names of columns from `X_train`.
+
+Similar to `Pipeline` class, `ColumnTransformer` takes a tuple of transformers. Each tuple `("step_name",transformer,columns)`should contain an arbitrary step name, the transformer itself and the list of column names that the transformer should be applied to . Here, we are creating a column transformer with 2 steps using both of our numeric and categorical preprocessing pipelines
+
+#### 6. (optional) Apply PCA to reduce dimensions.
+
+Principle Component Analysis aka PCA is a linear dimensionality reduction algorithm that is used to reduce the number of features in the dataset by keeping the maximum variance.
+
+
+```python
+#  Creating preprocessor pipeline which will first transform the data
+# and then apply PCA.
+preprocessor = Pipeline(steps=[('data_transformers', data_transformers),
+                             ('reduce_dim',PCA())])
+```
+
+#### 7. Final Pipeline With an Estimator
+
+
+```python
+model = Pipeline(steps=[('preprocessor', preprocessor),
+                      ('model', RandomForestRegressor())])
+```
+
+
+```python
+model.fit(X_train, y_train)
+model.score(X_test, y_test)
+```
+
+
+
+
+    0.6497809474139162
+
+
+
+
+```python
+
+```
+
+#### Visualizing Pipeline
+
+
+```python
+# imports
+from sklearn import set_config                      # to change the display
+from sklearn.utils import estimator_html_repr       # to save the diagram into HTML format
+
+# set config to diagram for visualizing the pipelines/composite estimators
+set_config(display='diagram')
+
+model
+
+```
+
+
+
+
+
+
+
+
+## Resource
+
+
+```python
+
+```
