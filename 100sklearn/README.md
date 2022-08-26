@@ -27,6 +27,8 @@
       - [6. (optional) Apply PCA to reduce dimensions.](#6-optional-apply-pca-to-reduce-dimensions)
       - [7. Final Pipeline With an Estimator](#7-final-pipeline-with-an-estimator)
       - [Visualizing Pipeline](#visualizing-pipeline)
+      - [🚀All In One](#all-in-one)
+    - [v2: Pipelining + GridSearchCV](#v2-pipelining--gridsearchcv)
   - [Resource](#resource)
 
 ```python
@@ -1283,7 +1285,7 @@ print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
 
 ```python
-X_train.describe().T.iloc[:10]
+X_train.describe().T.iloc[:5]
 
 ```
 
@@ -1362,61 +1364,6 @@ X_train.describe().T.iloc[:10]
       <td>7.0</td>
       <td>10.0</td>
     </tr>
-    <tr>
-      <th>OverallCond</th>
-      <td>1095.0</td>
-      <td>5.568037</td>
-      <td>1.115243</td>
-      <td>1.0</td>
-      <td>5.00</td>
-      <td>5.0</td>
-      <td>6.0</td>
-      <td>9.0</td>
-    </tr>
-    <tr>
-      <th>YearBuilt</th>
-      <td>1095.0</td>
-      <td>1971.006393</td>
-      <td>30.205435</td>
-      <td>1872.0</td>
-      <td>1954.00</td>
-      <td>1972.0</td>
-      <td>2000.0</td>
-      <td>2010.0</td>
-    </tr>
-    <tr>
-      <th>YearRemodAdd</th>
-      <td>1095.0</td>
-      <td>1984.691324</td>
-      <td>20.577087</td>
-      <td>1950.0</td>
-      <td>1966.50</td>
-      <td>1993.0</td>
-      <td>2003.0</td>
-      <td>2010.0</td>
-    </tr>
-    <tr>
-      <th>MasVnrArea</th>
-      <td>1090.0</td>
-      <td>104.244037</td>
-      <td>183.990710</td>
-      <td>0.0</td>
-      <td>0.00</td>
-      <td>0.0</td>
-      <td>170.0</td>
-      <td>1600.0</td>
-    </tr>
-    <tr>
-      <th>BsmtFinSF1</th>
-      <td>1095.0</td>
-      <td>441.032877</td>
-      <td>434.599451</td>
-      <td>0.0</td>
-      <td>0.00</td>
-      <td>381.0</td>
-      <td>716.0</td>
-      <td>2260.0</td>
-    </tr>
   </tbody>
 </table>
 </div>
@@ -1425,7 +1372,7 @@ X_train.describe().T.iloc[:10]
 
 
 ```python
-X_train.describe(include=object).T.iloc[:10]  # All object cols
+X_train.describe(include=object).T.iloc[:5]  # All object cols
 
 ```
 
@@ -1479,41 +1426,6 @@ X_train.describe(include=object).T.iloc[:10]  # All object cols
       <td>4</td>
       <td>Lvl</td>
       <td>991</td>
-    </tr>
-    <tr>
-      <th>Utilities</th>
-      <td>1095</td>
-      <td>2</td>
-      <td>AllPub</td>
-      <td>1094</td>
-    </tr>
-    <tr>
-      <th>LotConfig</th>
-      <td>1095</td>
-      <td>5</td>
-      <td>Inside</td>
-      <td>795</td>
-    </tr>
-    <tr>
-      <th>LandSlope</th>
-      <td>1095</td>
-      <td>3</td>
-      <td>Gtl</td>
-      <td>1030</td>
-    </tr>
-    <tr>
-      <th>Neighborhood</th>
-      <td>1095</td>
-      <td>25</td>
-      <td>NAmes</td>
-      <td>163</td>
-    </tr>
-    <tr>
-      <th>Condition1</th>
-      <td>1095</td>
-      <td>9</td>
-      <td>Norm</td>
-      <td>959</td>
     </tr>
   </tbody>
 </table>
@@ -1641,7 +1553,7 @@ numeric_pipeline.fit_transform(X_train.select_dtypes(include='number'))
 
 But, using the pipelines in this way means we have to call each pipeline separately on selected columns which is not what we want. What we want is to have a single preprocessor that is able to perform both numeric and categorical transformations in a single line of code like this: `full_processor.fit_transform(X_train)`
 
-`ColumnTransformer` helps to define different transformers for different types of inputs and combine them into a single feature space after transformation. Here we are applying numerical transformer and categorical transformer created above for our numerical and categorical features.
+🚀 `ColumnTransformer` helps to define different transformers for different types of inputs and combine them into a single feature space after transformation. Here we are applying numerical transformer and categorical transformer created above for our numerical and categorical features.
 
 
 ```python
@@ -1685,14 +1597,53 @@ model.score(X_test, y_test)
 
 
 
-    0.6497809474139162
+    0.6631921072752525
 
 
 
 
 ```python
-
+from sklearn.linear_model import LinearRegression,Lasso,SGDRegressor,Ridge,RidgeCV,ElasticNetCV
+from sklearn.svm  import LinearSVC,LinearSVR
+from sklearn.ensemble import RandomForestRegressor
+models = [
+    LinearRegression(),
+	Lasso(),
+	RandomForestRegressor(),
+    SGDRegressor(),
+    Ridge(),
+    RidgeCV(),
+    LinearSVC(),
+    LinearSVC(),
+    ElasticNetCV()
+    ]
+for model in models:
+    pipe = Pipeline(steps=[('preprocessor', preprocessor),
+                      ('model', model)])
+    pipe.fit(X_train, y_train)
+    print(model)
+    print(f"model score: {pipe.score(X_test, y_test)*100:.2f}%" )
 ```
+
+    LinearRegression()
+    model score: -486929079683966379753472.00%
+    Lasso()
+    model score: 55.11%
+    RandomForestRegressor()
+    model score: 65.00%
+    SGDRegressor()
+    model score: 73.26%
+    Ridge()
+    model score: 70.13%
+    RidgeCV(alphas=array([ 0.1,  1. , 10. ]))
+    model score: 70.13%
+    LinearSVC()
+    model score: 1.10%
+    LinearSVC()
+    model score: 1.10%
+    ElasticNetCV()
+    model score: 2.63%
+
 
 #### Visualizing Pipeline
 
@@ -1706,19 +1657,231 @@ from sklearn.utils import estimator_html_repr       # to save the diagram into H
 set_config(display='diagram')
 
 model
-
 ```
 
-
-
-
-
-
-
-
-## Resource
+#### 🚀All In One
 
 
 ```python
+# getting data ready
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler,StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+
+# modelling
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
+# setup random seed for reproducibility
+import numpy as np
+np.random.seed(42)
+
+
+df = pd.read_csv("house_prices.csv")
+
+#### 2. Define numerical and categorical features.
+numerical_features = X_train.select_dtypes(include='number').columns.tolist()
+categorical_features = X_train.select_dtypes(exclude='number').columns.tolist()
+
+
+#### 3. PipeLine 1: For categorical features: fill missing values then label encode
+categorical_pipeline = Pipeline(steps=[
+    ('cat_imputer', SimpleImputer(strategy='most_frequent')),
+    ('one-hot', OneHotEncoder(handle_unknown='ignore', sparse=False))
+])
+
+#### 4. PipeLine 2: For numerical features: fill missing values then feature scale
+numeric_pipeline = Pipeline(steps=[
+    ('num_imputer', SimpleImputer(strategy='mean')),
+    ('scale', MinMaxScaler())
+])
+
+#### 5. Combine numerical and categorical transformer using `ColumnTransformer`.
+data_transformers = ColumnTransformer(transformers=[
+    ('number_trans', numeric_pipeline, numerical_features),
+    ('category_trans', categorical_pipeline, categorical_features)
+])
+
+#### 6. (optional) Apply PCA to reduce dimensions.
+preprocessor = Pipeline(steps=[('data_transformers', data_transformers),
+                             ('reduce_dim',PCA())])
+
+#### 7. Final Pipeline With an Estimator
+regr = RandomForestRegressor(max_depth=2, random_state=0)
+
+regr_pipeline = Pipeline(steps=[
+    ('preprocess', preprocessor),
+    ('model', regr)
+])
+
+regr_pipeline.fit(X_train, y_train)
+regr_pipeline.score(X_test, y_test)
 
 ```
+
+
+
+
+    0.5815383582285798
+
+
+
+Finally, Generating Submissions with a Pipeline:
+
+
+```python
+preds_final = regr_pipeline.predict(X_test)
+output = pd.DataFrame({'Id': X_test.index,
+                       'SalePrice': preds_final})
+# output.to_csv('submission.csv', index=False)
+output.head()
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Id</th>
+      <th>SalePrice</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>529</td>
+      <td>195259.084615</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>491</td>
+      <td>128905.312343</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>459</td>
+      <td>129509.383524</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>279</td>
+      <td>207386.859503</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>655</td>
+      <td>132300.239534</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### v2: Pipelining + GridSearchCV
+
+- [https://scikit-learn.org/stable/tutorial/statistical_inference/putting_together.html](https://scikit-learn.org/stable/tutorial/statistical_inference/putting_together.html)
+- [https://machinelearninghd.com/gridsearchcv-hyperparameter-tuning-sckit-learn-regression-classification/](https://machinelearninghd.com/gridsearchcv-hyperparameter-tuning-sckit-learn-regression-classification/)
+- [https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/](https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/	)
+- 🥇[https://towardsdatascience.com/machine-learning-pipelines-with-scikit-learn](https://towardsdatascience.com/machine-learning-pipelines-with-scikit-learn-d43c32a6aa52)
+- [https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once](https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once-9fcebfcc6c23)
+- [https://machinelearninghd.com/sklearn-svm-starter-guide/](https://machinelearninghd.com/sklearn-svm-starter-guide/)
+
+
+```python
+# getting data ready
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler,StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+
+
+# modelling
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RepeatedKFold
+from sklearn.model_selection import GridSearchCV
+
+# setup random seed for reproducibility
+import numpy as np
+np.random.seed(42)
+
+
+df = pd.read_csv("house_prices.csv")
+
+#### 2. Define numerical and categorical features.
+numerical_features = X_train.select_dtypes(include='number').columns.tolist()
+categorical_features = X_train.select_dtypes(exclude='number').columns.tolist()
+
+
+#### 3. PipeLine 1: For categorical features: fill missing values then label encode
+categorical_pipeline = Pipeline(steps=[
+    ('cat_imputer', SimpleImputer(strategy='most_frequent')),
+    ('one-hot', OneHotEncoder(handle_unknown='ignore', sparse=False))
+])
+
+#### 4. PipeLine 2: For numerical features: fill missing values then feature scale
+numeric_pipeline = Pipeline(steps=[
+    ('num_imputer', SimpleImputer(strategy='mean')),
+    ('scale', MinMaxScaler())
+])
+
+#### 5. Combine numerical and categorical transformer using `ColumnTransformer`.
+data_transformers = ColumnTransformer(transformers=[
+    ('number_trans', numeric_pipeline, numerical_features),
+    ('category_trans', categorical_pipeline, categorical_features)
+])
+
+#### 6. (optional) Apply PCA to reduce dimensions.
+preprocessor = Pipeline(steps=[('data_transformers', data_transformers),
+                             ('reduce_dim',PCA())])
+
+#### 7. Final Pipeline With an Estimator
+
+# define model
+model1 = RandomForestRegressor()
+# define evaluation
+cv = RepeatedKFold(n_splits=5, n_repeats=2, random_state=1)
+
+# define parameters
+# `model__` prefix is mandatory when pipeline is used
+param = {
+    "model1__max_features": ['auto', 'sqrt'],
+    "model1__max_depth": [2, 3],
+    "model1__n_estimators": [100, 200],
+}
+# define search
+search = GridSearchCV(
+    Pipeline(steps=[
+        ('preprocess', preprocessor),
+        ('model1', model1)
+    ]),
+    param,
+    n_jobs=-1,
+    cv=cv
+)
+
+# execute search
+result = search.fit(X, y)
+```
+
+
+```python
+# summarize result
+print('Best Score: %s' % search.best_score_)
+print('Best Hyperparameters: %s' % search.best_params_)
+```
+
+    Best Score: 0.6327013025117788
+    Best Hyperparameters: {'model1__max_depth': 3, 'model1__max_features': 'auto', 'model1__n_estimators': 200}
+
+
+## Resource
