@@ -17,8 +17,9 @@
     - [Problem Specific Metrics for Classification](#problem-specific-metrics-for-classification)
       - [Accuracy](#accuracy)
       - [Area Under the ROC Curve](#area-under-the-roc-curve)
+  - [🔥Grid Search](#grid-search)
   - [Putting All Together: PipeLine + GridSearchCV](#putting-all-together-pipeline--gridsearchcv)
-    - [v1: Pipelining up to Single Estimator](#v1-pipelining-up-to-single-estimator)
+    - [🥈V1: Pipelining with Single Estimator](#v1-pipelining-with-single-estimator)
       - [1. EDA](#1-eda)
       - [2. Define numerical and categorical features.](#2-define-numerical-and-categorical-features)
       - [3. PipeLine 1: For categorical features: fill missing values then label encode](#3-pipeline-1-for-categorical-features-fill-missing-values-then-label-encode)
@@ -28,7 +29,8 @@
       - [7. Final Pipeline With an Estimator](#7-final-pipeline-with-an-estimator)
       - [Visualizing Pipeline](#visualizing-pipeline)
       - [🚀All In One](#all-in-one)
-    - [v2: Pipelining + GridSearchCV](#v2-pipelining--gridsearchcv)
+    - [🥈V2: Pipelining + GridSearchCV (Single Model Hyperparameter Tuning)](#v2-pipelining--gridsearchcv-single-model-hyperparameter-tuning)
+    - [🥇V3: Pipelining + GridSearchCV (Multi Models Hyperparameter Tuning) 🔥](#v3-pipelining--gridsearchcv-multi-models-hyperparameter-tuning-)
   - [Resource](#resource)
 
 ```python
@@ -1072,13 +1074,102 @@ roc_auc_score(y_test, y_probs_positive)
 
 
 
+## 🔥Grid Search
+
+
+```python
+import pandas as pd
+import numpy as np
+np.random.seed(42)
+
+# modelling
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+
+# # ignore ConvergenceWarnings
+# from warnings import simplefilter
+# from sklearn.exceptions import ConvergenceWarning
+# simplefilter("ignore", category=ConvergenceWarning)
+
+```
+
+
+```python
+df = pd.read_csv("heart-disease.csv")
+np.random.seed(0)
+
+X = df.drop('target', axis=1)
+y = df['target']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+```
+
+    (242, 13) (61, 13) (242,) (61,)
+
+
+
+```python
+models = [
+    {
+      "model_instance": RandomForestClassifier(),
+      "model_name": "RandomForest",
+      "params": {
+          "max_depth": [85],
+          "max_features": ['sqrt'],
+          "n_estimators": [60, 80, 90],
+          "random_state": [42]
+        }
+    },
+    { "model_instance": DecisionTreeClassifier(),
+      "model_name": "DecisionTree",
+      "params": {
+          "criterion": ['gini','entropy'],
+          "splitter": ['best','random'],
+          "max_depth": [None,90,95,100],
+          "max_features": [None, "sqrt","log2"],
+          "random_state": [42]
+      }
+    },
+]
+
+scores = []
+highest_acc = 0
+best_model = None
+
+print("Running Model:")
+for model in models:
+  # Create a based model
+    model_instance = model["model_instance"]
+    model_name = model["model_name"]
+    classifier = GridSearchCV(estimator=model_instance, param_grid=model["params"],
+                              cv=3, n_jobs=1)
+    classifier.fit(X_train, y_train)
+    print(f'Best Score: {classifier.best_score_}')
+    print(f'Best Hyperparameters: {classifier.best_params_}')
+    print()
+
+```
+
+    Running Model:
+    Best Score: 0.8141460905349794
+    Best Hyperparameters: {'max_depth': 85, 'max_features': 'sqrt', 'n_estimators': 60, 'random_state': 42}
+
+    Best Score: 0.8141975308641975
+    Best Hyperparameters: {'criterion': 'gini', 'max_depth': None, 'max_features': None, 'random_state': 42, 'splitter': 'random'}
+
+
+
 ## Putting All Together: PipeLine + GridSearchCV
 
 - [towardsdatascience.com/how-to-use-sklearn-pipelines-for-ridiculously-neat-code](https://towardsdatascience.com/how-to-use-sklearn-pipelines-for-ridiculously-neat-code-a61ab66ca90d)
 - [towardsdatascience.com/are-you-using-pipeline-in-scikit-learn](https://towardsdatascience.com/are-you-using-pipeline-in-scikit-learn-ac4cd85cb27f)
 - [https://medium.com/vickdata/a-simple-guide-to-scikit-learn-pipelines](https://medium.com/vickdata/a-simple-guide-to-scikit-learn-pipelines-4ac0d974bdcf)
 
-### v1: Pipelining up to Single Estimator
+### 🥈V1: Pipelining with Single Estimator
 
 
 
@@ -1100,6 +1191,19 @@ import numpy as np
 np.random.seed(42)
 
 ```
+
+Workflow:
+- Handling Catagorical Features:
+  - `Pipeline` to chain Sequences of different transforms:
+    - `SimpleImputer` to replace missing values with most frequent value
+    - `OneHotEncoder` can be used to encode categorical variables.
+- Handling Numerical Features:
+  - `Pipeline` to chain Sequences of different transforms:
+    - `SimpleImputer` to replace missing values with mean
+    - `MinMaxScaler` class can be used to scale numerical value
+- `ColumnTransformer` to apply numerical transformer and categorical transformer and combine them into a single feature space after transformation.
+-
+
 
 #### 1. EDA
 
@@ -1474,6 +1578,7 @@ missing.shape,missing
 
 ```python
 numerical_features = X_train.select_dtypes(include='number').columns.tolist()
+
 print(f'There are {len(numerical_features)} numerical features:', '\n')
 print(numerical_features)
 ```
@@ -1486,6 +1591,7 @@ print(numerical_features)
 
 ```python
 categorical_features = X_train.select_dtypes(exclude='number').columns.tolist()
+
 print(f'There are {len(categorical_features)} categorical features:', '\n')
 print(categorical_features)
 ```
@@ -1502,7 +1608,9 @@ For categoricals, we will use `SimpleImputer` to fill the missing values with th
 
 ```python
 categorical_pipeline = Pipeline(steps=[
+    # 1. fill missing values with the most frequent value in the column
     ('impute', SimpleImputer(strategy='most_frequent')),
+    # 2. convert categorical features to numerical
     ('one-hot', OneHotEncoder(handle_unknown='ignore', sparse=False))
 ])
 
@@ -1517,7 +1625,9 @@ For numeric columns, we first fill the missing values with `SimpleImputer` using
 
 ```python
 numeric_pipeline = Pipeline(steps=[
+    # 1. fill missing values with the median value in the column
     ('impute', SimpleImputer(strategy='mean')),
+    # 2. scale the values to a range of 0 to 1
     ('scale', MinMaxScaler())
 ])
 
@@ -1525,40 +1635,22 @@ numeric_pipeline = Pipeline(steps=[
 
 #### 5. Combine numerical and categorical transformer using `ColumnTransformer`.
 
-By default, all `Pipeline` objects have `fit` and `transform` methods which can be used to transform the input array like this:
+It is very common to want to perform different data preparation techniques on different columns in your input data.
 
+For example, you may want to impute missing numerical values with a median value, then scale the values and impute missing categorical values using the most frequent value and one hot encode the categories.
 
-```python
-numeric_pipeline.fit_transform(X_train.select_dtypes(include='number'))
-```
+Traditionally, this would require you to separate the numerical and categorical data and then manually apply the transforms on those groups of features before combining the columns back together in order to fit and evaluate a model.
 
-
-
-
-    array([[0.88553804, 0.29411765, 0.13356164, ..., 0.        , 1.        ,
-            0.75      ],
-           [0.69773818, 0.35294118, 0.16700174, ..., 0.        , 0.36363636,
-            0.25      ],
-           [0.83139136, 0.35294118, 0.16700174, ..., 0.        , 0.36363636,
-            0.        ],
-           ...,
-           [0.83344757, 0.41176471, 0.1609589 , ..., 0.        , 0.27272727,
-            1.        ],
-           [0.38313914, 0.58823529, 0.16700174, ..., 0.        , 0.81818182,
-            0.        ],
-           [0.46881426, 0.23529412, 0.12671233, ..., 0.        , 0.45454545,
-            1.        ]])
-
-
-
-But, using the pipelines in this way means we have to call each pipeline separately on selected columns which is not what we want. What we want is to have a single preprocessor that is able to perform both numeric and categorical transformations in a single line of code like this: `full_processor.fit_transform(X_train)`
+Now, you can use the ColumnTransformer to perform this operation for you.
 
 🚀 `ColumnTransformer` helps to define different transformers for different types of inputs and combine them into a single feature space after transformation. Here we are applying numerical transformer and categorical transformer created above for our numerical and categorical features.
 
 
 ```python
 data_transformers = ColumnTransformer(transformers=[
+    # use `numeric_pipeline` for transformations on the `numerical_features`
     ('number', numeric_pipeline, numerical_features),
+    # use `categorical_pipeline` for transformations on the `categorical_features`
     ('category', categorical_pipeline, categorical_features)
 ])
 
@@ -1617,6 +1709,7 @@ models = [
     LinearSVC(),
     ElasticNetCV()
     ]
+
 for model in models:
     pipe = Pipeline(steps=[('preprocessor', preprocessor),
                       ('model', model)])
@@ -1682,6 +1775,14 @@ np.random.seed(42)
 
 df = pd.read_csv("house_prices.csv")
 
+# 1. Prepare the data
+X = df.drop('SalePrice', axis=1)
+y = df.SalePrice
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25,
+                                                      random_state=0)
+print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
 #### 2. Define numerical and categorical features.
 numerical_features = X_train.select_dtypes(include='number').columns.tolist()
 categorical_features = X_train.select_dtypes(exclude='number').columns.tolist()
@@ -1722,6 +1823,9 @@ regr_pipeline.score(X_test, y_test)
 
 ```
 
+    (1095, 80) (365, 80) (1095,) (365,)
+
+
 
 
 
@@ -1729,68 +1833,20 @@ regr_pipeline.score(X_test, y_test)
 
 
 
-Finally, Generating Submissions with a Pipeline:
+### 🥈V2: Pipelining + GridSearchCV (Single Model Hyperparameter Tuning)
 
+When creating a parameter grid for the model in the pipeline, the model’s name needs to be appended to each parameter. For example in the code block below, `'classifier__'` have been appended to match the name of the model in the pipeline (named the model `‘classifier’` in the pipeline).
 
 ```python
-preds_final = regr_pipeline.predict(X_test)
-output = pd.DataFrame({'Id': X_test.index,
-                       'SalePrice': preds_final})
-# output.to_csv('submission.csv', index=False)
-output.head()
-
+#Creating parameter grid for Random Forest
+rand_forest_parms = {'classifier__n_estimators': [100, 300, 500],
+                     'classifier__max_depth':[6, 25, 50, 70],
+                     'classifier__min_samples_split': [2, 5, 10],
+                     'classifier__min_samples_leaf': [1, 2, 10]}
+#Calling the grid_search function using the parameters above
+grid_search(RandomForestClassifier(), rand_forest_parms)
 ```
 
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Id</th>
-      <th>SalePrice</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>529</td>
-      <td>195259.084615</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>491</td>
-      <td>128905.312343</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>459</td>
-      <td>129509.383524</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>279</td>
-      <td>207386.859503</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>655</td>
-      <td>132300.239534</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-### v2: Pipelining + GridSearchCV
-
-- [https://scikit-learn.org/stable/tutorial/statistical_inference/putting_together.html](https://scikit-learn.org/stable/tutorial/statistical_inference/putting_together.html)
-- [https://machinelearninghd.com/gridsearchcv-hyperparameter-tuning-sckit-learn-regression-classification/](https://machinelearninghd.com/gridsearchcv-hyperparameter-tuning-sckit-learn-regression-classification/)
-- [https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/](https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/	)
-- 🥇[https://towardsdatascience.com/machine-learning-pipelines-with-scikit-learn](https://towardsdatascience.com/machine-learning-pipelines-with-scikit-learn-d43c32a6aa52)
-- [https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once](https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once-9fcebfcc6c23)
-- [https://machinelearninghd.com/sklearn-svm-starter-guide/](https://machinelearninghd.com/sklearn-svm-starter-guide/)
 
 
 ```python
@@ -1806,7 +1862,7 @@ from sklearn.decomposition import PCA
 # modelling
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import GridSearchCV
 
@@ -1815,7 +1871,14 @@ import numpy as np
 np.random.seed(42)
 
 
-df = pd.read_csv("house_prices.csv")
+df = pd.read_csv("titanic.csv")
+X = df.drop(['Survived', 'Name', 'Ticket','Cabin'], axis=1)
+y = df['Survived']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+
 
 #### 2. Define numerical and categorical features.
 numerical_features = X_train.select_dtypes(include='number').columns.tolist()
@@ -1844,25 +1907,24 @@ data_transformers = ColumnTransformer(transformers=[
 preprocessor = Pipeline(steps=[('data_transformers', data_transformers),
                              ('reduce_dim',PCA())])
 
-#### 7. Final Pipeline With an Estimator
+#### 7. GridSearchCV
 
 # define model
-model1 = RandomForestRegressor()
+model1 = RandomForestClassifier()
 # define evaluation
 cv = RepeatedKFold(n_splits=5, n_repeats=2, random_state=1)
-
 # define parameters
-# `model__` prefix is mandatory when pipeline is used
+# `classifier__` prefix is mandatory when pipeline is used
 param = {
-    "model1__max_features": ['auto', 'sqrt'],
-    "model1__max_depth": [2, 3],
-    "model1__n_estimators": [100, 200],
+    "classifier__max_features": [None,'sqrt'],
+    "classifier__max_depth": [2, 3],
+    "classifier__n_estimators": [100, 200],
 }
 # define search
 search = GridSearchCV(
     Pipeline(steps=[
         ('preprocess', preprocessor),
-        ('model1', model1)
+        ('classifier', model1)
     ]),
     param,
     n_jobs=-1,
@@ -1870,18 +1932,277 @@ search = GridSearchCV(
 )
 
 # execute search
-result = search.fit(X, y)
+result = search.fit(X_test, y_test)
+# summarize result
+print(f'Best Score: {result.best_score_}')
+print(f'Best Hyperparameters: {result.best_params_}')
 ```
+
+    (712, 8) (179, 8) (712,) (179,)
+    Best Score: 0.7985714285714287
+    Best Hyperparameters: {'classifier__max_depth': 3, 'classifier__max_features': 'sqrt', 'classifier__n_estimators': 200}
+
+
+### 🥇V3: Pipelining + GridSearchCV (Multi Models Hyperparameter Tuning) 🔥
 
 
 ```python
-# summarize result
-print('Best Score: %s' % search.best_score_)
-print('Best Hyperparameters: %s' % search.best_params_)
+# setup random seed for reproducibility
+import numpy as np
+np.random.seed(42)
+import pandas as pd
+
+# getting data ready
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+
+# modelling
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import LinearSVC
+from sklearn import svm
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import SGDClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
+# matrics
+from sklearn.metrics import accuracy_score
+
+
+# ignore ConvergenceWarnings
+from  warnings import simplefilter
+from sklearn.exceptions import ConvergenceWarning
+simplefilter("ignore", category=ConvergenceWarning)
+
+# 1. Get the data ready
+df = pd.read_csv("titanic.csv")
+X = df.drop(['Survived', 'Name', 'Ticket','Cabin'], axis=1)
+y = df['Survived']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+#### 2. Define numerical and categorical features.
+numerical_features = X_train.select_dtypes(include='number').columns.tolist()
+categorical_features = X_train.select_dtypes(exclude='number').columns.tolist()
+
+
+#### 3. PipeLine 1: For categorical features: fill missing values then label encode
+categorical_pipeline = Pipeline(steps=[
+    ('cat_imputer', SimpleImputer(strategy='most_frequent')),
+    ('one-hot', OneHotEncoder(handle_unknown='ignore', sparse=False))
+])
+
+#### 4. PipeLine 2: For numerical features: fill missing values then feature scale
+numeric_pipeline = Pipeline(steps=[
+    ('num_imputer', SimpleImputer(strategy='mean')),
+    ('scale', MinMaxScaler())
+])
+
+#### 5. Combine numerical and categorical transformer using `ColumnTransformer`.
+data_transformers = ColumnTransformer(transformers=[
+    ('number_trans', numeric_pipeline, numerical_features),
+    ('category_trans', categorical_pipeline, categorical_features)
+])
+
+#### 6. (optional) Apply PCA to reduce dimensions.
+preprocessor = Pipeline(steps=[('data_transformers', data_transformers),
+                             ('reduce_dim',PCA())])
+
+##### 7. GridSearchCV
+models = [
+    { "model_instance": RandomForestClassifier(),
+      "model_name": "RandomForest",
+      "params": {
+          "classifier__max_depth": [85],
+          "classifier__max_features": ['sqrt'],
+          "classifier__n_estimators": [60, 80, 90],
+          "classifier__random_state": [42]
+      }
+    },
+    { "model_instance": DecisionTreeClassifier(),
+      "model_name": "DecisionTree",
+      "params": {
+          "classifier__criterion": ['gini','entropy'],
+          "classifier__splitter": ['best','random'],
+          "classifier__max_depth": [None,90,95,100],
+          "classifier__max_features": [None, "sqrt","log2"],
+          "classifier__random_state": [42]
+      }
+    },
+]
+
+
+scores = []
+highest_acc = 0
+best_model = None
+
+print("Running Model:")
+for model in models:
+    # get model details
+    model_instance = model["model_instance"]
+    model_name = model["model_name"]
+
+    # define grid search
+    classifier = GridSearchCV(
+        Pipeline(steps=[
+        ('preprocess', preprocessor),
+        ('classifier', model_instance)
+    ]),param_grid=model["params"],cv = 3, n_jobs = 1)
+
+    # fit model
+    classifier.fit(X_train, y_train)
+    # get predictions
+    predicted = classifier.predict(X_test)
+
+    # get accuracy
+    acc = accuracy_score(predicted, y_test)
+    # check if highest accuracy
+    if acc > highest_acc:
+        highest_acc = acc
+        # save best model
+        best_model = classifier
+
+    # save model details
+    scores.append({
+        "model":model_name,
+        "training_best_score": classifier.best_score_,
+        "test_best_score": acc,
+        "best_params": classifier.best_params_
+      })
+    print(f'[{model_name}]Best Score: {classifier.best_score_}')
+    print(f'[{model_name}]Best Hyperparameters: {classifier.best_params_}' )
 ```
 
-    Best Score: 0.6327013025117788
-    Best Hyperparameters: {'model1__max_depth': 3, 'model1__max_features': 'auto', 'model1__n_estimators': 200}
+    (712, 8) (179, 8) (712,) (179,)
+    Running Model:
+    [RandomForest]Best Score: 0.8020068787008473
+    [RandomForest]Best Hyperparameters: {'classifier__max_depth': 85, 'classifier__max_features': 'sqrt', 'classifier__n_estimators': 90, 'classifier__random_state': 42}
+    [DecisionTree]Best Score: 0.7514212436029265
+    [DecisionTree]Best Hyperparameters: {'classifier__criterion': 'entropy', 'classifier__max_depth': None, 'classifier__max_features': None, 'classifier__random_state': 42, 'classifier__splitter': 'random'}
 
+
+
+```python
+print(f"\nBest Model:{best_model.best_estimator_['classifier']}")
+print(f"\nBest Model:{best_model.best_estimator_}")
+
+```
+
+
+    Best Model:RandomForestClassifier(max_depth=85, n_estimators=90, random_state=42)
+
+    Best Model:Pipeline(steps=[('preprocess',
+                     Pipeline(steps=[('data_transformers',
+                                      ColumnTransformer(transformers=[('number_trans',
+                                                                       Pipeline(steps=[('num_imputer',
+                                                                                        SimpleImputer()),
+                                                                                       ('scale',
+                                                                                        MinMaxScaler())]),
+                                                                       ['PassengerId',
+                                                                        'Pclass',
+                                                                        'Age',
+                                                                        'SibSp',
+                                                                        'Parch',
+                                                                        'Fare']),
+                                                                      ('category_trans',
+                                                                       Pipeline(steps=[('cat_imputer',
+                                                                                        SimpleImputer(strategy='most_frequent')),
+                                                                                       ('one-hot',
+                                                                                        OneHotEncoder(handle_unknown='ignore',
+                                                                                                      sparse=False))]),
+                                                                       ['Sex',
+                                                                        'Embarked'])])),
+                                     ('reduce_dim', PCA())])),
+                    ('classifier',
+                     RandomForestClassifier(max_depth=85, n_estimators=90,
+                                            random_state=42))])
+
+
+
+```python
+best_pipeline = best_model.best_estimator_
+best_pipeline.score(X_test, y_test)
+
+```
+
+
+
+
+    0.8268156424581006
+
+
+
+
+```python
+pd.DataFrame(scores)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>training_best_score</th>
+      <th>test_best_score</th>
+      <th>best_params</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForest</td>
+      <td>0.802007</td>
+      <td>0.826816</td>
+      <td>{'classifier__max_depth': 85, 'classifier__max...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>0.751421</td>
+      <td>0.759777</td>
+      <td>{'classifier__criterion': 'entropy', 'classifi...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.DataFrame(scores).plot(x="model", y=["training_best_score", "test_best_score"], kind="bar", figsize=(10, 8))
+```
+
+
+
+
+    <AxesSubplot:xlabel='model'>
+
+
+
+
+
+![png](README_files/README_123_1.png)
+
+
+
+- [https://scikit-learn.org/stable/tutorial/statistical_inference/putting_together.html](https://scikit-learn.org/stable/tutorial/statistical_inference/putting_together.html)
+- [https://towardsdatascience.com/machine-learning-pipelines-with-scikit-learn](https://towardsdatascience.com/machine-learning-pipelines-with-scikit-learn-d43c32a6aa52)
+- [https://machinelearninghd.com/gridsearchcv-hyperparameter-tuning-sckit-learn-regression-classification/](https://machinelearninghd.com/gridsearchcv-hyperparameter-tuning-sckit-learn-regression-classification/)
+- [https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/](https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/	)
+- [https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once](https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once-9fcebfcc6c23)
+- [https://machinelearninghd.com/sklearn-svm-starter-guide/](https://machinelearninghd.com/sklearn-svm-starter-guide/)
 
 ## Resource
