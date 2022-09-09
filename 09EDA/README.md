@@ -45,13 +45,14 @@
         - [10 best features for LinearRegression model](#10-best-features-for-linearregression-model)
       - [Embedded methods](#embedded-methods)
 
-
 ```python
 """
 cd .\09EDA\
 jupyter nbconvert --to markdown jupyter.ipynb --output README.md
 """
 ```
+
+- [https://amueller.github.io/ml-training-intro/slides/04-preprocessing.html#1](https://amueller.github.io/ml-training-intro/slides/04-preprocessing.html#1)
 
 ## What Is Exploratory Data Analysis?
 
@@ -1784,7 +1785,7 @@ data['SalePrice'].plot(kind='hist', bins=50, figsize=(10,6))
 
 
 
-![jpeg](README_files/README_53_1.jpg)
+![jpeg](README_files/README_54_1.jpg)
 
 
 
@@ -1798,7 +1799,7 @@ plt.show()
 
 
 
-![jpeg](README_files/README_54_0.jpg)
+![jpeg](README_files/README_55_0.jpg)
 
 
 
@@ -1877,7 +1878,7 @@ sns.histplot(saleprice_scaled, kde=True)
 
 
 
-![jpeg](README_files/README_62_1.jpg)
+![jpeg](README_files/README_63_1.jpg)
 
 
 
@@ -1922,7 +1923,7 @@ data.LotConfig.value_counts(normalize=True).plot(kind='barh', figsize=(10,6))
 
 
 
-![jpeg](README_files/README_65_1.jpg)
+![jpeg](README_files/README_66_1.jpg)
 
 
 
@@ -1981,7 +1982,7 @@ data[data['SalePrice'] < 180159]['SalePrice'].shape
 
 
 
-![jpeg](README_files/README_69_1.jpg)
+![jpeg](README_files/README_70_1.jpg)
 
 
 
@@ -2008,7 +2009,7 @@ data[['SalePrice', 'LotArea']].loc[:50].plot()
 
 
 
-![jpeg](README_files/README_73_1.jpg)
+![jpeg](README_files/README_74_1.jpg)
 
 
 
@@ -2030,7 +2031,7 @@ data.plot.scatter(x='GrLivArea', y='SalePrice', ylim=(0,800000),figsize=(10,6))
 
 
 
-![jpeg](README_files/README_76_1.jpg)
+![jpeg](README_files/README_77_1.jpg)
 
 
 
@@ -2172,7 +2173,7 @@ data.plot.scatter(x='GrLivArea', y='SalePrice', ylim=(0,800000),figsize=(10,6))
 
 
 
-![jpeg](README_files/README_81_1.jpg)
+![jpeg](README_files/README_82_1.jpg)
 
 
 
@@ -2218,7 +2219,7 @@ sns.heatmap(data[['YrSold','MoSold','LotArea']].corr(),annot=True)
 
 
 
-![jpeg](README_files/README_84_1.jpg)
+![jpeg](README_files/README_85_1.jpg)
 
 
 
@@ -2238,7 +2239,7 @@ plt.show()
 
 
 
-![jpeg](README_files/README_86_0.jpg)
+![jpeg](README_files/README_87_0.jpg)
 
 
 
@@ -2274,7 +2275,7 @@ data.groupby('SaleCondition')['SaleCondition'].size().sort_values(ascending=True
 
 
 
-![jpeg](README_files/README_91_1.jpg)
+![jpeg](README_files/README_92_1.jpg)
 
 
 
@@ -2397,7 +2398,7 @@ data.groupby('SaleCondition')['SalePrice'].mean().sort_values(ascending=False).p
 
 
 
-![jpeg](README_files/README_94_1.jpg)
+![jpeg](README_files/README_95_1.jpg)
 
 
 
@@ -2417,7 +2418,7 @@ data.groupby('SaleCondition')['SalePrice'].count().sort_values(ascending=False).
 
 
 
-![jpeg](README_files/README_95_1.jpg)
+![jpeg](README_files/README_96_1.jpg)
 
 
 
@@ -2437,7 +2438,7 @@ data.groupby('SaleCondition')['SalePrice'].std().sort_values(ascending=False).pl
 
 
 
-![jpeg](README_files/README_96_1.jpg)
+![jpeg](README_files/README_97_1.jpg)
 
 
 
@@ -2676,7 +2677,7 @@ sns.barplot(x='cols', y='vals', data=df,hue='SaleCondition')
 
 
 
-![jpeg](README_files/README_102_1.jpg)
+![jpeg](README_files/README_103_1.jpg)
 
 
 
@@ -2696,7 +2697,7 @@ sns.boxplot(x='SaleCondition', y='SalePrice', data=data)
 
 
 
-![jpeg](README_files/README_104_1.jpg)
+![jpeg](README_files/README_105_1.jpg)
 
 
 
@@ -3217,7 +3218,7 @@ X_train.plot.box(figsize=(20,5), rot=90)
 
 
 
-![png](README_files/README_117_1.png)
+![png](README_files/README_118_1.png)
 
 
 
@@ -3461,7 +3462,7 @@ pd.DataFrame(X_train_norm, columns=X_train.columns).plot.box(figsize=(20,5), rot
 
 
 
-![png](README_files/README_122_1.png)
+![png](README_files/README_123_1.png)
 
 
 
@@ -3688,7 +3689,7 @@ pd.DataFrame(X_train_stand, columns=X_train.columns).plot.box(figsize=(20,5), ro
 
 
 
-![png](README_files/README_126_1.png)
+![png](README_files/README_127_1.png)
 
 
 
@@ -3845,7 +3846,7 @@ df.plot.barh(figsize=[15, 15])
 
 
 
-![png](README_files/README_136_1.png)
+![png](README_files/README_137_1.png)
 
 
 

@@ -9,11 +9,11 @@
     - [Indexing](#indexing)
       - [Slicing a `Series` also slices the index labels:](#slicing-a-series-also-slices-the-index-labels)
   - [`DataFrame` objects](#dataframe-objects)
-  - [Creating `DataFrame`; `DataFrame(data=,columns=,index=)`](#creating-dataframe-dataframedatacolumnsindex)
+  - [Creating `DataFrame`](#creating-dataframe)
     - [From Numpy Array](#from-numpy-array)
-    - [🚀🚀 lists of lists](#-lists-of-lists)
+    - [🚀🚀 lists of lists: row wise data](#-lists-of-lists-row-wise-data)
     - [dict of narray/lists](#dict-of-narraylists)
-    - [🚀🚀list of dicts](#list-of-dicts)
+    - [🚀🚀list of dicts: column wise data](#list-of-dicts-column-wise-data)
     - [🚀using `zip()`; list of tuple](#using-zip-list-of-tuple)
     - [Dicts of series.](#dicts-of-series)
   - [Saving & loading files](#saving--loading-files)
@@ -21,8 +21,6 @@
     - [Saving: Append to Existing File](#saving-append-to-existing-file)
     - [Loading](#loading)
     - [Minimize the size of Large DataSet; `nrows=n`](#minimize-the-size-of-large-dataset-nrowsn)
-  - [Converting to/from `DataFrame`](#converting-tofrom-dataframe)
-    - [to python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
   - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
     - [Adding Column](#adding-column)
       - [`d['new_col'] = list()`](#dnew_col--list)
@@ -59,7 +57,7 @@
       - [Choosing between loc and iloc](#choosing-between-loc-and-iloc)
     - [🚀🚀 Split Input and Output Features and convert to NumPy arrays](#-split-input-and-output-features-and-convert-to-numpy-arrays)
     - [♻️Reset Index](#️reset-index)
-  - [🚀🚀Masking - logical filtering and sorting](#masking---logical-filtering-and-sorting)
+  - [🚀🚀Masking - logical filtering](#masking---logical-filtering)
     - [`SELECT * FROM df WHERE columnX = value`](#select--from-df-where-columnx--value)
     - [🔥`SELECT col1,col2.. FROM df WHERE columnX = value`](#select-col1col2-from-df-where-columnx--value)
     - [`SELECT * FROM df WHERE col1 = value 🤝AND🤝 col2 = value`](#select--from-df-where-col1--value-and-col2--value)
@@ -81,21 +79,26 @@
       - [`columns`](#columns)
       - [`unique()` and `nunique()`](#unique-and-nunique)
       - [`value_counts()`](#value_counts)
-  - [Iterate over rows](#iterate-over-rows)
-  - [Applying functions: `apply()`, `map()` and `applymap()`](#applying-functions-apply-map-and-applymap)
-    - [`apply()`](#apply)
-    - [`applymap()`](#applymap)
-    - [`map()`](#map)
-  - [🔥Pivot Tables](#pivot-tables)
-    - [Visualize Pivot Table](#visualize-pivot-table)
   - [Data Types and Missing Values](#data-types-and-missing-values)
     - [`dtypes`, `astype()`](#dtypes-astype)
     - [Missing data](#missing-data)
       - [`isnull()`, `isnull().sum()` and `notnull()`](#isnull-isnullsum-and-notnull)
       - [`fillna`](#fillna)
       - [`dropna`](#dropna)
+  - [Iterate over rows](#iterate-over-rows)
+  - [Applying functions: `apply()`, `map()` and `applymap()`](#applying-functions-apply-map-and-applymap)
+    - [`apply()`](#apply)
+    - [`applymap()`](#applymap)
+    - [`map()`](#map)
+  - [Converting to/from `DataFrame`](#converting-tofrom-dataframe)
+    - [To Numpy Representation: `values/to_numpy()`](#to-numpy-representation-valuesto_numpy)
+    - [To python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
+    - [To python List: `to_list()/tolist()`](#to-python-list-to_listtolist)
+  - [🔥Pivot Tables](#pivot-tables)
+    - [Visualize Pivot Table](#visualize-pivot-table)
   - [Grouping and Sorting](#grouping-and-sorting)
     - [Groupwise analysis](#groupwise-analysis)
+      - [Example:](#example)
     - [Sorting: `sort_index`, `sort_values`](#sorting-sort_index-sort_values)
       - [`sort_index`](#sort_index)
       - [`sort_values`](#sort_values)
@@ -120,7 +123,6 @@
     - [Area plot](#area-plot)
     - [Pie chart](#pie-chart)
 
-
 ## Introduction
 
 - library for Data Analysis and Manipulation
@@ -142,8 +144,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython.display import display
+import seaborn as sns
 from matplotlib_inline.backend_inline import set_matplotlib_formats
-set_matplotlib_formats('jpg')
+set_matplotlib_formats('png')
+plt.rcParams.update({
+    "figure.facecolor": "white",
+    "axes.facecolor": "white",
+})
+
 ```
 
 ## `Series` objects
@@ -449,7 +457,7 @@ A `DataFrame` is a table. It contains an array of individual entries, each of wh
 <img src="img/anatomy.png" alt="anatomy.jpg" width="1000px">
 </div>
 
-## Creating `DataFrame`; `DataFrame(data=,columns=,index=)`
+## Creating `DataFrame`
 
 ### From Numpy Array
 
@@ -676,22 +684,43 @@ df
 </div>
 
 
-### 🚀🚀 lists of lists
+### 🚀🚀 lists of lists: row wise data
 
 
 ```python
+list(np.random.random(3))
+```
+
+
+
+
+    [0.4199111706306522, 0.7491701900315496, 0.2603523272964693]
+
+
+
+
+```python
+np.random.seed(100)
+row1 = ['TeKET'] + list(np.random.random(3))
+row2 = ['Yake'] + list(np.random.random(3))
+row3 = ['TP'] + list(np.random.random(3))
+row4 = ['IFTDF'] + list(np.random.random(3))
+
 values = [
-            [1985, np.nan, "Biking",   68],
-            [1984, 3,      "Dancing",  83],
-            [1992, 0,      np.nan,    112]
+            row1,
+            row2,
+            row3,
+            row4
          ]
 d3 = pd.DataFrame(
         values,
-        columns=["birthyear", "children", "hobby", "weight"],
-        index=["alice", "bob", "charles"]
+        columns=['Model', 'precision', 'recall', 'f1'],
+      #   index=["alice", "bob", "charles"]
      )
 d3
 ```
+
+
 
 
 <div>
@@ -700,49 +729,45 @@ d3
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>birthyear</th>
-      <th>children</th>
-      <th>hobby</th>
-      <th>weight</th>
+      <th>Model</th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>alice</th>
-      <td>1985</td>
-      <td>NaN</td>
-      <td>Biking</td>
-      <td>68</td>
+      <th>0</th>
+      <td>TeKET</td>
+      <td>0.543405</td>
+      <td>0.278369</td>
+      <td>0.424518</td>
     </tr>
     <tr>
-      <th>bob</th>
-      <td>1984</td>
-      <td>3.0</td>
-      <td>Dancing</td>
-      <td>83</td>
+      <th>1</th>
+      <td>Yake</td>
+      <td>0.844776</td>
+      <td>0.004719</td>
+      <td>0.121569</td>
     </tr>
     <tr>
-      <th>charles</th>
-      <td>1992</td>
-      <td>0.0</td>
-      <td>NaN</td>
-      <td>112</td>
+      <th>2</th>
+      <td>TP</td>
+      <td>0.670749</td>
+      <td>0.825853</td>
+      <td>0.136707</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>IFTDF</td>
+      <td>0.575093</td>
+      <td>0.891322</td>
+      <td>0.209202</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-
-
-```python
-l = [None] * 5
-a, b, *r = l
-r
-
-```
-
-
-    [None, None, None]
 
 
 
@@ -760,6 +785,8 @@ d4 = pd.DataFrame(
 d4
 
 ```
+
+
 
 
 <div>
@@ -799,6 +826,7 @@ d4
   </tbody>
 </table>
 </div>
+
 
 
 ### dict of narray/lists
@@ -855,7 +883,7 @@ df
 </div>
 
 
-### 🚀🚀list of dicts
+### 🚀🚀list of dicts: column wise data
 
 
 ```python
@@ -1513,109 +1541,6 @@ data.head(n=2)
 # Save the dataframe to a csv file
 data.to_csv("winemag-data-130k-v2-mod.csv")
 ```
-
-## Converting to/from `DataFrame`
-
-### to python list of dicts: `to_dict()`
-
-
-```python
-data = [
-	{'a': 1, 'b': 2, 'c': 3},
-	{'a': 10, 'b': 20, 'c': 30},
-	{'a': 100, 'b': None, 'c': 300}
-]
-
-df = pd.DataFrame(data)
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>2.0</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>10</td>
-      <td>20.0</td>
-      <td>30</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>100</td>
-      <td>NaN</td>
-      <td>300</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.to_dict()
-```
-
-
-
-
-    {'a': {0: 1, 1: 10, 2: 100},
-     'b': {0: 2.0, 1: 20.0, 2: nan},
-     'c': {0: 3, 1: 30, 2: 300}}
-
-
-
-
-```python
-df.to_dict(orient='records')
-```
-
-
-
-
-    [{'a': 1, 'b': 2.0, 'c': 3},
-     {'a': 10, 'b': 20.0, 'c': 30},
-     {'a': 100, 'b': nan, 'c': 300}]
-
-
-
-Note: With `.to_dict()`, pandas converts `NaN` to `nan` in python dictionary ; How to check if `nan` in python?
-
-
-```python
-# using `pd.isna()`
-d = df.to_dict(orient='records')
-for i, v in enumerate(d):
-    if pd.isna(v['b']):
-        print(i)
-
-```
-
-    2
-
-
-Pandas `dataframe.isna()` function is used to detect missing values. It return a boolean same-sized object indicating if the values are NA. NA values, such as None or numpy.NaN, gets mapped to True values. Everything else gets mapped to False values. Characters such as empty strings ” or numpy.inf are not considered NA values (unless you set pandas.options.mode.use_inf_as_na = True).
-
-- [with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to](https://stackoverflow.com/questions/72348490/with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to)
-- [https://www.geeksforgeeks.org/python-pandas-dataframe-isna/](https://www.geeksforgeeks.org/python-pandas-dataframe-isna/)
 
 ## Edit Whole Row/Columns
 
@@ -5587,7 +5512,7 @@ df
 
 
 
-## 🚀🚀Masking - logical filtering and sorting
+## 🚀🚀Masking - logical filtering
 
 
 ```python
@@ -7495,7 +7420,110 @@ reviews.describe().T
 
 
 
-This method generates a high-level summary of the attributes of the given `column`. It is type-aware, meaning that its output changes based on the data type of the input. The output above only makes sense for numerical data; for string data here's what we get:
+
+```python
+reviews.describe(include=object).T
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>unique</th>
+      <th>top</th>
+      <th>freq</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>country</th>
+      <td>100</td>
+      <td>10</td>
+      <td>US</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <th>description</th>
+      <td>100</td>
+      <td>100</td>
+      <td>Aromas include tropical fruit, broom, brimston...</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>designation</th>
+      <td>70</td>
+      <td>65</td>
+      <td>Estate</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>province</th>
+      <td>100</td>
+      <td>30</td>
+      <td>California</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>region_1</th>
+      <td>88</td>
+      <td>56</td>
+      <td>Sicilia</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>region_2</th>
+      <td>37</td>
+      <td>10</td>
+      <td>Napa</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>taster_name</th>
+      <td>82</td>
+      <td>12</td>
+      <td>Roger Voss</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>taster_twitter_handle</th>
+      <td>74</td>
+      <td>10</td>
+      <td>@vossroger</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>title</th>
+      <td>100</td>
+      <td>100</td>
+      <td>Nicosia 2013 Vulkà Bianco  (Etna)</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>variety</th>
+      <td>100</td>
+      <td>44</td>
+      <td>Red Blend</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>winery</th>
+      <td>100</td>
+      <td>91</td>
+      <td>Henry Fessy</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -7792,6 +7820,31 @@ reviews.columns
 
 
 
+
+```python
+[{i: v} for i, v in enumerate(reviews.columns.tolist())]
+
+```
+
+
+
+
+    [{0: 'country'},
+     {1: 'description'},
+     {2: 'designation'},
+     {3: 'points'},
+     {4: 'price'},
+     {5: 'province'},
+     {6: 'region_1'},
+     {7: 'region_2'},
+     {8: 'taster_name'},
+     {9: 'taster_twitter_handle'},
+     {10: 'title'},
+     {11: 'variety'},
+     {12: 'winery'}]
+
+
+
 #### `unique()` and `nunique()`
 
 The Pandas Unique technique identifies the unique values of a Pandas Series.
@@ -7888,7 +7941,829 @@ reviews['country'].value_counts()['US']
 
 
 
- ## Iterate over rows
+## Data Types and Missing Values
+
+
+```python
+reviews = pd.read_csv('winemag-data-130k-v2-mod.csv', index_col=0)
+reviews.head(n=2)
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>country</th>
+      <th>description</th>
+      <th>designation</th>
+      <th>points</th>
+      <th>price</th>
+      <th>province</th>
+      <th>region_1</th>
+      <th>region_2</th>
+      <th>taster_name</th>
+      <th>taster_twitter_handle</th>
+      <th>title</th>
+      <th>variety</th>
+      <th>winery</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Italy</td>
+      <td>Aromas include tropical fruit, broom, brimston...</td>
+      <td>Vulkà Bianco</td>
+      <td>77</td>
+      <td>NaN</td>
+      <td>Sicily &amp; Sardinia</td>
+      <td>Etna</td>
+      <td>NaN</td>
+      <td>Kerin O’Keefe</td>
+      <td>@kerinokeefe</td>
+      <td>Nicosia 2013 Vulkà Bianco  (Etna)</td>
+      <td>White Blend</td>
+      <td>Nicosia</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Portugal</td>
+      <td>This is ripe and fruity, a wine that is smooth...</td>
+      <td>Avidagos</td>
+      <td>87</td>
+      <td>15.0</td>
+      <td>Douro</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Roger Voss</td>
+      <td>@vossroger</td>
+      <td>Quinta dos Avidagos 2011 Avidagos Red (Douro)</td>
+      <td>Portuguese Red</td>
+      <td>Quinta dos Avidagos</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### `dtypes`, `astype()`
+
+The data type for a column in a DataFrame or a Series is known as the dtype.
+
+
+```python
+reviews.dtypes
+
+```
+
+
+    country                   object
+    description               object
+    designation               object
+    points                     int64
+    price                    float64
+    province                  object
+    region_1                  object
+    region_2                  object
+    taster_name               object
+    taster_twitter_handle     object
+    title                     object
+    variety                   object
+    winery                    object
+    dtype: object
+
+
+You can use the dtype property to grab the type of a specific column. For instance, we can get the dtype of the price column in the reviews DataFrame:
+
+
+
+
+```python
+reviews.price.dtype
+```
+
+
+    dtype('float64')
+
+
+It's possible to convert a column of one type into another wherever such a conversion makes sense by using the `astype()` function. For example, we may transform the points column from its existing int64 data type into a float64 data type:
+
+
+
+
+```python
+reviews.points.astype('float64')
+```
+
+
+    0     77.0
+    1     87.0
+    2     87.0
+    3     87.0
+    4     90.0
+          ...
+    95    88.0
+    96    88.0
+    97    88.0
+    98    88.0
+    99    88.0
+    Name: points, Length: 100, dtype: float64
+
+
+### Missing data
+
+
+Entries missing values are given the value `NaN`, short for `"Not a Number"`. For technical reasons these NaN values are always of the float64 dtype.
+
+
+```python
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id':np.random.randint(1000, 2000, size=5),
+	'marks':np.random.randint(50,100,size=5)
+}
+df = pd.DataFrame(data)
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17</td>
+      <td>1020</td>
+      <td>52</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19</td>
+      <td>1467</td>
+      <td>52</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>49</td>
+      <td>1747</td>
+      <td>86</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>57</td>
+      <td>1187</td>
+      <td>67</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>77</td>
+      <td>1867</td>
+      <td>74</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+nan_idx = np.random.randint(0,5,3)
+df['marks'][nan_idx] = np.nan
+# df['marks'][[1,4,3]] = np.nan
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>17</td>
+      <td>1020</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19</td>
+      <td>1467</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>49</td>
+      <td>1747</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>57</td>
+      <td>1187</td>
+      <td>67.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>77</td>
+      <td>1867</td>
+      <td>74.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `isnull()`, `isnull().sum()` and `notnull()`
+
+
+Pandas provides some methods specific to missing data. To select NaN entries you can use `pd.isnull()` (or its companion `pd.notnull()`). This is meant to be used thusly:
+
+
+
+```python
+df.isnull()
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.isnull().sum()
+```
+
+
+    roll_no    0
+    ppr_id     0
+    marks      3
+    dtype: int64
+
+
+
+```python
+df['marks'].isnull()
+
+```
+
+
+    0     True
+    1     True
+    2     True
+    3    False
+    4    False
+    Name: marks, dtype: bool
+
+
+
+```python
+''' SELECT * from df where marks is NULL '''
+df[df['marks'].isnull()]         # DataFrame of values with null continent value
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>96</td>
+      <td>1142</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>80</td>
+      <td>1557</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>6</td>
+      <td>1402</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+missing_marks = df[df.marks.isnull()]
+n_missing_marks = len(missing_marks)
+# Cute alternative solution: if we sum a boolean series, True is treated as 1 and False as 0
+n_missing_marks = df.marks.isnull().sum()
+# or equivalently:
+n_missing_marks = pd.isnull(df.marks).sum()
+n_missing_marks
+
+```
+
+
+    3
+
+
+#### `fillna`
+
+
+```python
+df.fillna("FILLED")
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>FILLED</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df = df.fillna("FILLED")
+df.fillna("FILLED",inplace=True)
+df
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>37</td>
+      <td>1690</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>1700</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>53</td>
+      <td>1364</td>
+      <td>55.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94</td>
+      <td>1372</td>
+      <td>FILLED</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44</td>
+      <td>1291</td>
+      <td>FILLED</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id': np.random.randint(1000, 2000, size=5),
+	'marks': np.random.randint(50, 100, size=5)
+}
+df = pd.DataFrame(data)
+nan_idx = np.random.randint(0, 5, 3)
+df['marks'][nan_idx] = np.nan
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>60</td>
+      <td>1764</td>
+      <td>53.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>58</td>
+      <td>1443</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>1603</td>
+      <td>96.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>18</td>
+      <td>1626</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>21</td>
+      <td>1656</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.marks.fillna(df.marks.mean(), inplace=True)
+```
+
+
+```python
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>60</td>
+      <td>1764</td>
+      <td>53.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>58</td>
+      <td>1443</td>
+      <td>74.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>1603</td>
+      <td>96.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>18</td>
+      <td>1626</td>
+      <td>74.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>21</td>
+      <td>1656</td>
+      <td>74.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `dropna`
+
+
+```python
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+
+```python
+data = {
+	'roll_no': np.random.randint(1, 100, size=5),
+	'ppr_id': np.random.randint(1000, 2000, size=5),
+	'marks': np.random.randint(50, 100, size=5)
+}
+df = pd.DataFrame(data)
+df['marks'][[0, 2, 4]] = np.nan
+df['ppr_id'][[0, 3]] = np.nan
+df['roll_no'][[0, 2]] = np.nan
+df
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>74.0</td>
+      <td>1647.0</td>
+      <td>82.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NaN</td>
+      <td>1843.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.0</td>
+      <td>NaN</td>
+      <td>83.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>1227.0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.dropna(subset=['ppr_id'])
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>74.0</td>
+      <td>1647.0</td>
+      <td>82.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NaN</td>
+      <td>1843.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>1227.0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.dropna()
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roll_no</th>
+      <th>ppr_id</th>
+      <th>marks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>74.0</td>
+      <td>1647.0</td>
+      <td>82.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+## Iterate over rows
 
 
 ```python
@@ -8579,6 +9454,259 @@ employees
 
 
 
+## Converting to/from `DataFrame`
+
+
+```python
+data = [
+	{'a': 1, 'b': 2, 'c': 3},
+	{'a': 10, 'b': 20, 'c': 30},
+	{'a': 100, 'b': None, 'c': 300}
+]
+
+df = pd.DataFrame(data)
+df
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2.0</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10</td>
+      <td>20.0</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>100</td>
+      <td>NaN</td>
+      <td>300</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### To Numpy Representation: `values/to_numpy()`
+
+- `DataFrame.to_numpy()` is recommended.
+
+
+
+
+```python
+df.to_numpy()
+
+```
+
+
+
+
+    array([[  1.,   2.,   3.],
+           [ 10.,  20.,  30.],
+           [100.,  nan, 300.]])
+
+
+
+
+```python
+df.values
+```
+
+
+
+
+    array([[  1.,   2.,   3.],
+           [ 10.,  20.,  30.],
+           [100.,  nan, 300.]])
+
+
+
+### To python list of dicts: `to_dict()`
+
+
+```python
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2.0</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10</td>
+      <td>20.0</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>100</td>
+      <td>NaN</td>
+      <td>300</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.to_dict()
+```
+
+
+
+
+    {'a': {0: 1, 1: 10, 2: 100},
+     'b': {0: 2.0, 1: 20.0, 2: nan},
+     'c': {0: 3, 1: 30, 2: 300}}
+
+
+
+
+```python
+df.to_dict(orient='records')
+```
+
+
+
+
+    [{'a': 1, 'b': 2.0, 'c': 3},
+     {'a': 10, 'b': 20.0, 'c': 30},
+     {'a': 100, 'b': nan, 'c': 300}]
+
+
+
+Note: With `.to_dict()`, pandas converts `NaN` to `nan` in python dictionary ; How to check if `nan` in python?
+
+
+```python
+# using `pd.isna()`
+d = df.to_dict(orient='records')
+for i, v in enumerate(d):
+    if pd.isna(v['b']):
+        print(i)
+
+```
+
+    2
+
+
+Pandas `dataframe.isna()` function is used to detect missing values. It return a boolean same-sized object indicating if the values are NA. NA values, such as None or numpy.NaN, gets mapped to True values. Everything else gets mapped to False values. Characters such as empty strings ” or numpy.inf are not considered NA values (unless you set pandas.options.mode.use_inf_as_na = True).
+
+- [with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to](https://stackoverflow.com/questions/72348490/with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to)
+- [https://www.geeksforgeeks.org/python-pandas-dataframe-isna/](https://www.geeksforgeeks.org/python-pandas-dataframe-isna/)
+
+### To python List: `to_list()/tolist()`
+
+- `Series.tolist()`:Panda -> > Python List |  NumPy -> Python List
+- `to_list()`: Panda -> Python List
+
+
+```python
+df['a'].tolist()
+```
+
+
+
+
+    [1, 10, 100]
+
+
+
+
+```python
+df['a'].values
+```
+
+
+
+
+    array([  1,  10, 100], dtype=int64)
+
+
+
+
+```python
+df['a'].values.tolist()
+```
+
+
+
+
+    [1, 10, 100]
+
+
+
+
+```python
+df['a'].values.to_list()
+```
+
+
+    ---------------------------------------------------------------------------
+
+    AttributeError                            Traceback (most recent call last)
+
+    d:\CSE\Programs\ML-py\01pandas\pandas.ipynb Cell 372 in <cell line: 1>()
+    ----> <a href='vscode-notebook-cell:/d%3A/CSE/Programs/ML-py/01pandas/pandas.ipynb#Z1360sZmlsZQ%3D%3D?line=0'>1</a> df['a'].values.to_list()
+
+
+    AttributeError: 'numpy.ndarray' object has no attribute 'to_list'
+
+
+
+```python
+df['a'].to_list()
+```
+
+
+
+
+    [1, 10, 100]
+
+
+
 ## 🔥Pivot Tables
 
 It creates a spreadsheet-style pivot table as a DataFrame.
@@ -8854,7 +9982,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_374_1.png)
+![png](README_files/README_419_1.png)
 
 
 
@@ -8873,7 +10001,7 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_375_1.png)
+![png](README_files/README_420_1.png)
 
 
 
@@ -9054,885 +10182,6 @@ employees.pivot_table("Income",index=["Department",exp],columns="Work Level")
 ### Visualize Pivot Table
 
 - [https://opendatascience.com/how-to-pivot-and-plot-data-with-pandas/](https://opendatascience.com/how-to-pivot-and-plot-data-with-pandas/)
-
-## Data Types and Missing Values
-
-
-```python
-reviews = pd.read_csv('winemag-data-130k-v2-mod.csv', index_col=0)
-reviews.head(n=2)
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>country</th>
-      <th>description</th>
-      <th>designation</th>
-      <th>points</th>
-      <th>price</th>
-      <th>province</th>
-      <th>region_1</th>
-      <th>region_2</th>
-      <th>taster_name</th>
-      <th>taster_twitter_handle</th>
-      <th>title</th>
-      <th>variety</th>
-      <th>winery</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Italy</td>
-      <td>Aromas include tropical fruit, broom, brimston...</td>
-      <td>Vulkà Bianco</td>
-      <td>77</td>
-      <td>NaN</td>
-      <td>Sicily &amp; Sardinia</td>
-      <td>Etna</td>
-      <td>NaN</td>
-      <td>Kerin O’Keefe</td>
-      <td>@kerinokeefe</td>
-      <td>Nicosia 2013 Vulkà Bianco  (Etna)</td>
-      <td>White Blend</td>
-      <td>Nicosia</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Portugal</td>
-      <td>This is ripe and fruity, a wine that is smooth...</td>
-      <td>Avidagos</td>
-      <td>87</td>
-      <td>15.0</td>
-      <td>Douro</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>Roger Voss</td>
-      <td>@vossroger</td>
-      <td>Quinta dos Avidagos 2011 Avidagos Red (Douro)</td>
-      <td>Portuguese Red</td>
-      <td>Quinta dos Avidagos</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### `dtypes`, `astype()`
-
-The data type for a column in a DataFrame or a Series is known as the dtype.
-
-
-```python
-reviews.dtypes
-
-```
-
-
-
-
-    country                   object
-    description               object
-    designation               object
-    points                     int64
-    price                    float64
-    province                  object
-    region_1                  object
-    region_2                  object
-    taster_name               object
-    taster_twitter_handle     object
-    title                     object
-    variety                   object
-    winery                    object
-    dtype: object
-
-
-
-You can use the dtype property to grab the type of a specific column. For instance, we can get the dtype of the price column in the reviews DataFrame:
-
-
-
-
-```python
-reviews.price.dtype
-```
-
-
-
-
-    dtype('float64')
-
-
-
-It's possible to convert a column of one type into another wherever such a conversion makes sense by using the `astype()` function. For example, we may transform the points column from its existing int64 data type into a float64 data type:
-
-
-
-
-```python
-reviews.points.astype('float64')
-```
-
-
-
-
-    0     77.0
-    1     87.0
-    2     87.0
-    3     87.0
-    4     90.0
-          ...
-    95    88.0
-    96    88.0
-    97    88.0
-    98    88.0
-    99    88.0
-    Name: points, Length: 100, dtype: float64
-
-
-
-### Missing data
-
-
-Entries missing values are given the value `NaN`, short for `"Not a Number"`. For technical reasons these NaN values are always of the float64 dtype.
-
-
-```python
-data = {
-	'roll_no': np.random.randint(1, 100, size=5),
-	'ppr_id':np.random.randint(1000, 2000, size=5),
-	'marks':np.random.randint(50,100,size=5)
-}
-df = pd.DataFrame(data)
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>17</td>
-      <td>1020</td>
-      <td>52</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>19</td>
-      <td>1467</td>
-      <td>52</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>49</td>
-      <td>1747</td>
-      <td>86</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>57</td>
-      <td>1187</td>
-      <td>67</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>77</td>
-      <td>1867</td>
-      <td>74</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-nan_idx = np.random.randint(0,5,3)
-df['marks'][nan_idx] = np.nan
-# df['marks'][[1,4,3]] = np.nan
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>17</td>
-      <td>1020</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>19</td>
-      <td>1467</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>49</td>
-      <td>1747</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>57</td>
-      <td>1187</td>
-      <td>67.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>77</td>
-      <td>1867</td>
-      <td>74.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `isnull()`, `isnull().sum()` and `notnull()`
-
-
-Pandas provides some methods specific to missing data. To select NaN entries you can use `pd.isnull()` (or its companion `pd.notnull()`). This is meant to be used thusly:
-
-
-
-```python
-df.isnull()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.isnull().sum()
-```
-
-
-
-
-    roll_no    0
-    ppr_id     0
-    marks      3
-    dtype: int64
-
-
-
-
-```python
-df['marks'].isnull()
-
-```
-
-
-
-
-    0     True
-    1     True
-    2     True
-    3    False
-    4    False
-    Name: marks, dtype: bool
-
-
-
-
-```python
-''' SELECT * from df where marks is NULL '''
-df[df['marks'].isnull()]         # DataFrame of values with null continent value
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>96</td>
-      <td>1142</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>80</td>
-      <td>1557</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>6</td>
-      <td>1402</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-missing_marks = df[df.marks.isnull()]
-n_missing_marks = len(missing_marks)
-# Cute alternative solution: if we sum a boolean series, True is treated as 1 and False as 0
-n_missing_marks = df.marks.isnull().sum()
-# or equivalently:
-n_missing_marks = pd.isnull(df.marks).sum()
-n_missing_marks
-
-```
-
-
-
-
-    3
-
-
-
-#### `fillna`
-
-
-```python
-df.fillna("FILLED")
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>37</td>
-      <td>1690</td>
-      <td>56.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>15</td>
-      <td>1700</td>
-      <td>FILLED</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>53</td>
-      <td>1364</td>
-      <td>55.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>94</td>
-      <td>1372</td>
-      <td>FILLED</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>44</td>
-      <td>1291</td>
-      <td>FILLED</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>37</td>
-      <td>1690</td>
-      <td>56.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>15</td>
-      <td>1700</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>53</td>
-      <td>1364</td>
-      <td>55.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>94</td>
-      <td>1372</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>44</td>
-      <td>1291</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df = df.fillna("FILLED")
-df.fillna("FILLED",inplace=True)
-df
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>37</td>
-      <td>1690</td>
-      <td>56.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>15</td>
-      <td>1700</td>
-      <td>FILLED</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>53</td>
-      <td>1364</td>
-      <td>55.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>94</td>
-      <td>1372</td>
-      <td>FILLED</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>44</td>
-      <td>1291</td>
-      <td>FILLED</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-data = {
-	'roll_no': np.random.randint(1, 100, size=5),
-	'ppr_id': np.random.randint(1000, 2000, size=5),
-	'marks': np.random.randint(50, 100, size=5)
-}
-df = pd.DataFrame(data)
-nan_idx = np.random.randint(0, 5, 3)
-df['marks'][nan_idx] = np.nan
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>60</td>
-      <td>1764</td>
-      <td>53.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>58</td>
-      <td>1443</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>23</td>
-      <td>1603</td>
-      <td>96.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>18</td>
-      <td>1626</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>21</td>
-      <td>1656</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.marks.fillna(df.marks.mean(), inplace=True)
-```
-
-
-```python
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>60</td>
-      <td>1764</td>
-      <td>53.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>58</td>
-      <td>1443</td>
-      <td>74.5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>23</td>
-      <td>1603</td>
-      <td>96.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>18</td>
-      <td>1626</td>
-      <td>74.5</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>21</td>
-      <td>1656</td>
-      <td>74.5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `dropna`
-
-
-```python
-import warnings
-warnings.filterwarnings('ignore')
-```
-
-
-```python
-data = {
-	'roll_no': np.random.randint(1, 100, size=5),
-	'ppr_id': np.random.randint(1000, 2000, size=5),
-	'marks': np.random.randint(50, 100, size=5)
-}
-df = pd.DataFrame(data)
-df['marks'][[0, 2, 4]] = np.nan
-df['ppr_id'][[0, 3]] = np.nan
-df['roll_no'][[0, 2]] = np.nan
-df
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>74.0</td>
-      <td>1647.0</td>
-      <td>82.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>NaN</td>
-      <td>1843.0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2.0</td>
-      <td>NaN</td>
-      <td>83.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.0</td>
-      <td>1227.0</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.dropna(subset=['ppr_id'])
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1</th>
-      <td>74.0</td>
-      <td>1647.0</td>
-      <td>82.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>NaN</td>
-      <td>1843.0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.0</td>
-      <td>1227.0</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.dropna()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>roll_no</th>
-      <th>ppr_id</th>
-      <th>marks</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1</th>
-      <td>74.0</td>
-      <td>1647.0</td>
-      <td>82.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
 
 ## Grouping and Sorting
 
@@ -10624,6 +10873,427 @@ employees.groupby("Department").aggregate({"Income": "mean", "Age": "max"})
   </tbody>
 </table>
 </div>
+
+
+
+#### Example:
+
+
+```python
+ipl = pd.read_csv('ipl.csv')
+ipl.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>batting_team</th>
+      <th>bowling_team</th>
+      <th>city</th>
+      <th>runs_left</th>
+      <th>balls_left</th>
+      <th>wickets</th>
+      <th>total_runs_x</th>
+      <th>cur_run_rate</th>
+      <th>req_run_rate</th>
+      <th>result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Royal Challengers Bangalore</td>
+      <td>Sunrisers Hyderabad</td>
+      <td>Hyderabad</td>
+      <td>207</td>
+      <td>119</td>
+      <td>10</td>
+      <td>208</td>
+      <td>6.0</td>
+      <td>10.436975</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Royal Challengers Bangalore</td>
+      <td>Sunrisers Hyderabad</td>
+      <td>Hyderabad</td>
+      <td>207</td>
+      <td>118</td>
+      <td>10</td>
+      <td>208</td>
+      <td>3.0</td>
+      <td>10.525424</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Royal Challengers Bangalore</td>
+      <td>Sunrisers Hyderabad</td>
+      <td>Hyderabad</td>
+      <td>207</td>
+      <td>117</td>
+      <td>10</td>
+      <td>208</td>
+      <td>2.0</td>
+      <td>10.615385</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Royal Challengers Bangalore</td>
+      <td>Sunrisers Hyderabad</td>
+      <td>Hyderabad</td>
+      <td>205</td>
+      <td>116</td>
+      <td>10</td>
+      <td>208</td>
+      <td>4.5</td>
+      <td>10.603448</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Royal Challengers Bangalore</td>
+      <td>Sunrisers Hyderabad</td>
+      <td>Hyderabad</td>
+      <td>201</td>
+      <td>115</td>
+      <td>10</td>
+      <td>208</td>
+      <td>8.4</td>
+      <td>10.486957</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+batting_team_wining = ipl[['batting_team','result']].groupby(['batting_team','result']).agg({'result':'count'}).rename(columns={'result':'count'}).reset_index()
+plt.figure(figsize=(25,5))
+sns.barplot(x='batting_team',y='count',hue='result',data=batting_team_wining)
+batting_team_wining.head()
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>batting_team</th>
+      <th>result</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Chennai Super Kings</td>
+      <td>0</td>
+      <td>2984</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Chennai Super Kings</td>
+      <td>1</td>
+      <td>5358</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Deccan Chargers</td>
+      <td>0</td>
+      <td>2509</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Deccan Chargers</td>
+      <td>1</td>
+      <td>1108</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Delhi Capitals</td>
+      <td>0</td>
+      <td>341</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+
+![jpeg](README_files/README_447_1.jpg)
+
+
+
+
+```python
+bowling_team = ipl[['bowling_team','result']].groupby(['bowling_team','result']).agg({'result':'count'}).rename(columns={'result':'count'}).reset_index()
+plt.figure(figsize=(25,5))
+sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
+```
+
+
+
+
+    <AxesSubplot:xlabel='bowling_team', ylabel='count'>
+
+
+
+
+
+![jpeg](README_files/README_448_1.jpg)
+
+
+
+
+```python
+city = ipl[['bowling_team','city','result']].groupby(['bowling_team','city','result']).agg({'result':'count'}).rename(columns={'result':'count'})
+city
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>bowling_team</th>
+      <th>city</th>
+      <th>result</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">Chennai Super Kings</th>
+      <th rowspan="2" valign="top">Abu Dhabi</th>
+      <th>0</th>
+      <td>96</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>118</td>
+    </tr>
+    <tr>
+      <th>Ahmedabad</th>
+      <th>1</th>
+      <td>111</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Bangalore</th>
+      <th>0</th>
+      <td>369</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>116</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">Sunrisers Hyderabad</th>
+      <th rowspan="2" valign="top">Raipur</th>
+      <th>0</th>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>125</td>
+    </tr>
+    <tr>
+      <th>Sharjah</th>
+      <th>1</th>
+      <td>117</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Visakhapatnam</th>
+      <th>0</th>
+      <td>103</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>246</td>
+    </tr>
+  </tbody>
+</table>
+<p>244 rows × 1 columns</p>
+</div>
+
+
+
+
+```python
+grouped = city.groupby(['bowling_team','city','result','count']).count().reset_index()
+grouped
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>bowling_team</th>
+      <th>city</th>
+      <th>result</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Chennai Super Kings</td>
+      <td>Abu Dhabi</td>
+      <td>0</td>
+      <td>96</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Chennai Super Kings</td>
+      <td>Abu Dhabi</td>
+      <td>1</td>
+      <td>118</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Chennai Super Kings</td>
+      <td>Ahmedabad</td>
+      <td>1</td>
+      <td>111</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Chennai Super Kings</td>
+      <td>Bangalore</td>
+      <td>0</td>
+      <td>369</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Chennai Super Kings</td>
+      <td>Bangalore</td>
+      <td>1</td>
+      <td>116</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>239</th>
+      <td>Sunrisers Hyderabad</td>
+      <td>Raipur</td>
+      <td>0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>240</th>
+      <td>Sunrisers Hyderabad</td>
+      <td>Raipur</td>
+      <td>1</td>
+      <td>125</td>
+    </tr>
+    <tr>
+      <th>241</th>
+      <td>Sunrisers Hyderabad</td>
+      <td>Sharjah</td>
+      <td>1</td>
+      <td>117</td>
+    </tr>
+    <tr>
+      <th>242</th>
+      <td>Sunrisers Hyderabad</td>
+      <td>Visakhapatnam</td>
+      <td>0</td>
+      <td>103</td>
+    </tr>
+    <tr>
+      <th>243</th>
+      <td>Sunrisers Hyderabad</td>
+      <td>Visakhapatnam</td>
+      <td>1</td>
+      <td>246</td>
+    </tr>
+  </tbody>
+</table>
+<p>244 rows × 4 columns</p>
+</div>
+
+
+
+
+```python
+chn = grouped[grouped['bowling_team'] == 'Chennai Super Kings']
+plt.figure(figsize=(25,5))
+sns.barplot(x='city',y='count',hue='result',data=chn)
+```
+
+
+
+
+    <AxesSubplot:xlabel='city', ylabel='count'>
+
+
+
+
+
+![jpeg](README_files/README_451_1.jpg)
+
+
+
+
+```python
+sh = grouped[grouped['bowling_team'] == 'Sunrisers Hyderabad']
+plt.figure(figsize=(25,5))
+sns.barplot(x='city',y='count',hue='result',data=sh)
+```
+
+
+
+
+    <AxesSubplot:xlabel='city', ylabel='count'>
+
+
+
+
+
+![jpeg](README_files/README_452_1.jpg)
 
 
 
@@ -12090,7 +12760,7 @@ df.plot()
 
 
 
-![png](README_files/README_495_1.png)
+![png](README_files/README_516_1.png)
 
 
 
@@ -12108,7 +12778,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_496_1.png)
+![png](README_files/README_517_1.png)
 
 
 
@@ -12119,7 +12789,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_497_0.png)
+![png](README_files/README_518_0.png)
 
 
 
@@ -12132,7 +12802,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_499_0.png)
+![png](README_files/README_520_0.png)
 
 
 
@@ -12153,7 +12823,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_500_1.jpg)
+![jpeg](README_files/README_521_1.jpg)
 
 
 
@@ -12172,7 +12842,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_501_1.jpg)
+![jpeg](README_files/README_522_1.jpg)
 
 
 
@@ -12204,7 +12874,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_504_1.png)
+![png](README_files/README_525_1.png)
 
 
 
@@ -12216,7 +12886,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_505_0.png)
+![png](README_files/README_526_0.png)
 
 
 
@@ -12228,7 +12898,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_506_0.png)
+![png](README_files/README_527_0.png)
 
 
 
@@ -12249,7 +12919,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_508_1.png)
+![png](README_files/README_529_1.png)
 
 
 
@@ -12260,7 +12930,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_509_0.png)
+![png](README_files/README_530_0.png)
 
 
 
@@ -12280,7 +12950,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_511_1.jpg)
+![jpeg](README_files/README_532_1.jpg)
 
 
 
@@ -12299,7 +12969,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_512_1.jpg)
+![jpeg](README_files/README_533_1.jpg)
 
 
 
@@ -12338,7 +13008,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_515_1.jpg)
+![jpeg](README_files/README_536_1.jpg)
 
 
 
@@ -12359,6 +13029,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_516_1.jpg)
+![jpeg](README_files/README_537_1.jpg)
 
 

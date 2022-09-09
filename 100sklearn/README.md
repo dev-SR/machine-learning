@@ -33,6 +33,8 @@
     - [🥇V3: Pipelining + GridSearchCV (Multi Models Hyperparameter Tuning) 🔥](#v3-pipelining--gridsearchcv-multi-models-hyperparameter-tuning-)
   - [Resource](#resource)
 
+
+
 ```python
 """
 cd .\100sklearn\
@@ -1081,22 +1083,22 @@ roc_auc_score(y_test, y_probs_positive)
 import pandas as pd
 import numpy as np
 np.random.seed(42)
+from tqdm.notebook import tqdm
 
 # modelling
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import RepeatedKFold
 
+# matrics
+from sklearn.metrics import accuracy_score
 # # ignore ConvergenceWarnings
 # from warnings import simplefilter
 # from sklearn.exceptions import ConvergenceWarning
 # simplefilter("ignore", category=ConvergenceWarning)
 
-```
-
-
-```python
 df = pd.read_csv("heart-disease.csv")
 np.random.seed(0)
 
@@ -1106,13 +1108,6 @@ y = df['target']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
-```
-
-    (242, 13) (61, 13) (242,) (61,)
-
-
-
-```python
 models = [
     {
       "model_instance": RandomForestClassifier(),
@@ -1120,7 +1115,7 @@ models = [
       "params": {
           "max_depth": [85],
           "max_features": ['sqrt'],
-          "n_estimators": [60, 80, 90],
+          "n_estimators": [50,60, 80, 90,100],
           "random_state": [42]
         }
     },
@@ -1139,29 +1134,211 @@ models = [
 scores = []
 highest_acc = 0
 best_model = None
+# Cross validation Strategy
+cv = RepeatedKFold(n_splits=5, n_repeats=2, random_state=1)
 
 print("Running Model:")
-for model in models:
-  # Create a based model
+for _,model in enumerate(tqdm(models)):
+
+    # Create a based model
     model_instance = model["model_instance"]
     model_name = model["model_name"]
-    classifier = GridSearchCV(estimator=model_instance, param_grid=model["params"],
-                              cv=3, n_jobs=1)
-    classifier.fit(X_train, y_train)
-    print(f'Best Score: {classifier.best_score_}')
-    print(f'Best Hyperparameters: {classifier.best_params_}')
-    print()
+    grid = GridSearchCV(estimator=model_instance, param_grid=model["params"],
+                              cv=cv, n_jobs=1)
+    grid.fit(X_train, y_train)
 
+    # get accuracy
+    acc = grid.score(X_test, y_test)
+
+    # acc = accuracy_score(predicted, y_test)
+    # check if highest accuracy
+    if acc > highest_acc:
+        highest_acc = acc
+        # save best model
+        best_model = grid
+
+    # save model details
+    scores.append({
+        "model":model_name,
+        "training_best_score": grid.best_score_,
+        "test_best_score": acc,
+        "best_params": grid.best_params_
+      })
+
+
+res_df = pd.DataFrame(scores)
+res_df
 ```
 
+    (242, 13) (61, 13) (242,) (61,)
     Running Model:
-    Best Score: 0.8141460905349794
-    Best Hyperparameters: {'max_depth': 85, 'max_features': 'sqrt', 'n_estimators': 60, 'random_state': 42}
-
-    Best Score: 0.8141975308641975
-    Best Hyperparameters: {'criterion': 'gini', 'max_depth': None, 'max_features': None, 'random_state': 42, 'splitter': 'random'}
 
 
+
+      0%|          | 0/2 [00:00<?, ?it/s]
+
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>training_best_score</th>
+      <th>test_best_score</th>
+      <th>best_params</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForest</td>
+      <td>0.832781</td>
+      <td>0.852459</td>
+      <td>{'max_depth': 85, 'max_features': 'sqrt', 'n_estimators': 100, 'random_state': 42}</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>0.766454</td>
+      <td>0.819672</td>
+      <td>{'criterion': 'gini', 'max_depth': None, 'max_features': None, 'random_state': 42, 'splitter': 'random'}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+results = pd.DataFrame(best_model.cv_results_)
+print(results.columns)
+results.head(2)
+```
+
+    Index(['mean_fit_time', 'std_fit_time', 'mean_score_time', 'std_score_time',
+           'param_max_depth', 'param_max_features', 'param_n_estimators',
+           'param_random_state', 'params', 'split0_test_score',
+           'split1_test_score', 'split2_test_score', 'split3_test_score',
+           'split4_test_score', 'split5_test_score', 'split6_test_score',
+           'split7_test_score', 'split8_test_score', 'split9_test_score',
+           'mean_test_score', 'std_test_score', 'rank_test_score'],
+          dtype='object')
+
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean_fit_time</th>
+      <th>std_fit_time</th>
+      <th>mean_score_time</th>
+      <th>std_score_time</th>
+      <th>param_max_depth</th>
+      <th>param_max_features</th>
+      <th>param_n_estimators</th>
+      <th>param_random_state</th>
+      <th>params</th>
+      <th>split0_test_score</th>
+      <th>...</th>
+      <th>split3_test_score</th>
+      <th>split4_test_score</th>
+      <th>split5_test_score</th>
+      <th>split6_test_score</th>
+      <th>split7_test_score</th>
+      <th>split8_test_score</th>
+      <th>split9_test_score</th>
+      <th>mean_test_score</th>
+      <th>std_test_score</th>
+      <th>rank_test_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.095308</td>
+      <td>0.025508</td>
+      <td>0.008096</td>
+      <td>0.001643</td>
+      <td>85</td>
+      <td>sqrt</td>
+      <td>50</td>
+      <td>42</td>
+      <td>{'max_depth': 85, 'max_features': 'sqrt', 'n_e...</td>
+      <td>0.836735</td>
+      <td>...</td>
+      <td>0.791667</td>
+      <td>0.875</td>
+      <td>0.714286</td>
+      <td>0.836735</td>
+      <td>0.8125</td>
+      <td>0.916667</td>
+      <td>0.8125</td>
+      <td>0.822449</td>
+      <td>0.051033</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.115407</td>
+      <td>0.042089</td>
+      <td>0.011100</td>
+      <td>0.004404</td>
+      <td>85</td>
+      <td>sqrt</td>
+      <td>60</td>
+      <td>42</td>
+      <td>{'max_depth': 85, 'max_features': 'sqrt', 'n_e...</td>
+      <td>0.836735</td>
+      <td>...</td>
+      <td>0.812500</td>
+      <td>0.875</td>
+      <td>0.714286</td>
+      <td>0.836735</td>
+      <td>0.8125</td>
+      <td>0.895833</td>
+      <td>0.8125</td>
+      <td>0.822449</td>
+      <td>0.046586</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 22 columns</p>
+</div>
+
+
+
+
+```python
+nesm = pd.DataFrame(best_model.cv_results_)[['param_n_estimators','mean_test_score']]
+sns.lineplot(x='param_n_estimators', y='mean_test_score', data=nesm)
+```
+
+
+
+
+    <AxesSubplot:xlabel='param_n_estimators', ylabel='mean_test_score'>
+
+
+
+
+
+![jpeg](README_files/README_76_1.jpg)
+
+
+
+- [https://amueller.github.io/ml-training-intro/slides/03-cross-validation-grid-search.html#1](https://amueller.github.io/ml-training-intro/slides/03-cross-validation-grid-search.html#1)
 
 ## Putting All Together: PipeLine + GridSearchCV
 
@@ -1951,6 +2128,7 @@ print(f'Best Hyperparameters: {result.best_params_}')
 import numpy as np
 np.random.seed(42)
 import pandas as pd
+from tqdm.notebook import tqdm
 
 # getting data ready
 from sklearn.compose import ColumnTransformer
@@ -1969,6 +2147,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import RepeatedKFold
 
 # matrics
 from sklearn.metrics import accuracy_score
@@ -2016,14 +2195,13 @@ preprocessor = Pipeline(steps=[('data_transformers', data_transformers),
 
 ##### 7. GridSearchCV
 models = [
-    { "model_instance": RandomForestClassifier(),
-      "model_name": "RandomForest",
+    { "model_instance": KNeighborsClassifier(),
+      "model_name": "KNeighbors",
       "params": {
-          "classifier__max_depth": [85],
-          "classifier__max_features": ['sqrt'],
-          "classifier__n_estimators": [60, 80, 90],
-          "classifier__random_state": [42]
-      }
+          "classifier__n_neighbors": range(3,5),
+          "classifier__weights": ['uniform','distance'],
+          "classifier__leaf_size": [25,30,35]
+        }
     },
     { "model_instance": DecisionTreeClassifier(),
       "model_name": "DecisionTree",
@@ -2031,60 +2209,170 @@ models = [
           "classifier__criterion": ['gini','entropy'],
           "classifier__splitter": ['best','random'],
           "classifier__max_depth": [None,90,95,100],
-          "classifier__max_features": [None, "sqrt","log2"],
+          "classifier__max_features": [None,"sqrt","log2"],
           "classifier__random_state": [42]
       }
     },
+    { "model_instance": LinearSVC(),
+      "model_name": "SVC",
+      "params": {
+          "classifier__loss": ['hinge','squared_hinge'],
+          "classifier__multi_class": ['ovr', 'crammer_singer'],
+          "classifier__fit_intercept": [True, False],
+          "classifier__random_state": [42],
+          "classifier__max_iter": [900, 1000, 1100]
+      }
+    },
+    { "model_instance": svm.SVC(),
+      "model_name": "SVM",
+      "params": {
+          'classifier__C': [0.1,1, 10, 100, 1000],
+          'classifier__gamma': [1,0.1,0.01,0.001,0.0001],
+          'classifier__kernel': ['rbf']
+      }
+    },
+    { "model_instance": RandomForestClassifier(),
+      "model_name": "RandomForest",
+      "params": {
+      "classifier__criterion": ['gini','entropy'],
+      "classifier__bootstrap": [True, False],
+      "classifier__max_depth": [85,90,95,100],
+      "classifier__max_features": ['sqrt','log2'],
+      "classifier__n_estimators": [60, 80, 90],
+      "classifier__random_state": [42]
+      }
+    },
+    { "model_instance": SGDClassifier(),
+      "model_name": "SGDClassifier",
+      "params": {
+          "classifier__loss": ['hinge', 'log_loss', 'perceptron'],
+          "classifier__penalty": ['l2', 'l1'],
+          "classifier__alpha": [0.0001, 0.0003, 0.0010],
+          "classifier__early_stopping": [True],
+          "classifier__max_iter": [1000, 1500],
+          "classifier__random_state": [42]
+      }
+    }
 ]
 
 
 scores = []
 highest_acc = 0
 best_model = None
+# Cross validation Strategy
+cv = RepeatedKFold(n_splits=5, n_repeats=2, random_state=1)
 
 print("Running Model:")
-for model in models:
+for _,model in enumerate(tqdm(models)):
     # get model details
     model_instance = model["model_instance"]
     model_name = model["model_name"]
 
     # define grid search
-    classifier = GridSearchCV(
+    grid = GridSearchCV(
         Pipeline(steps=[
         ('preprocess', preprocessor),
         ('classifier', model_instance)
-    ]),param_grid=model["params"],cv = 3, n_jobs = 1)
+    ]),param_grid=model["params"],cv = cv, n_jobs = 1)
 
-    # fit model
-    classifier.fit(X_train, y_train)
-    # get predictions
-    predicted = classifier.predict(X_test)
-
+    grid.fit(X_train, y_train)
     # get accuracy
-    acc = accuracy_score(predicted, y_test)
+    # print(f'[{model_name}]Best mean cross-validation score: {grid.best_score_}')
+    # print(f'[{model_name}]Best Hyperparameters: {grid.best_params_}' )
+    acc = grid.score(X_test, y_test)
+    # print(f'[{model_name}]Test-set score: {acc}' )
+
+    # acc = accuracy_score(predicted, y_test)
     # check if highest accuracy
     if acc > highest_acc:
         highest_acc = acc
         # save best model
-        best_model = classifier
+        best_model = grid
 
     # save model details
     scores.append({
         "model":model_name,
-        "training_best_score": classifier.best_score_,
+        "training_best_score": grid.best_score_,
         "test_best_score": acc,
-        "best_params": classifier.best_params_
+        "best_params": grid.best_params_
       })
-    print(f'[{model_name}]Best Score: {classifier.best_score_}')
-    print(f'[{model_name}]Best Hyperparameters: {classifier.best_params_}' )
+
+
+res_df = pd.DataFrame(scores)
+res_df
+
 ```
 
     (712, 8) (179, 8) (712,) (179,)
     Running Model:
-    [RandomForest]Best Score: 0.8020068787008473
-    [RandomForest]Best Hyperparameters: {'classifier__max_depth': 85, 'classifier__max_features': 'sqrt', 'classifier__n_estimators': 90, 'classifier__random_state': 42}
-    [DecisionTree]Best Score: 0.7514212436029265
-    [DecisionTree]Best Hyperparameters: {'classifier__criterion': 'entropy', 'classifier__max_depth': None, 'classifier__max_features': None, 'classifier__random_state': 42, 'classifier__splitter': 'random'}
+
+
+
+      0%|          | 0/6 [00:00<?, ?it/s]
+
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>training_best_score</th>
+      <th>test_best_score</th>
+      <th>best_params</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>KNeighbors</td>
+      <td>0.783709</td>
+      <td>0.810056</td>
+      <td>{'classifier__leaf_size': 25, 'classifier__n_neighbors': 4, 'classifier__weights': 'uniform'}</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>0.740855</td>
+      <td>0.731844</td>
+      <td>{'classifier__criterion': 'entropy', 'classifier__max_depth': None, 'classifier__max_features': None, 'classifier__random_state': 42, 'classifier__splitter': 'best'}</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SVC</td>
+      <td>0.791431</td>
+      <td>0.798883</td>
+      <td>{'classifier__fit_intercept': True, 'classifier__loss': 'squared_hinge', 'classifier__max_iter': 900, 'classifier__multi_class': 'ovr', 'classifier__random_state': 42}</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SVM</td>
+      <td>0.814607</td>
+      <td>0.821229</td>
+      <td>{'classifier__C': 1000, 'classifier__gamma': 0.1, 'classifier__kernel': 'rbf'}</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>RandomForest</td>
+      <td>0.792116</td>
+      <td>0.826816</td>
+      <td>{'classifier__bootstrap': True, 'classifier__criterion': 'gini', 'classifier__max_depth': 85, 'classifier__max_features': 'sqrt', 'classifier__n_estimators': 90, 'classifier__random_state': 42}</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>SGDClassifier</td>
+      <td>0.792835</td>
+      <td>0.826816</td>
+      <td>{'classifier__alpha': 0.001, 'classifier__early_stopping': True, 'classifier__loss': 'log_loss', 'classifier__max_iter': 1000, 'classifier__penalty': 'l1', 'classifier__random_state': 42}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 
@@ -2163,16 +2451,61 @@ pd.DataFrame(scores)
     <tr>
       <th>0</th>
       <td>RandomForest</td>
-      <td>0.802007</td>
+      <td>0.792116</td>
       <td>0.826816</td>
       <td>{'classifier__max_depth': 85, 'classifier__max...</td>
     </tr>
     <tr>
       <th>1</th>
       <td>DecisionTree</td>
-      <td>0.751421</td>
-      <td>0.759777</td>
+      <td>0.740855</td>
+      <td>0.731844</td>
       <td>{'classifier__criterion': 'entropy', 'classifi...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.set_option("display.max_columns", None) # show all cols
+pd.set_option('display.max_colwidth', None) # show full width of showing cols
+pd.set_option("display.expand_frame_repr", False) # print cols side by side as it's supposed to be
+pd.DataFrame(scores)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model</th>
+      <th>training_best_score</th>
+      <th>test_best_score</th>
+      <th>best_params</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>RandomForest</td>
+      <td>0.792116</td>
+      <td>0.826816</td>
+      <td>{'classifier__max_depth': 85, 'classifier__max_features': 'sqrt', 'classifier__n_estimators': 90, 'classifier__random_state': 42}</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>DecisionTree</td>
+      <td>0.740855</td>
+      <td>0.731844</td>
+      <td>{'classifier__criterion': 'entropy', 'classifier__max_depth': None, 'classifier__max_features': None, 'classifier__random_state': 42, 'classifier__splitter': 'best'}</td>
     </tr>
   </tbody>
 </table>
@@ -2194,7 +2527,143 @@ pd.DataFrame(scores).plot(x="model", y=["training_best_score", "test_best_score"
 
 
 
-![png](README_files/README_123_1.png)
+![jpeg](README_files/README_125_1.jpg)
+
+
+
+
+```python
+pd.DataFrame(best_model.cv_results_)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean_fit_time</th>
+      <th>std_fit_time</th>
+      <th>mean_score_time</th>
+      <th>std_score_time</th>
+      <th>param_classifier__max_depth</th>
+      <th>param_classifier__max_features</th>
+      <th>param_classifier__n_estimators</th>
+      <th>param_classifier__random_state</th>
+      <th>params</th>
+      <th>split0_test_score</th>
+      <th>...</th>
+      <th>split3_test_score</th>
+      <th>split4_test_score</th>
+      <th>split5_test_score</th>
+      <th>split6_test_score</th>
+      <th>split7_test_score</th>
+      <th>split8_test_score</th>
+      <th>split9_test_score</th>
+      <th>mean_test_score</th>
+      <th>std_test_score</th>
+      <th>rank_test_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.208997</td>
+      <td>0.028888</td>
+      <td>0.020902</td>
+      <td>0.003240</td>
+      <td>85</td>
+      <td>sqrt</td>
+      <td>60</td>
+      <td>42</td>
+      <td>{'classifier__max_depth': 85, 'classifier__max...</td>
+      <td>0.853147</td>
+      <td>...</td>
+      <td>0.774648</td>
+      <td>0.816901</td>
+      <td>0.804196</td>
+      <td>0.748252</td>
+      <td>0.767606</td>
+      <td>0.795775</td>
+      <td>0.774648</td>
+      <td>0.789299</td>
+      <td>0.028563</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.266900</td>
+      <td>0.021876</td>
+      <td>0.019300</td>
+      <td>0.002235</td>
+      <td>85</td>
+      <td>sqrt</td>
+      <td>80</td>
+      <td>42</td>
+      <td>{'classifier__max_depth': 85, 'classifier__max...</td>
+      <td>0.860140</td>
+      <td>...</td>
+      <td>0.753521</td>
+      <td>0.823944</td>
+      <td>0.804196</td>
+      <td>0.769231</td>
+      <td>0.774648</td>
+      <td>0.788732</td>
+      <td>0.774648</td>
+      <td>0.791397</td>
+      <td>0.029332</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.288898</td>
+      <td>0.029934</td>
+      <td>0.025804</td>
+      <td>0.009366</td>
+      <td>85</td>
+      <td>sqrt</td>
+      <td>90</td>
+      <td>42</td>
+      <td>{'classifier__max_depth': 85, 'classifier__max...</td>
+      <td>0.860140</td>
+      <td>...</td>
+      <td>0.767606</td>
+      <td>0.823944</td>
+      <td>0.797203</td>
+      <td>0.755245</td>
+      <td>0.788732</td>
+      <td>0.788732</td>
+      <td>0.781690</td>
+      <td>0.792116</td>
+      <td>0.028535</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 22 columns</p>
+</div>
+
+
+
+
+```python
+nesm = pd.DataFrame(best_model.cv_results_)[['param_classifier__n_estimators','mean_test_score']]
+sns.lineplot(x='param_classifier__n_estimators', y='mean_test_score', data=nesm)
+```
+
+
+
+
+    <AxesSubplot:xlabel='param_classifier__n_estimators', ylabel='mean_test_score'>
+
+
+
+
+
+![jpeg](README_files/README_127_1.jpg)
 
 
 
