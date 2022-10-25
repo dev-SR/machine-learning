@@ -21,6 +21,8 @@
   - [Histograms](#histograms)
     - [Standard Deviation](#standard-deviation)
   - [Subplots](#subplots)
+    - [`plt.subplots()`](#pltsubplots)
+    - [`plt.GridSpec()`](#pltgridspec)
   - [3D projection](#3d-projection)
   - [Images](#images)
     - [cropping](#cropping)
@@ -37,37 +39,30 @@ jupyter nbconvert --to markdown matplotlib.ipynb --output README.md
 #normal charts inside notebooks
 # %matplotlib inline
 import matplotlib.pyplot as plt
-plt.style.use('default')
+# plt.style.use('default')
 import numpy as np
-
+import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
 # from IPython import display
 # display.set_matplotlib_formats('svg')
 from matplotlib_inline.backend_inline import set_matplotlib_formats
-set_matplotlib_formats('svg')
+set_matplotlib_formats('png')
 # "background: #22272E;"
 
 ```
 
 
 ```python
-plt.plot()
+# rc configuration
+plt.rcParams.update({
+    "figure.facecolor": "white",
+    "axes.facecolor": "white",
+    'font.size': 14
+})
+
 ```
-
-
-
-
-    []
-
-
-
-
-
-![svg](README_files/README_2_1.svg)
-
-
 
 ## Line Plots
 
@@ -1036,25 +1031,30 @@ plt.hist(data,bins=10)
 
 
 
+### `plt.subplots()`
+
+- [https://jakevdp.github.io/PythonDataScienceHandbook/04.08-multiple-subplots.html](https://jakevdp.github.io/PythonDataScienceHandbook/04.08-multiple-subplots.html)
+- [https://omz-software.com/pythonista/matplotlib/users/gridspec.html](https://omz-software.com/pythonista/matplotlib/users/gridspec.html)
+
 A matplotlib figure may contain multiple subplots. These subplots are organized in a grid. To create a subplot, just call the `subplot` function, and specify the number of rows and columns in the figure, and the index of the subplot you want to draw on (starting from 1, then left to right, and top to bottom). Note that pyplot keeps track of the currently active subplot (which you can get a reference to by calling `plt.gca()`), so when you call the `plot` function, it draws on the *active* subplot.
 
 
 ```python
 x = np.linspace(-1.4, 1.4, 30)
-plt.subplot(2, 2, 1)  # 2 rows, 2 columns, 1st subplot = top left
+plt.subplot(2, 2, 1)  # 2 rows, 2 columns, [1st subplot = top left]
 plt.plot(x, x)
-plt.subplot(2, 2, 2)  # 2 rows, 2 columns, 2nd subplot = top right
+plt.subplot(2, 2, 2)  # 2 rows, 2 columns, [2nd subplot = top right]
 plt.plot(x, x**2)
-plt.subplot(2, 2, 3)  # 2 rows, 2 columns, 3rd subplot = bottow left
+plt.subplot(2, 2, 3)  # 2 rows, 2 columns, [3rd subplot = bottow left]
 plt.plot(x, x**3)
-plt.subplot(2, 2, 4)  # 2 rows, 2 columns, 4th subplot = bottom right
+plt.subplot(2, 2, 4)  # 2 rows, 2 columns, [4th subplot = bottom right]
 plt.plot(x, x**4)
 plt.show()
 ```
 
 
 
-![svg](README_files/README_84_0.svg)
+![svg](README_files/README_86_0.svg)
 
 
 
@@ -1075,32 +1075,281 @@ plt.show()
 
 
 
-![svg](README_files/README_87_0.svg)
-
-
-
-If you need more complex subplot positionning, you can use `subplot2grid` instead of `subplot`. You specify the number of rows and columns in the grid, then your subplot's position in that grid (top-left = (0,0)), and optionally how many rows and/or columns it spans.  For example:
-
-
-```python
-plt.subplot2grid((3,3), (0, 0), rowspan=2, colspan=2)
-plt.plot(x, x**2)
-plt.subplot2grid((3,3), (0, 2))
-plt.plot(x, x**3)
-plt.subplot2grid((3,3), (1, 2), rowspan=2)
-plt.plot(x, x**4)
-plt.subplot2grid((3,3), (2, 0), colspan=2)
-plt.plot(x, x**5)
-plt.show()
-```
-
-
-
 ![svg](README_files/README_89_0.svg)
 
 
 
-If you need even more flexibility in subplot positioning, check out the [GridSpec documentation](http://matplotlib.org/users/gridspec.html)
+### `plt.GridSpec()`
+
+To go beyond a regular grid to subplots that span multiple rows and columns, `plt.GridSpec()` is the best tool. `The plt.GridSpec()` object does not create a plot by itself; it is simply a convenient interface that is recognized by the `plt.subplot()` command. For example, a `gridspec` for a grid of two rows and three columns with some specified width and height space looks like this:
+
+
+
+
+```python
+import matplotlib.gridspec as gridspec
+gs = gridspec.GridSpec(2, 2) # 2 rows, 2 columns
+ax1 = plt.subplot(gs[0, 0]) # 1st subplot = top left
+ax2 = plt.subplot(gs[0, 1]) # 2nd subplot = top right
+ax3 = plt.subplot(gs[1, :]) # 3rd subplot = bottom
+x = np.linspace(-1.4, 1.4, 30)
+ax1.plot(x, x)
+ax2.plot(x, x**2)
+ax3.plot(x, x**3)
+
+
+```
+
+
+
+
+    [<matplotlib.lines.Line2D at 0x1170b4b72e0>]
+
+
+
+
+
+![png](README_files/README_92_1.png)
+
+
+
+
+```python
+df = pd.read_csv('keyphrase-evaluation.csv')
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Model</th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F-1</th>
+      <th>level</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>TeKET</td>
+      <td>0.252252</td>
+      <td>0.116424</td>
+      <td>0.159317</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>YAKE</td>
+      <td>0.283784</td>
+      <td>0.130977</td>
+      <td>0.179232</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>IFTDF</td>
+      <td>0.256757</td>
+      <td>0.118503</td>
+      <td>0.162162</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>TR</td>
+      <td>0.220721</td>
+      <td>0.101871</td>
+      <td>0.139403</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>PR</td>
+      <td>0.058559</td>
+      <td>0.027027</td>
+      <td>0.036984</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>TeKET</td>
+      <td>0.084719</td>
+      <td>0.039067</td>
+      <td>0.053473</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>YAKE</td>
+      <td>0.081648</td>
+      <td>0.037684</td>
+      <td>0.051567</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>IFTDF</td>
+      <td>0.078277</td>
+      <td>0.036128</td>
+      <td>0.049438</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>TR</td>
+      <td>0.064045</td>
+      <td>0.029559</td>
+      <td>0.040449</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>PR</td>
+      <td>0.007491</td>
+      <td>0.003457</td>
+      <td>0.004731</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>TeKET</td>
+      <td>0.017643</td>
+      <td>0.008095</td>
+      <td>0.011092</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>YAKE</td>
+      <td>0.015358</td>
+      <td>0.007088</td>
+      <td>0.009700</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>IFTDF</td>
+      <td>0.013061</td>
+      <td>0.006028</td>
+      <td>0.008249</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>TR</td>
+      <td>0.016506</td>
+      <td>0.007618</td>
+      <td>0.010425</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>PR</td>
+      <td>0.000746</td>
+      <td>0.000344</td>
+      <td>0.000471</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+from matplotlib.ticker import FormatStrFormatter
+
+```
+
+
+```python
+y_cols = ['Precision','Recall','F-1']
+barLabelFormat=.2
+width=0.3
+p1 = ['#1c4cc3', '#1878a7', '#18a88f']
+```
+
+
+```python
+import matplotlib.gridspec as gridspec
+gs = gridspec.GridSpec(1, 3)
+plt.figure(figsize=(30,6))
+ax1 = plt.subplot(gs[0, 0])
+ax2 = plt.subplot(gs[0, 1])
+ax3 = plt.subplot(gs[0, 2])
+
+# subplot 1
+L1 = df[df['level']==1]
+L1_X = np.arange(len(L1['Model']))
+L1_X_ticks = L1['Model'].tolist()
+	# plot bars
+for i,y_col in enumerate(y_cols):
+	x_data = L1_X + width*i
+	y_data = L1[y_col]
+	ax1.bar(x_data, y_data, width=width, color=p1[i])
+	# set ticks on each bar
+	for x,y in zip(x_data,y_data):
+		ax1.text(x,y,f'%{barLabelFormat}f'%y,ha='center',va='bottom')
+ax1.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+# set ticks on x-axis
+ax1.set_xticks(L1_X + width, L1_X_ticks, rotation=45)
+ax1.legend(y_cols)
+ax1.set_title('Level 1: Precision, Recall, F-1')
+ax1.set_ylim((0,.35))
+
+# subplot 2
+L2 = df[df['level']==2]
+L2_X = np.arange(len(L2['Model']))
+L2_X_ticks = L2['Model'].tolist()
+for i,y_col in enumerate(y_cols):
+	x_data = L2_X + width*i
+	y_data = L2[y_col]
+	ax2.bar(x_data, y_data, width=width, color=p1[i])
+	for x,y in zip(x_data,y_data):
+		ax2.text(x,y,f'%{barLabelFormat}f'%y,ha='center',va='bottom')
+ax2.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+ax2.set_xticks(L2_X + width, L2_X_ticks, rotation=45)
+ax2.legend(y_cols)
+ax2.set_title('Level 2: Precision, Recall, F-1')
+ax2.set_ylim((0,.35))
+
+# subplot 3
+L3 = df[df['level']==2]
+L3_X = np.arange(len(L3['Model']))
+L3_X_ticks = L3['Model'].tolist()
+for i,y_col in enumerate(y_cols):
+	x_data = L3_X + width*i
+	y_data = L3[y_col]
+	ax3.bar(x_data, y_data, width=width, color=p1[i])
+	for x,y in zip(x_data,y_data):
+		ax3.text(x,y,f'%{barLabelFormat}f'%y,ha='center',va='bottom')
+ax3.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+ax3.set_xticks(L3_X + width, L3_X_ticks, rotation=45)
+ax3.legend(y_cols)
+ax3.set_title('Level 3: Precision, Recall, F-1')
+ax3.set_ylim((0,.35))
+
+```
+
+
+
+
+    (0.0, 0.35)
+
+
+
+
+
+![png](README_files/README_96_1.png)
+
+
 
 ## 3D projection
 
@@ -1146,7 +1395,7 @@ fig.gca(projection='3d')
 
 
 
-![png](README_files/README_94_1.png)
+![png](README_files/README_100_1.png)
 
 
 
@@ -1167,7 +1416,7 @@ plt.show()
 
 
 
-![png](README_files/README_96_0.png)
+![png](README_files/README_102_0.png)
 
 
 
@@ -1207,7 +1456,7 @@ plt.imshow(img)
 
 
 
-![png](README_files/README_101_1.png)
+![png](README_files/README_107_1.png)
 
 
 
@@ -1220,7 +1469,7 @@ plt.show()
 
 
 
-![png](README_files/README_102_0.png)
+![png](README_files/README_108_0.png)
 
 
 
@@ -1249,7 +1498,7 @@ plt.show()
 
 
 
-![png](README_files/README_105_0.png)
+![png](README_files/README_111_0.png)
 
 
 
@@ -1289,7 +1538,7 @@ plt.show()
 
 
 
-![png](README_files/README_109_0.png)
+![png](README_files/README_115_0.png)
 
 
 
@@ -1305,6 +1554,6 @@ plt.savefig("my_square_function.png", transparent=True)
 
 
 
-![svg](README_files/README_111_0.svg)
+![svg](README_files/README_117_0.svg)
 
 
