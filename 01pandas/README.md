@@ -16,13 +16,13 @@
     - [🚀🚀list of dicts: column wise data](#list-of-dicts-column-wise-data)
     - [🚀using `zip()`; list of tuple](#using-zip-list-of-tuple)
     - [Dicts of series.](#dicts-of-series)
-  - [Saving & loading files](#saving--loading-files)
+  - [Saving \& loading files](#saving--loading-files)
     - [Saving: creating new file](#saving-creating-new-file)
     - [Saving: Append to Existing File](#saving-append-to-existing-file)
     - [Loading](#loading)
     - [Minimize the size of Large DataSet; `nrows=n`](#minimize-the-size-of-large-dataset-nrowsn)
   - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
-    - [Adding Column](#adding-column)
+    - [Adding Columns](#adding-columns)
       - [`d['new_col'] = list()`](#dnew_col--list)
       - [`d['new_col'] = constant`](#dnew_col--constant)
       - [`d['new_col'] = range(len(d))`](#dnew_col--rangelend)
@@ -30,14 +30,14 @@
       - [`insert(position,column,value)`](#insertpositioncolumnvalue)
       - [`assign(new_col,value)`](#assignnew_colvalue)
     - [Moving Columns Position](#moving-columns-position)
-    - [Adding Row](#adding-row)
-      - [`append()` [deprecated]](#append-deprecated)
-      - [`concat()`](#concat)
+    - [Adding/Appending Rows](#addingappending-rows)
+      - [`append()` \[deprecated\]](#append-deprecated)
+      - [🌰 `concat()`](#-concat)
       - [`loc()` - dict](#loc---dict)
       - [`loc()` - list](#loc---list)
       - [`iloc[]` - list](#iloc---list)
     - [Combine Pd Dataframes /Py dict to Pd Dataframe](#combine-pd-dataframes-py-dict-to-pd-dataframe)
-      - [`concat()`](#concat-1)
+      - [`concat()`](#concat)
       - [`join()`](#join)
     - [Removing Rows/Columns](#removing-rowscolumns)
       - [`drop()` - column](#drop---column)
@@ -122,6 +122,7 @@
     - [Box plot](#box-plot)
     - [Area plot](#area-plot)
     - [Pie chart](#pie-chart)
+
 
 ## Introduction
 
@@ -1546,7 +1547,7 @@ data.to_csv("winemag-data-130k-v2-mod.csv")
 
 - [https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/](https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/)
 
-###  Adding Column
+###  Adding Columns
 
 
 ```python
@@ -2281,7 +2282,7 @@ df
 
 
 
-### Adding Row
+### Adding/Appending Rows
 
 - [https://www.geeksforgeeks.org/how-to-add-one-row-in-an-existing-pandas-dataframe/](https://www.geeksforgeeks.org/how-to-add-one-row-in-an-existing-pandas-dataframe/)
  - [https://www.geeksforgeeks.org/how-to-append-a-list-as-a-row-to-a-pandas-dataframe-in-python/](https://www.geeksforgeeks.org/how-to-append-a-list-as-a-row-to-a-pandas-dataframe-in-python/)
@@ -2354,15 +2355,32 @@ employees.append({"Name":"Berkay","Department":"Finance","Income":6000,"Age":24}
 
 
 
-#### `concat()`
+#### 🌰 `concat()`
 
 
 ```python
-employees = pd.DataFrame({"Name":["Josh","Mike","Julia"],
-                          "Department":["IT","Human Resources","Finance"],
-                          "Income":[4800,5200,6600],
-                          "Age":[24,28,33]})
-employees
+# appending to an empty dataframe
+# output = pd.DataFrame()
+# or
+# output = pd.DataFrame(columns=["Name","Department","Income","Age"])
+# or
+# append to an existing dataframe
+# output = pd.DataFrame({"Name":["Josh","Mike","Julia"],
+#                           "Department":["IT","Human Resources","Finance"],
+#                           "Income":[4800,5200,6600],
+#                           "Age":[24,28,33]})
+# output
+```
+
+
+```python
+output = pd.DataFrame()
+# data
+dictionary = {"Name": "Berkay", "Department": "Finance", "Income": 6000, "Age": 24}
+df_dictionary = pd.DataFrame([dictionary])
+# append
+output = pd.concat([output, df_dictionary], ignore_index=True)
+output
 ```
 
 
@@ -2381,147 +2399,12 @@ employees
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-employees = pd.concat([employees, pd.DataFrame(
-    [{"Name": "Berkay", "Department": "Finance", "Income": 6000, "Age": 24}])])
-employees
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-    </tr>
     <tr>
       <th>0</th>
       <td>Berkay</td>
       <td>Finance</td>
       <td>6000</td>
       <td>24</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-employees = pd.concat([employees, pd.DataFrame([{"Name":"Berkay","Department":"Finance"}]) ])
-employees
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800.0</td>
-      <td>24.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200.0</td>
-      <td>28.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600.0</td>
-      <td>33.0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>Berkay</td>
-      <td>Finance</td>
-      <td>6000.0</td>
-      <td>24.0</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>Berkay</td>
-      <td>Finance</td>
-      <td>NaN</td>
-      <td>NaN</td>
     </tr>
   </tbody>
 </table>
@@ -9904,6 +9787,7 @@ employees.groupby(["Department", "Work Level"])[
 
 
 <div>
+<style scoped>
 
 <table border="1" class="dataframe">
   <thead>
@@ -9982,7 +9866,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_419_1.png)
+![png](README_files/README_418_1.png)
 
 
 
@@ -10001,7 +9885,7 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_420_1.png)
+![png](README_files/README_419_1.png)
 
 
 
@@ -10709,6 +10593,7 @@ employees.groupby("Department").aggregate(["max", "min"])
 
 
 <div>
+<style scoped>
 
 <table border="1" class="dataframe">
   <thead>
@@ -11038,7 +10923,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_447_1.jpg)
+![jpeg](README_files/README_446_1.jpg)
 
 
 
@@ -11058,7 +10943,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_448_1.jpg)
+![jpeg](README_files/README_447_1.jpg)
 
 
 
@@ -11273,7 +11158,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_451_1.jpg)
+![jpeg](README_files/README_450_1.jpg)
 
 
 
@@ -11293,7 +11178,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_452_1.jpg)
+![jpeg](README_files/README_451_1.jpg)
 
 
 
@@ -12760,7 +12645,7 @@ df.plot()
 
 
 
-![png](README_files/README_516_1.png)
+![png](README_files/README_515_1.png)
 
 
 
@@ -12778,7 +12663,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_517_1.png)
+![png](README_files/README_516_1.png)
 
 
 
@@ -12789,7 +12674,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_518_0.png)
+![png](README_files/README_517_0.png)
 
 
 
@@ -12802,7 +12687,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_520_0.png)
+![png](README_files/README_519_0.png)
 
 
 
@@ -12823,7 +12708,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_521_1.jpg)
+![jpeg](README_files/README_520_1.jpg)
 
 
 
@@ -12842,7 +12727,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_522_1.jpg)
+![jpeg](README_files/README_521_1.jpg)
 
 
 
@@ -12874,7 +12759,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_525_1.png)
+![png](README_files/README_524_1.png)
 
 
 
@@ -12886,7 +12771,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_526_0.png)
+![png](README_files/README_525_0.png)
 
 
 
@@ -12898,7 +12783,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_527_0.png)
+![png](README_files/README_526_0.png)
 
 
 
@@ -12919,7 +12804,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_529_1.png)
+![png](README_files/README_528_1.png)
 
 
 
@@ -12930,7 +12815,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_530_0.png)
+![png](README_files/README_529_0.png)
 
 
 
@@ -12950,7 +12835,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_532_1.jpg)
+![jpeg](README_files/README_531_1.jpg)
 
 
 
@@ -12969,7 +12854,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_533_1.jpg)
+![jpeg](README_files/README_532_1.jpg)
 
 
 
@@ -13008,7 +12893,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_536_1.jpg)
+![jpeg](README_files/README_535_1.jpg)
 
 
 
@@ -13029,6 +12914,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_537_1.jpg)
+![jpeg](README_files/README_536_1.jpg)
 
 
