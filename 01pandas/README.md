@@ -1,129 +1,5 @@
 # Pandas
 
-- [Pandas](#pandas)
-  - [Introduction](#introduction)
-  - [`Series` objects](#series-objects)
-    - [Creating a `Series`](#creating-a-series)
-      - [Init from `dict`](#init-from-dict)
-    - [Similar to a 1D `ndarray`](#similar-to-a-1d-ndarray)
-    - [Indexing](#indexing)
-      - [Slicing a `Series` also slices the index labels:](#slicing-a-series-also-slices-the-index-labels)
-  - [`DataFrame` objects](#dataframe-objects)
-  - [Creating `DataFrame`](#creating-dataframe)
-    - [From Numpy Array](#from-numpy-array)
-    - [🚀🚀 lists of lists: row wise data](#-lists-of-lists-row-wise-data)
-    - [dict of narray/lists](#dict-of-narraylists)
-    - [🚀🚀list of dicts: column wise data](#list-of-dicts-column-wise-data)
-    - [🚀using `zip()`; list of tuple](#using-zip-list-of-tuple)
-    - [Dicts of series.](#dicts-of-series)
-  - [Saving \& loading files](#saving--loading-files)
-    - [Saving: creating new file](#saving-creating-new-file)
-    - [Saving: Append to Existing File](#saving-append-to-existing-file)
-    - [Loading](#loading)
-    - [Minimize the size of Large DataSet; `nrows=n`](#minimize-the-size-of-large-dataset-nrowsn)
-  - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
-    - [Adding Columns](#adding-columns)
-      - [`d['new_col'] = list()`](#dnew_col--list)
-      - [`d['new_col'] = constant`](#dnew_col--constant)
-      - [`d['new_col'] = range(len(d))`](#dnew_col--rangelend)
-      - [`d['new_col'] = d['col1'] + d['col2']` from existing columns](#dnew_col--dcol1--dcol2-from-existing-columns)
-      - [`insert(position,column,value)`](#insertpositioncolumnvalue)
-      - [`assign(new_col,value)`](#assignnew_colvalue)
-    - [Moving Columns Position](#moving-columns-position)
-    - [Adding/Appending Rows](#addingappending-rows)
-      - [`append()` \[deprecated\]](#append-deprecated)
-      - [🌰 `concat()`](#-concat)
-      - [`loc()` - dict](#loc---dict)
-      - [`loc()` - list](#loc---list)
-      - [`iloc[]` - list](#iloc---list)
-    - [Combine Pd Dataframes /Py dict to Pd Dataframe](#combine-pd-dataframes-py-dict-to-pd-dataframe)
-      - [`concat()`](#concat)
-      - [`join()`](#join)
-    - [Removing Rows/Columns](#removing-rowscolumns)
-      - [`drop()` - column](#drop---column)
-      - [`drop()` - row](#drop---row)
-        - [🔥Conditional Drop🔥](#conditional-drop)
-    - [👫Duplicate Rows👫](#duplicate-rows)
-      - [Find Duplicates](#find-duplicates)
-      - [Drop Duplicate Rows](#drop-duplicate-rows)
-    - [Renaming Columns](#renaming-columns)
-    - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
-      - [Using `pd.sample()`](#using-pdsample)
-      - [Using `sklearn.utils.shuffle()`](#using-sklearnutilsshuffle)
-  - [Indexing](#indexing-1)
-    - [🚀Extracting Columns `df[col]`, `df[[col1,col2,..]]` + `.values` property](#extracting-columns-dfcol-dfcol1col2--values-property)
-    - [🚀Index-based selection - `iloc[row_indexer,col_indexer]`](#index-based-selection---ilocrow_indexercol_indexer)
-    - [🚀Label-based selection - `loc[row_indexer,col_indexer]`](#label-based-selection---locrow_indexercol_indexer)
-      - [Choosing between loc and iloc](#choosing-between-loc-and-iloc)
-    - [🚀🚀 Split Input and Output Features and convert to NumPy arrays](#-split-input-and-output-features-and-convert-to-numpy-arrays)
-    - [♻️Reset Index](#️reset-index)
-  - [🚀🚀Masking - logical filtering](#masking---logical-filtering)
-    - [`SELECT * FROM df WHERE columnX = value`](#select--from-df-where-columnx--value)
-    - [🔥`SELECT col1,col2.. FROM df WHERE columnX = value`](#select-col1col2-from-df-where-columnx--value)
-    - [`SELECT * FROM df WHERE col1 = value 🤝AND🤝 col2 = value`](#select--from-df-where-col1--value-and-col2--value)
-    - [`SELECT * FROM df WHERE col1 = value 🤝OR🤝 col2 = value`](#select--from-df-where-col1--value-or-col2--value)
-    - [`SELECT * FROM df WHERE condition1 SORT BY col1`](#select--from-df-where-condition1-sort-by-col1)
-    - [Opposite Filter `(~)`](#opposite-filter-)
-    - [`isin()` ; `SELECT * FROM df WHERE columnX IN (value1,value2,..)`](#isin--select--from-df-where-columnx-in-value1value2)
-    - ["NOT IN" - `df[~df['col_name'].isin(values_list)]`](#not-in---dfdfcol_nameisinvalues_list)
-    - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
-    - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
-    - [`isnull`](#isnull)
-    - [Filtering with filter() function](#filtering-with-filter-function)
-  - [Querying a `DataFrame`](#querying-a-dataframe)
-  - [Aggregation and Summary Functions](#aggregation-and-summary-functions)
-    - [Aggregation](#aggregation)
-    - [Summary Function](#summary-function)
-      - [`shape` , `dtypes` , `info()`, `describe()`](#shape--dtypes--info-describe)
-      - [`head()` and `tail()`](#head-and-tail)
-      - [`columns`](#columns)
-      - [`unique()` and `nunique()`](#unique-and-nunique)
-      - [`value_counts()`](#value_counts)
-  - [Data Types and Missing Values](#data-types-and-missing-values)
-    - [`dtypes`, `astype()`](#dtypes-astype)
-    - [Missing data](#missing-data)
-      - [`isnull()`, `isnull().sum()` and `notnull()`](#isnull-isnullsum-and-notnull)
-      - [`fillna`](#fillna)
-      - [`dropna`](#dropna)
-  - [Iterate over rows](#iterate-over-rows)
-  - [Applying functions: `apply()`, `map()` and `applymap()`](#applying-functions-apply-map-and-applymap)
-    - [`apply()`](#apply)
-    - [`applymap()`](#applymap)
-    - [`map()`](#map)
-  - [Converting to/from `DataFrame`](#converting-tofrom-dataframe)
-    - [To Numpy Representation: `values/to_numpy()`](#to-numpy-representation-valuesto_numpy)
-    - [To python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
-    - [To python List: `to_list()/tolist()`](#to-python-list-to_listtolist)
-  - [🔥Pivot Tables](#pivot-tables)
-    - [Visualize Pivot Table](#visualize-pivot-table)
-  - [Grouping and Sorting](#grouping-and-sorting)
-    - [Groupwise analysis](#groupwise-analysis)
-      - [Example:](#example)
-    - [Sorting: `sort_index`, `sort_values`](#sorting-sort_index-sort_values)
-      - [`sort_index`](#sort_index)
-      - [`sort_values`](#sort_values)
-      - [`nlargest()` and `nsmallest()`](#nlargest-and-nsmallest)
-    - [More example:](#more-example)
-  - [Categorical encoding](#categorical-encoding)
-    - [Introduction](#introduction-1)
-    - [Label Encoding](#label-encoding)
-      - [🌟🌟Custom Map Function](#custom-map-function)
-        - [🚀Unique Values with labels assigned side-by-side🚀](#unique-values-with-labels-assigned-side-by-side)
-      - [🌟🌟`sklearn.LabelEncoder()`](#sklearnlabelencoder)
-        - [Decoding](#decoding)
-    - [One-Hot-Encoding](#one-hot-encoding)
-        - [Using `Pandas.get_dummies()`](#using-pandasget_dummies)
-      - [Using 🌟`sklearn.OneHotEncoder()`🌟](#using-sklearnonehotencoder)
-    - [Discretization](#discretization)
-  - [Visualization with Pandas](#visualization-with-pandas)
-    - [Line plot](#line-plot)
-    - [Scatter plot](#scatter-plot)
-    - [Bar plot](#bar-plot)
-    - [Box plot](#box-plot)
-    - [Area plot](#area-plot)
-    - [Pie chart](#pie-chart)
-
-
 ## Introduction
 
 - library for Data Analysis and Manipulation
@@ -1542,6 +1418,46 @@ data.head(n=2)
 # Save the dataframe to a csv file
 data.to_csv("winemag-data-130k-v2-mod.csv")
 ```
+
+### 🔥Load All Csv Files In A Folder
+
+Read all csv files in a folder and process them one by one:
+
+
+```python
+import glob
+import os
+all_files = glob.glob("data/reports/*.csv")
+for file in all_files:
+		reviewer = os.path.basename(file).split(".")[0]
+		print(reviewer)
+		report = pd.read_csv(file)
+		# generate_report_plot(report,reviewer,with_similarity_threshold=True)
+```
+
+Read all csv files in a folder and combine them into a single dataframe:
+
+
+```python
+import glob
+import os
+all_files = glob.glob("animals/*.csv")
+df = pd. concat((pd.read_csv(f) for f in all_files))
+df
+```
+
+Without `glob`, you would have to manually list all the files you want to read:
+
+
+```python
+folder = "example_folder"
+files = [x for x in os.listdir(folder) if x.endswith(".csv")]
+# get full path
+files = [os.path.join(folder, x) for x in files]
+files[0]
+```
+
+
 
 ## Edit Whole Row/Columns
 
@@ -9787,7 +9703,6 @@ employees.groupby(["Department", "Work Level"])[
 
 
 <div>
-<style scoped>
 
 <table border="1" class="dataframe">
   <thead>
@@ -9866,7 +9781,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_418_1.png)
+![png](README_files/README_426_1.png)
 
 
 
@@ -9885,7 +9800,7 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_419_1.png)
+![png](README_files/README_427_1.png)
 
 
 
@@ -10593,7 +10508,6 @@ employees.groupby("Department").aggregate(["max", "min"])
 
 
 <div>
-<style scoped>
 
 <table border="1" class="dataframe">
   <thead>
@@ -10923,7 +10837,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_446_1.jpg)
+![jpeg](README_files/README_454_1.jpg)
 
 
 
@@ -10943,7 +10857,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_447_1.jpg)
+![jpeg](README_files/README_455_1.jpg)
 
 
 
@@ -11158,7 +11072,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_450_1.jpg)
+![jpeg](README_files/README_458_1.jpg)
 
 
 
@@ -11178,7 +11092,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_451_1.jpg)
+![jpeg](README_files/README_459_1.jpg)
 
 
 
@@ -12645,7 +12559,7 @@ df.plot()
 
 
 
-![png](README_files/README_515_1.png)
+![png](README_files/README_523_1.png)
 
 
 
@@ -12663,7 +12577,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_516_1.png)
+![png](README_files/README_524_1.png)
 
 
 
@@ -12674,7 +12588,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_517_0.png)
+![png](README_files/README_525_0.png)
 
 
 
@@ -12687,7 +12601,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_519_0.png)
+![png](README_files/README_527_0.png)
 
 
 
@@ -12708,7 +12622,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_520_1.jpg)
+![jpeg](README_files/README_528_1.jpg)
 
 
 
@@ -12727,7 +12641,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_521_1.jpg)
+![jpeg](README_files/README_529_1.jpg)
 
 
 
@@ -12759,7 +12673,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_524_1.png)
+![png](README_files/README_532_1.png)
 
 
 
@@ -12771,7 +12685,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_525_0.png)
+![png](README_files/README_533_0.png)
 
 
 
@@ -12783,7 +12697,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_526_0.png)
+![png](README_files/README_534_0.png)
 
 
 
@@ -12804,7 +12718,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_528_1.png)
+![png](README_files/README_536_1.png)
 
 
 
@@ -12815,7 +12729,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_529_0.png)
+![png](README_files/README_537_0.png)
 
 
 
@@ -12835,7 +12749,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_531_1.jpg)
+![jpeg](README_files/README_539_1.jpg)
 
 
 
@@ -12854,7 +12768,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_532_1.jpg)
+![jpeg](README_files/README_540_1.jpg)
 
 
 
@@ -12893,7 +12807,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_535_1.jpg)
+![jpeg](README_files/README_543_1.jpg)
 
 
 
@@ -12914,6 +12828,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_536_1.jpg)
+![jpeg](README_files/README_544_1.jpg)
 
 
