@@ -91,10 +91,14 @@
     - [`apply()`](#apply)
     - [`applymap()`](#applymap)
     - [`map()`](#map)
-  - [Converting to/from `DataFrame`](#converting-tofrom-dataframe)
-    - [To Numpy Representation: `values/to_numpy()`](#to-numpy-representation-valuesto_numpy)
+  - [🌶️ Converting to/from `DataFrame`](#️-converting-tofrom-dataframe)
+    - [To Numpy Representation](#to-numpy-representation)
+      - [`to_numpy()`](#to_numpy)
+      - [Avoid using `df.values`](#avoid-using-dfvalues)
+      - [`to_records()` : to list of tuple](#to_records--to-list-of-tuple)
+      - [`np.asarray(df)`](#npasarraydf)
     - [To python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
-    - [To python List: `to_list()/tolist()`](#to-python-list-to_listtolist)
+    - [To Python List/List of List](#to-python-listlist-of-list)
   - [🔥Pivot Tables](#pivot-tables)
     - [Visualize Pivot Table](#visualize-pivot-table)
   - [Grouping and Sorting](#grouping-and-sorting)
@@ -9378,7 +9382,7 @@ employees
 
 
 
-## Converting to/from `DataFrame`
+## 🌶️ Converting to/from `DataFrame`
 
 
 ```python
@@ -9432,11 +9436,12 @@ df
 
 
 
-### To Numpy Representation: `values/to_numpy()`
+### To Numpy Representation
 
-- `DataFrame.to_numpy()` is recommended.
+#### `to_numpy()`
 
 
+- to convert a pandas DataFrame into a NumPy
 
 
 ```python
@@ -9455,6 +9460,20 @@ df.to_numpy()
 
 
 ```python
+type(df.to_numpy())
+```
+
+
+
+
+    numpy.ndarray
+
+
+
+#### Avoid using `df.values`
+
+
+```python
 df.values
 ```
 
@@ -9467,7 +9486,85 @@ df.values
 
 
 
+
+```python
+df.to_records(index=True)
+```
+
+
+
+
+    rec.array([(0,   1,  2.,   3), (1,  10, 20.,  30), (2, 100, nan, 300)],
+              dtype=[('index', '<i8'), ('a', '<i8'), ('b', '<f8'), ('c', '<i8')])
+
+
+
+#### `to_records()` : to list of tuple
+
+
+```python
+df.to_records()
+```
+
+
+
+
+    rec.array([(0,   1,  2.,   3), (1,  10, 20.,  30), (2, 100, nan, 300)],
+              dtype=[('index', '<i8'), ('a', '<i8'), ('b', '<f8'), ('c', '<i8')])
+
+
+
+
+```python
+df.to_records(index=False)
+```
+
+
+
+
+    rec.array([(  1,  2.,   3), ( 10, 20.,  30), (100, nan, 300)],
+              dtype=[('a', '<i8'), ('b', '<f8'), ('c', '<i8')])
+
+
+
+
+```python
+df.to_records(index=False).tolist()
+```
+
+
+
+
+    [(1, 2.0, 3), (10, 20.0, 30), (100, nan, 300)]
+
+
+
+#### `np.asarray(df)`
+
+
+```python
+####
+import numpy as np
+ndarray = np.asarray(df)
+ndarray
+```
+
+
+
+
+    array([[  1.,   2.,   3.],
+           [ 10.,  20.,  30.],
+           [100.,  nan, 300.]])
+
+
+
 ### To python list of dicts: `to_dict()`
+
+- [https://pynative.com/convert-pandas-dataframe-to-dict/](https://pynative.com/convert-pandas-dataframe-to-dict/)
+
+<div align="center">
+<img src="img/to_dict.jpg" alt="to_dict.jpg" width="600px">
+</div>
 
 
 ```python
@@ -9561,50 +9658,66 @@ Pandas `dataframe.isna()` function is used to detect missing values. It return a
 - [with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to](https://stackoverflow.com/questions/72348490/with-to-dict-pandas-converts-nan-to-nan-in-python-dictionary-how-to)
 - [https://www.geeksforgeeks.org/python-pandas-dataframe-isna/](https://www.geeksforgeeks.org/python-pandas-dataframe-isna/)
 
-### To python List: `to_list()/tolist()`
+### To Python List/List of List
 
-- `Series.tolist()`:Panda -> > Python List |  NumPy -> Python List
-- `to_list()`: Panda -> Python List
+- Converting Pandas DataFrame into a List:
+  - `df.values.tolist()` | `df.to_numpy().tolist()`
+- Individual Column in the DataFrame into a List:
+  - `df['column_name'].values.tolist()`
 
 
 ```python
-df['a'].tolist()
+data = {'product': ['Tablet', 'Printer', 'Laptop', 'Monitor'],
+        'price': [250, 100, 1200, 300]
+        }
+
+df = pd.DataFrame(data)
+df
 ```
 
 
 
 
-    [1, 10, 100]
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>product</th>
+      <th>price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tablet</td>
+      <td>250</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Printer</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Laptop</td>
+      <td>1200</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Monitor</td>
+      <td>300</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
 
 ```python
-df['a'].values
-```
-
-
-
-
-    array([  1,  10, 100], dtype=int64)
-
-
-
-
-```python
-df['a'].values.tolist()
-```
-
-
-
-
-    [1, 10, 100]
-
-
-
-
-```python
-df['a'].values.to_list()
+df.tolist()
 ```
 
 
@@ -9612,22 +9725,144 @@ df['a'].values.to_list()
 
     AttributeError                            Traceback (most recent call last)
 
-    d:\CSE\Programs\ML-py\01pandas\pandas.ipynb Cell 372 in <cell line: 1>()
-    ----> <a href='vscode-notebook-cell:/d%3A/CSE/Programs/ML-py/01pandas/pandas.ipynb#Z1360sZmlsZQ%3D%3D?line=0'>1</a> df['a'].values.to_list()
+    d:\CSE\Programs\Learn\machine-learning\01pandas\pandas.ipynb Cell 415 in <cell line: 1>()
+    ----> <a href='vscode-notebook-cell:/d%3A/CSE/Programs/Learn/machine-learning/01pandas/pandas.ipynb#Z1410sZmlsZQ%3D%3D?line=0'>1</a> df.tolist()
 
 
-    AttributeError: 'numpy.ndarray' object has no attribute 'to_list'
+    File ~\AppData\Roaming\Python\Python39\site-packages\pandas\core\generic.py:5575, in NDFrame.__getattr__(self, name)
+       5568 if (
+       5569     name not in self._internal_names_set
+       5570     and name not in self._metadata
+       5571     and name not in self._accessors
+       5572     and self._info_axis._can_hold_identifiers_and_holds_name(name)
+       5573 ):
+       5574     return self[name]
+    -> 5575 return object.__getattribute__(self, name)
+
+
+    AttributeError: 'DataFrame' object has no attribute 'tolist'
 
 
 
 ```python
-df['a'].to_list()
+df.values
 ```
 
 
 
 
-    [1, 10, 100]
+    array([['Tablet', 250],
+           ['Printer', 100],
+           ['Laptop', 1200],
+           ['Monitor', 300]], dtype=object)
+
+
+
+
+```python
+df.to_numpy().tolist()
+```
+
+
+
+
+    [['Tablet', 250], ['Printer', 100], ['Laptop', 1200], ['Monitor', 300]]
+
+
+
+
+```python
+df.values.tolist()
+```
+
+
+
+
+    [['Tablet', 250], ['Printer', 100], ['Laptop', 1200], ['Monitor', 300]]
+
+
+
+
+```python
+df['product'].tolist()
+```
+
+
+
+
+    ['Tablet', 'Printer', 'Laptop', 'Monitor']
+
+
+
+
+```python
+df['product'].to_list()
+```
+
+
+
+
+    ['Tablet', 'Printer', 'Laptop', 'Monitor']
+
+
+
+
+```python
+df['product'].values
+```
+
+
+
+
+    array(['Tablet', 'Printer', 'Laptop', 'Monitor'], dtype=object)
+
+
+
+
+```python
+df['product'].to_numpy()
+```
+
+
+
+
+    array(['Tablet', 'Printer', 'Laptop', 'Monitor'], dtype=object)
+
+
+
+
+```python
+df['product'].values.tolist()
+```
+
+
+
+
+    ['Tablet', 'Printer', 'Laptop', 'Monitor']
+
+
+
+
+```python
+df['product'].to_numpy().tolist()
+```
+
+
+
+
+    ['Tablet', 'Printer', 'Laptop', 'Monitor']
+
+
+
+
+```python
+df.iloc[0].to_numpy().tolist()
+```
+
+
+
+
+    ['Tablet', 250]
 
 
 
@@ -9906,7 +10141,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_426_1.png)
+![png](README_files/README_445_1.png)
 
 
 
@@ -9925,13 +10160,132 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_427_1.png)
+![png](README_files/README_446_1.png)
 
 
 
 
 ```python
-employees.pivot_table("Income",index="Department",columns="Work Level") #We can make it easier.
+employees
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Work Level</th>
+      <th>Income</th>
+      <th>Age</th>
+      <th>Experience</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>WL3</td>
+      <td>4800</td>
+      <td>24</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>WL2</td>
+      <td>5200</td>
+      <td>28</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>WL2</td>
+      <td>6600</td>
+      <td>33</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>WL1</td>
+      <td>5700</td>
+      <td>41</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>WL3</td>
+      <td>7200</td>
+      <td>22</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Michael</td>
+      <td>Marketing</td>
+      <td>WL2</td>
+      <td>8400</td>
+      <td>46</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Sarath</td>
+      <td>IT</td>
+      <td>WL1</td>
+      <td>7700</td>
+      <td>31</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Jakub</td>
+      <td>Human Resources</td>
+      <td>WL3</td>
+      <td>4200</td>
+      <td>27</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Chris</td>
+      <td>Law</td>
+      <td>WL1</td>
+      <td>9400</td>
+      <td>39</td>
+      <td>13</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# We get mean of income according to department and work level.
+"""
+`index` : index is the column name which we want to group by.
+`columns`: the columns that we want to see in the pivot table.
+`values` : the values in each column.
+
+ """
+employees.pivot_table(index="Department",columns=["Work Level"],values="Income")
+
+
 ```
 
 
@@ -10022,7 +10376,7 @@ exp #We will create a new column
 
 
 ```python
-employees.pivot_table("Income",index=["Department",exp],columns="Work Level")
+employees.pivot_table(values="Income",index=["Department",exp],columns="Work Level")
 #We can make it easier.
 ```
 
@@ -10962,7 +11316,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_454_1.jpg)
+![jpeg](README_files/README_474_1.jpg)
 
 
 
@@ -10982,7 +11336,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_455_1.jpg)
+![jpeg](README_files/README_475_1.jpg)
 
 
 
@@ -11197,7 +11551,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_458_1.jpg)
+![jpeg](README_files/README_478_1.jpg)
 
 
 
@@ -11217,7 +11571,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_459_1.jpg)
+![jpeg](README_files/README_479_1.jpg)
 
 
 
@@ -12684,7 +13038,7 @@ df.plot()
 
 
 
-![png](README_files/README_523_1.png)
+![png](README_files/README_543_1.png)
 
 
 
@@ -12702,7 +13056,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_524_1.png)
+![png](README_files/README_544_1.png)
 
 
 
@@ -12713,7 +13067,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_525_0.png)
+![png](README_files/README_545_0.png)
 
 
 
@@ -12726,7 +13080,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_527_0.png)
+![png](README_files/README_547_0.png)
 
 
 
@@ -12747,7 +13101,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_528_1.jpg)
+![jpeg](README_files/README_548_1.jpg)
 
 
 
@@ -12766,7 +13120,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_529_1.jpg)
+![jpeg](README_files/README_549_1.jpg)
 
 
 
@@ -12798,7 +13152,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_532_1.png)
+![png](README_files/README_552_1.png)
 
 
 
@@ -12810,7 +13164,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_533_0.png)
+![png](README_files/README_553_0.png)
 
 
 
@@ -12822,7 +13176,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_534_0.png)
+![png](README_files/README_554_0.png)
 
 
 
@@ -12843,7 +13197,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_536_1.png)
+![png](README_files/README_556_1.png)
 
 
 
@@ -12854,7 +13208,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_537_0.png)
+![png](README_files/README_557_0.png)
 
 
 
@@ -12874,7 +13228,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_539_1.jpg)
+![jpeg](README_files/README_559_1.jpg)
 
 
 
@@ -12893,7 +13247,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_540_1.jpg)
+![jpeg](README_files/README_560_1.jpg)
 
 
 
@@ -12932,7 +13286,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_543_1.jpg)
+![jpeg](README_files/README_563_1.jpg)
 
 
 
@@ -12953,6 +13307,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_544_1.jpg)
+![jpeg](README_files/README_564_1.jpg)
 
 
