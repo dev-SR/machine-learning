@@ -22,35 +22,6 @@
     - [Loading](#loading)
       - [Minimize the size of Large DataSet; `nrows=n`](#minimize-the-size-of-large-dataset-nrowsn)
       - [🔥Load All Csv Files In A Folder](#load-all-csv-files-in-a-folder)
-  - [Edit Whole Row/Columns](#edit-whole-rowcolumns)
-    - [Adding Columns](#adding-columns)
-      - [`d['new_col'] = list()`](#dnew_col--list)
-      - [`d['new_col'] = constant`](#dnew_col--constant)
-      - [`d['new_col'] = range(len(d))`](#dnew_col--rangelend)
-      - [`d['new_col'] = d['col1'] + d['col2']` from existing columns](#dnew_col--dcol1--dcol2-from-existing-columns)
-      - [`insert(position,column,value)`](#insertpositioncolumnvalue)
-      - [`assign(new_col,value)`](#assignnew_colvalue)
-    - [Moving Columns Position](#moving-columns-position)
-    - [Adding/Appending Rows](#addingappending-rows)
-      - [`append()` \[deprecated\]](#append-deprecated)
-      - [🌰 `concat()`](#-concat)
-      - [`loc()` - dict](#loc---dict)
-      - [`loc()` - list](#loc---list)
-      - [`iloc[]` - list](#iloc---list)
-    - [Combine Pd Dataframes /Py dict to Pd Dataframe](#combine-pd-dataframes-py-dict-to-pd-dataframe)
-      - [`concat()`](#concat)
-      - [`join()`](#join)
-    - [Removing Rows/Columns](#removing-rowscolumns)
-      - [`drop()` - column](#drop---column)
-      - [`drop()` - row](#drop---row)
-        - [🔥Conditional Drop🔥](#conditional-drop)
-    - [👫Duplicate Rows👫](#duplicate-rows)
-      - [Find Duplicates](#find-duplicates)
-      - [Drop Duplicate Rows](#drop-duplicate-rows)
-    - [Renaming Columns](#renaming-columns)
-    - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
-      - [Using `pd.sample()`](#using-pdsample)
-      - [Using `sklearn.utils.shuffle()`](#using-sklearnutilsshuffle)
   - [Indexing](#indexing-1)
     - [🚀Extracting Columns `df[col]`, `df[[col1,col2,..]]` + `.values` property](#extracting-columns-dfcol-dfcol1col2--values-property)
     - [🚀Index-based selection - `iloc[row_indexer,col_indexer]`](#index-based-selection---ilocrow_indexercol_indexer)
@@ -71,6 +42,44 @@
     - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
     - [`isnull`](#isnull)
     - [Filtering with filter() function](#filtering-with-filter-function)
+  - [CRUD Row/Column Wise](#crud-rowcolumn-wise)
+    - [Adding Columns](#adding-columns)
+      - [`d['new_col'] = list()`](#dnew_col--list)
+      - [`d['new_col'] = constant`](#dnew_col--constant)
+      - [`d['new_col'] = range(len(d))`](#dnew_col--rangelend)
+      - [`d['new_col'] = d['col1'] + d['col2']` from existing columns](#dnew_col--dcol1--dcol2-from-existing-columns)
+      - [`insert(position,column,value)`](#insertpositioncolumnvalue)
+      - [`assign(new_col,value)`](#assignnew_colvalue)
+    - [Moving Columns Position](#moving-columns-position)
+    - [Adding/Appending Rows](#addingappending-rows)
+      - [`append()` \[deprecated\]](#append-deprecated)
+      - [🌰 `concat()`](#-concat)
+      - [`loc()` - dict](#loc---dict)
+      - [`loc()` - list](#loc---list)
+      - [`iloc[]` - list](#iloc---list)
+    - [Removing Rows/Columns](#removing-rowscolumns)
+      - [`drop()` - column](#drop---column)
+      - [`drop()` - row](#drop---row)
+        - [🔥Conditional Drop🔥](#conditional-drop)
+    - [👫Duplicate Rows👫](#duplicate-rows)
+      - [Find Duplicates](#find-duplicates)
+      - [Drop Duplicate Rows](#drop-duplicate-rows)
+    - [Renaming Columns](#renaming-columns)
+    - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
+      - [Using `pd.sample()`](#using-pdsample)
+      - [Using `sklearn.utils.shuffle()`](#using-sklearnutilsshuffle)
+  - [Merge/Join/Concat DataFrame](#mergejoinconcat-dataframe)
+    - [`concat()`: appending rows or columns](#concat-appending-rows-or-columns)
+    - [`merge()`](#merge)
+      - [Intro](#intro)
+      - [Inner Join (Default)](#inner-join-default)
+        - [1. Without any key column](#1-without-any-key-column)
+        - [2. Specifying key columns using argument on](#2-specifying-key-columns-using-argument-on)
+        - [3. Merging using left\_on and right\_on](#3-merging-using-left_on-and-right_on)
+      - [left join](#left-join)
+      - [right join](#right-join)
+      - [outer join](#outer-join)
+    - [`join()`](#join)
   - [Querying a `DataFrame`](#querying-a-dataframe)
   - [Aggregation and Summary Functions](#aggregation-and-summary-functions)
     - [Aggregation](#aggregation)
@@ -89,8 +98,8 @@
   - [Iterate over rows](#iterate-over-rows)
   - [Applying functions: `apply()`, `map()` and `applymap()`](#applying-functions-apply-map-and-applymap)
     - [`apply()`](#apply)
-    - [`applymap()`](#applymap)
     - [`map()`](#map)
+    - [`applymap()`](#applymap)
   - [🌶️ Converting to/from `DataFrame`](#️-converting-tofrom-dataframe)
     - [To Numpy Representation](#to-numpy-representation)
       - [`to_numpy()`](#to_numpy)
@@ -109,6 +118,7 @@
       - [`sort_values`](#sort_values)
       - [`nlargest()` and `nsmallest()`](#nlargest-and-nsmallest)
     - [More example:](#more-example)
+    - [`groupby()` and `transform()`](#groupby-and-transform)
   - [Categorical encoding](#categorical-encoding)
     - [Introduction](#introduction-1)
     - [Label Encoding](#label-encoding)
@@ -1587,2780 +1597,6 @@ files[0]
 ```
 
 
-
-## Edit Whole Row/Columns
-
-- [https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/](https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/)
-
-###  Adding Columns
-
-
-```python
-df = pd.DataFrame({
-    "a": [1, 2, 3, 4],
-    "b": ["Bob", "Alice", "Bob", "Alice"],
-})
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `d['new_col'] = list()`
-
-
-```python
-# df['c'] = [1, 2, 3, 4,5] # not valid
-# df['c'] = [1, 2, 3] # not valid
-df['c'] = [1, 2, 3, 4]
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-      <td>4</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `d['new_col'] = constant`
-
-
-```python
-df['d'] = np.nan
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df['d'] = None
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>None</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `d['new_col'] = range(len(d))`
-
-
-```python
-df['d'] = range(len(df))
-df
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df['d'] = [None]*len(df)
-df
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>None</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `d['new_col'] = d['col1'] + d['col2']` from existing columns
-
-
-```python
-df['e'] = df['a'] + df['c']
-df
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-      <th>e</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>0</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>1</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>2</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>3</td>
-      <td>8</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-more:
-
-- [Create a new column in Pandas DataFrame based on the existing columns](https://www.geeksforgeeks.org/create-a-new-column-in-pandas-dataframe-based-on-the-existing-columns/?ref=lbp)
-- [Creating a Pandas dataframe column based on a given condition](https://www.geeksforgeeks.org/python-creating-a-pandas-dataframe-column-based-on-a-given-condition/?ref=lbp)
-
-#### `insert(position,column,value)`
-
-When adding a new column, it is added at the end (on the right) by default. You can also insert a column anywhere else using the `insert()` method:
-
-
-```python
-df.insert(1, "i", range(len(df)))
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>i</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>1</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>2</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>None</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>3</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>None</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `assign(new_col,value)`
-
-This method will create a new dataframe with a new column added to the old dataframe. Note that this returns a new `DataFrame` object, **the original is not modified:**
-
-
-```python
-df2 = df.assign(new=range(len(df)))
-df2
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>i</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-      <th>new</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>0</td>
-      <td>Bob</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>1</td>
-      <td>Alice</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>2</td>
-      <td>Bob</td>
-      <td>3</td>
-      <td>NaN</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>3</td>
-      <td>Alice</td>
-      <td>4</td>
-      <td>NaN</td>
-      <td>3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Note that you cannot access columns created within the same assignment:
-
-### Moving Columns Position
-
-
-```python
-import numpy as np
-import pandas as pd
-
-df = pd.DataFrame(np.random.rand(5, 3))
-df['mean'] = df.mean(1)
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-      <th>mean</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.016342</td>
-      <td>0.861809</td>
-      <td>0.225315</td>
-      <td>0.367822</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.226359</td>
-      <td>0.728893</td>
-      <td>0.477359</td>
-      <td>0.477537</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.623582</td>
-      <td>0.774813</td>
-      <td>0.920502</td>
-      <td>0.772966</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.950771</td>
-      <td>0.064937</td>
-      <td>0.622619</td>
-      <td>0.546109</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.392424</td>
-      <td>0.147109</td>
-      <td>0.299565</td>
-      <td>0.279699</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-popped_col = df.pop('mean')
-df.insert(0, 'mean', popped_col)
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>mean</th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.367822</td>
-      <td>0.016342</td>
-      <td>0.861809</td>
-      <td>0.225315</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.477537</td>
-      <td>0.226359</td>
-      <td>0.728893</td>
-      <td>0.477359</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.772966</td>
-      <td>0.623582</td>
-      <td>0.774813</td>
-      <td>0.920502</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.546109</td>
-      <td>0.950771</td>
-      <td>0.064937</td>
-      <td>0.622619</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.279699</td>
-      <td>0.392424</td>
-      <td>0.147109</td>
-      <td>0.299565</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.insert(0, 'mean', df.pop('mean'))
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>mean</th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.367822</td>
-      <td>0.016342</td>
-      <td>0.861809</td>
-      <td>0.225315</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.477537</td>
-      <td>0.226359</td>
-      <td>0.728893</td>
-      <td>0.477359</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.772966</td>
-      <td>0.623582</td>
-      <td>0.774813</td>
-      <td>0.920502</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.546109</td>
-      <td>0.950771</td>
-      <td>0.064937</td>
-      <td>0.622619</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.279699</td>
-      <td>0.392424</td>
-      <td>0.147109</td>
-      <td>0.299565</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### Adding/Appending Rows
-
-- [https://www.geeksforgeeks.org/how-to-add-one-row-in-an-existing-pandas-dataframe/](https://www.geeksforgeeks.org/how-to-add-one-row-in-an-existing-pandas-dataframe/)
- - [https://www.geeksforgeeks.org/how-to-append-a-list-as-a-row-to-a-pandas-dataframe-in-python/](https://www.geeksforgeeks.org/how-to-append-a-list-as-a-row-to-a-pandas-dataframe-in-python/)
-
-#### `append()` [deprecated]
-
-
-```python
-employees.append({"Name":"Berkay","Department":"Finance","Income":6000,"Age":24},ignore_index=True)
-```
-
-    C:\Users\soiko\AppData\Local\Temp\ipykernel_924\3498463607.py:1: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      employees.append({"Name":"Berkay","Department":"Finance","Income":6000,"Age":24},ignore_index=True)
-
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Berkay</td>
-      <td>Finance</td>
-      <td>6000</td>
-      <td>24</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### 🌰 `concat()`
-
-
-```python
-# appending to an empty dataframe
-# output = pd.DataFrame()
-# or
-# output = pd.DataFrame(columns=["Name","Department","Income","Age"])
-# or
-# append to an existing dataframe
-# output = pd.DataFrame({"Name":["Josh","Mike","Julia"],
-#                           "Department":["IT","Human Resources","Finance"],
-#                           "Income":[4800,5200,6600],
-#                           "Age":[24,28,33]})
-# output
-```
-
-
-```python
-output = pd.DataFrame()
-# data
-dictionary = {"Name": "Berkay", "Department": "Finance", "Income": 6000, "Age": 24}
-df_dictionary = pd.DataFrame([dictionary])
-# append
-output = pd.concat([output, df_dictionary], ignore_index=True)
-output
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Berkay</td>
-      <td>Finance</td>
-      <td>6000</td>
-      <td>24</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `loc()` - dict
-
-
-```python
-n = { "Ex": "loc() dict", "value": 10 }
-# df.loc[len(df.index)] = n
-# or
-df.loc[df.shape[0]] = n
-
-display(df)
-
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Ex</th>
-      <th>value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>87</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>B</td>
-      <td>91</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>C</td>
-      <td>97</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>95</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>append() dict</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>append() list</td>
-      <td>25</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>loc() dict</td>
-      <td>10</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-#### `loc()` - list
-
-
-```python
-# New list for append into df
-l = ["loc() list", 25]
-
-# using loc methods
-df.loc[len(df)] = l
-
-# display
-display(df)
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Ex</th>
-      <th>value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>87</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>B</td>
-      <td>91</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>C</td>
-      <td>97</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>95</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>append() dict</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>append() list</td>
-      <td>25</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>loc() dict</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>loc() list</td>
-      <td>25</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-#### `iloc[]` - list
-
-
-```python
-df.iloc[2] = ["iloc() list", 25]
-display(df)
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Ex</th>
-      <th>value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>87</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>B</td>
-      <td>91</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>iloc() list</td>
-      <td>25</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>95</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>append() dict</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>append() list</td>
-      <td>25</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>loc() dict</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>loc() list</td>
-      <td>25</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-### Combine Pd Dataframes /Py dict to Pd Dataframe
-
-- [https://realpython.com/pandas-merge-join-and-concat/](https://realpython.com/pandas-merge-join-and-concat/)
-
-#### `concat()`
-
-
-```python
-df1 = pd.DataFrame({'id': ['A01', 'A02', 'A03', 'A04'],
-                    'Name': ['ABC', 'PQR', 'DEF', 'GHI']})
-df2 = pd.DataFrame({'id': ['B05', 'B06', 'B07', 'B08'],
-                    'Name': ['XYZ', 'TUV', 'MNO', 'JKL']})
-frames = [df1, df2]
-pd.concat(frames)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>id</th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A01</td>
-      <td>ABC</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>A02</td>
-      <td>PQR</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>A03</td>
-      <td>DEF</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A04</td>
-      <td>GHI</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>B05</td>
-      <td>XYZ</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>B06</td>
-      <td>TUV</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>B07</td>
-      <td>MNO</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>B08</td>
-      <td>JKL</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-pd.concat(frames,ignore_index = True)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>id</th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A01</td>
-      <td>ABC</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>A02</td>
-      <td>PQR</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>A03</td>
-      <td>DEF</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A04</td>
-      <td>GHI</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>B05</td>
-      <td>XYZ</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>B06</td>
-      <td>TUV</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>B07</td>
-      <td>MNO</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>B08</td>
-      <td>JKL</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-result = pd.concat(frames,axis=1)
-result
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>id</th>
-      <th>Name</th>
-      <th>id</th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A01</td>
-      <td>ABC</td>
-      <td>B05</td>
-      <td>XYZ</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>A02</td>
-      <td>PQR</td>
-      <td>B06</td>
-      <td>TUV</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>A03</td>
-      <td>DEF</td>
-      <td>B07</td>
-      <td>MNO</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A04</td>
-      <td>GHI</td>
-      <td>B08</td>
-      <td>JKL</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `join()`
-
-
-```python
-data1 = {
-    "name": ["Sally", "Mary", "John"],
-    "age": [50, 40, 30]
-}
-data2 = {
-    "qualified": [True, False, False]
-}
-df1 = pd.DataFrame(data1)
-df2 = pd.DataFrame(data2)
-df1.join(df2)
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>name</th>
-      <th>age</th>
-      <th>qualified</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Sally</td>
-      <td>50</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mary</td>
-      <td>40</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>John</td>
-      <td>30</td>
-      <td>False</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-### Removing Rows/Columns
-
-#### `drop()` - column
-
-
-```python
-arr = np.random.randint(10, 100, size=(4,8))
-df = pd.DataFrame(data=arr,columns=["a", "b", "c", "d", "e", "f", "g", "h"])
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>c</th>
-      <th>d</th>
-      <th>e</th>
-      <th>f</th>
-      <th>g</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>11</td>
-      <td>51</td>
-      <td>81</td>
-      <td>84</td>
-      <td>63</td>
-      <td>65</td>
-      <td>36</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>56</td>
-      <td>16</td>
-      <td>48</td>
-      <td>10</td>
-      <td>15</td>
-      <td>52</td>
-      <td>63</td>
-      <td>81</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>25</td>
-      <td>27</td>
-      <td>99</td>
-      <td>24</td>
-      <td>77</td>
-      <td>94</td>
-      <td>11</td>
-      <td>79</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>39</td>
-      <td>61</td>
-      <td>11</td>
-      <td>31</td>
-      <td>93</td>
-      <td>97</td>
-      <td>28</td>
-      <td>16</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-delC = df.pop('c')  # removes column c
-del df["d"] # removes column d
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>e</th>
-      <th>f</th>
-      <th>g</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>11</td>
-      <td>51</td>
-      <td>63</td>
-      <td>65</td>
-      <td>36</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>56</td>
-      <td>16</td>
-      <td>15</td>
-      <td>52</td>
-      <td>63</td>
-      <td>81</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>25</td>
-      <td>27</td>
-      <td>77</td>
-      <td>94</td>
-      <td>11</td>
-      <td>79</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>39</td>
-      <td>61</td>
-      <td>93</td>
-      <td>97</td>
-      <td>28</td>
-      <td>16</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.drop(columns=['e','f']) # removes columns e, f
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>g</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>11</td>
-      <td>51</td>
-      <td>36</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>56</td>
-      <td>16</td>
-      <td>63</td>
-      <td>81</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>25</td>
-      <td>27</td>
-      <td>11</td>
-      <td>79</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>39</td>
-      <td>61</td>
-      <td>28</td>
-      <td>16</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>e</th>
-      <th>f</th>
-      <th>g</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>11</td>
-      <td>51</td>
-      <td>63</td>
-      <td>65</td>
-      <td>36</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>56</td>
-      <td>16</td>
-      <td>15</td>
-      <td>52</td>
-      <td>63</td>
-      <td>81</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>25</td>
-      <td>27</td>
-      <td>77</td>
-      <td>94</td>
-      <td>11</td>
-      <td>79</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>39</td>
-      <td>61</td>
-      <td>93</td>
-      <td>97</td>
-      <td>28</td>
-      <td>16</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-`drop` creates a new copy for you with the required changes. To modify the original Dataframe use `inplace=True` options.
-
-
-```python
-df.drop(columns=['e', 'f'], inplace=True)  # original df is modified
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>a</th>
-      <th>b</th>
-      <th>g</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>11</td>
-      <td>51</td>
-      <td>36</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>56</td>
-      <td>16</td>
-      <td>63</td>
-      <td>81</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>25</td>
-      <td>27</td>
-      <td>11</td>
-      <td>79</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>39</td>
-      <td>61</td>
-      <td>28</td>
-      <td>16</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### `drop()` - row
-
-
-```python
-data = {'Name': ['Tom', 'nick', 'jhon', 'jack', 'jane', 'jill', 'joe'],
-        'Age': [20, 21, 19, 18, 19, 20, 18]}
-
-df = pd.DataFrame(data)
-
-df.head()
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>nick</td>
-      <td>21</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jhon</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jack</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jane</td>
-      <td>19</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.drop(index=1,inplace=True) # removes row 1
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jhon</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jack</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jane</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>jill</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>joe</td>
-      <td>18</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.drop(index=[2,4]) # removes row 2,4
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jack</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>jill</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>joe</td>
-      <td>18</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-##### 🔥Conditional Drop🔥
-
-
-```python
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jhon</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>jack</td>
-      <td>18</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jane</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>jill</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>joe</td>
-      <td>18</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-filteredDf = df[df['Age'] != 18]
-display(filteredDf)
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jhon</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jane</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>jill</td>
-      <td>20</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-filteredDf = df[~df.Age.isin([18,19])]
-display(filteredDf)
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>jill</td>
-      <td>20</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-idx = df.index[df['Age'] == 18]
-# idx = df.index[df['Age'] == 18].tolist()
-# idx = df[df['Age'] == 18].index
-# idx = df[df['Age'] == 18].index.values.tolist()
-print(idx)
-filteredDf = df.drop(index=idx)
-filteredDf
-
-```
-
-    Int64Index([3, 6], dtype='int64')
-
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Tom</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>jhon</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>jane</td>
-      <td>19</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>jill</td>
-      <td>20</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### 👫Duplicate Rows👫
-
-#### Find Duplicates
-
-You can use the `duplicated()` function to find duplicate values in a pandas DataFrame.
-
-
-```python
-#find duplicate rows across all columns
-duplicateRows = df[df.duplicated()]
-duplicateRows = df[df.duplicated(keep='last')]
-
-#find duplicate rows across specific columns
-duplicateRows = df[df.duplicated(['col1', 'col2'])]
-```
-
-
-```python
-#create DataFrame
-df = pd.DataFrame({'team': ['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B','C'],
-                   'points': [10, 10, 12, 12, 15, 17, 20, 20,11],
-                   'assists': [5, 5, 7, 9, 12, 9, 6, 6,4]})
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>team</th>
-      <th>points</th>
-      <th>assists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>A</td>
-      <td>12</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>12</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>B</td>
-      <td>15</td>
-      <td>12</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>B</td>
-      <td>17</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>B</td>
-      <td>20</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>B</td>
-      <td>20</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>C</td>
-      <td>11</td>
-      <td>4</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-#identify duplicate rows
-df[df.duplicated()]
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>team</th>
-      <th>points</th>
-      <th>assists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>B</td>
-      <td>20</td>
-      <td>6</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df[df.duplicated(['team', 'points'])]
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>team</th>
-      <th>points</th>
-      <th>assists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>12</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>B</td>
-      <td>20</td>
-      <td>6</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### Drop Duplicate Rows
-
-The easiest way to drop duplicate rows in a pandas DataFrame is by using the `drop_duplicates()` function, which uses the following syntax:
-
-
-```python
-df.drop_duplicates(subset=None, keep='first', inplace=False)
-```
-
-where:
-
-- `subset`: Which columns to consider for identifying duplicates. Default is all columns.
-- `keep`: Indicates which duplicates (if any) to keep.
-  - `first`: Delete all duplicate rows except first.
-  - `last`: Delete all duplicate rows except last.
-  - `False`: Delete all duplicates.
-- `inplace`: Indicates whether to drop duplicates in place or return a copy of the DataFrame.
-
-
-```python
-df.drop_duplicates(subset=['team'])
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>team</th>
-      <th>points</th>
-      <th>assists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>B</td>
-      <td>15</td>
-      <td>12</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>C</td>
-      <td>11</td>
-      <td>4</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df.drop_duplicates(subset=['team'],keep='last')
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>team</th>
-      <th>points</th>
-      <th>assists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>12</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>B</td>
-      <td>20</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>C</td>
-      <td>11</td>
-      <td>4</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# However, we could use the keep=False argument to delete all duplicates entirely:
-df.drop_duplicates(keep=False)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>team</th>
-      <th>points</th>
-      <th>assists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2</th>
-      <td>A</td>
-      <td>12</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>12</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>B</td>
-      <td>15</td>
-      <td>12</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>B</td>
-      <td>17</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>C</td>
-      <td>11</td>
-      <td>4</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### Renaming Columns
-
-
-```python
-data = pd.read_csv('spam.csv')
-data.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>v1</th>
-      <th>v2</th>
-      <th>Unnamed: 2</th>
-      <th>Unnamed: 3</th>
-      <th>Unnamed: 4</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ham</td>
-      <td>Ok lar... Joking wif u oni...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ham</td>
-      <td>U dun say so early hor... U c already then say...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ham</td>
-      <td>Nah I don't think he goes to usf, he lives aro...</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-data.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], inplace=True)
-```
-
-
-```python
-data.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>v1</th>
-      <th>v2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ham</td>
-      <td>Ok lar... Joking wif u oni...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ham</td>
-      <td>U dun say so early hor... U c already then say...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ham</td>
-      <td>Nah I don't think he goes to usf, he lives aro...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-data.rename(columns={'v1': 'label', 'v2': 'messages'}, inplace=True)
-```
-
-
-```python
-data.head()
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>label</th>
-      <th>messages</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ham</td>
-      <td>Go until jurong point, crazy.. Available only ...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ham</td>
-      <td>Ok lar... Joking wif u oni...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>spam</td>
-      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ham</td>
-      <td>U dun say so early hor... U c already then say...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ham</td>
-      <td>Nah I don't think he goes to usf, he lives aro...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-### 👉Shuffle a DataFrame rows
-
-#### Using `pd.sample()`
-
-The first option you have for shuffling pandas DataFrames is the `panads.DataFrame.sample` method that **returns a random sample of items**. In this method you can specify either the exact number or the fraction of records that you wish to sample. Since we want to shuffle the whole DataFrame, we are going to use `frac=1 `so that all records are returned.
-
-
-
-```python
-original = pd.DataFrame({
-    'colA': [10, 20, 30, 40, 50],
-    'colB': ['a', 'b', 'c', 'd', 'e'],
-    'colC': [True, False, False, True, False],
-    'colD': [0.5, 1.2, 2.4, 3.3, 5.5],
-})
-original
-
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>colA</th>
-      <th>colB</th>
-      <th>colC</th>
-      <th>colD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>10</td>
-      <td>a</td>
-      <td>True</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>20</td>
-      <td>b</td>
-      <td>False</td>
-      <td>1.2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>30</td>
-      <td>c</td>
-      <td>False</td>
-      <td>2.4</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>40</td>
-      <td>d</td>
-      <td>True</td>
-      <td>3.3</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>50</td>
-      <td>e</td>
-      <td>False</td>
-      <td>5.5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-a = original.sample(frac=1)
-a
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>colA</th>
-      <th>colB</th>
-      <th>colC</th>
-      <th>colD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2</th>
-      <td>30</td>
-      <td>c</td>
-      <td>False</td>
-      <td>2.4</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>20</td>
-      <td>b</td>
-      <td>False</td>
-      <td>1.2</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>50</td>
-      <td>e</td>
-      <td>False</td>
-      <td>5.5</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>10</td>
-      <td>a</td>
-      <td>True</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>40</td>
-      <td>d</td>
-      <td>True</td>
-      <td>3.3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-b = original.sample(frac=1, random_state=42).reset_index(drop=True)
-b
-
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>colA</th>
-      <th>colB</th>
-      <th>colC</th>
-      <th>colD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>20</td>
-      <td>b</td>
-      <td>False</td>
-      <td>1.2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>50</td>
-      <td>e</td>
-      <td>False</td>
-      <td>5.5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>30</td>
-      <td>c</td>
-      <td>False</td>
-      <td>2.4</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>10</td>
-      <td>a</td>
-      <td>True</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>40</td>
-      <td>d</td>
-      <td>True</td>
-      <td>3.3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-- `frac=1` means all rows of a dataframe
-- `random_state=42` means keeping same order in each execution
-- `reset_index(drop=True)` means reinitialize index for randomized dataframe
-
-#### Using `sklearn.utils.shuffle()`
-
-
-```python
-from sklearn.utils import shuffle
-c = shuffle(original, random_state=42)
-c
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>colA</th>
-      <th>colB</th>
-      <th>colC</th>
-      <th>colD</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1</th>
-      <td>20</td>
-      <td>b</td>
-      <td>False</td>
-      <td>1.2</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>50</td>
-      <td>e</td>
-      <td>False</td>
-      <td>5.5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>30</td>
-      <td>c</td>
-      <td>False</td>
-      <td>2.4</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>10</td>
-      <td>a</td>
-      <td>True</td>
-      <td>0.5</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>40</td>
-      <td>d</td>
-      <td>True</td>
-      <td>3.3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-- https://www.geeksforgeeks.org/different-ways-to-create-pandas-dataframe/
 
 ## Indexing
 
@@ -6759,6 +3995,3249 @@ employees.filter(regex='e$', axis=1)  # Columns end with "e"
 
 
 
+## CRUD Row/Column Wise
+
+- [https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/](https://www.geeksforgeeks.org/adding-new-column-to-existing-dataframe-in-pandas/)
+
+###  Adding Columns
+
+
+```python
+df = pd.DataFrame({
+    "a": [1, 2, 3, 4],
+    "b": ["Bob", "Alice", "Bob", "Alice"],
+})
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `d['new_col'] = list()`
+
+
+```python
+# df['c'] = [1, 2, 3, 4,5] # not valid
+# df['c'] = [1, 2, 3] # not valid
+df['c'] = [1, 2, 3, 4]
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `d['new_col'] = constant`
+
+
+```python
+df['d'] = np.nan
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df['d'] = None
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `d['new_col'] = range(len(d))`
+
+
+```python
+df['d'] = range(len(df))
+df
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df['d'] = [None]*len(df)
+df
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `d['new_col'] = d['col1'] + d['col2']` from existing columns
+
+
+```python
+df['e'] = df['a'] + df['c']
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+      <th>e</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>1</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>2</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>3</td>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+more:
+
+- [Create a new column in Pandas DataFrame based on the existing columns](https://www.geeksforgeeks.org/create-a-new-column-in-pandas-dataframe-based-on-the-existing-columns/?ref=lbp)
+- [Creating a Pandas dataframe column based on a given condition](https://www.geeksforgeeks.org/python-creating-a-pandas-dataframe-column-based-on-a-given-condition/?ref=lbp)
+
+#### `insert(position,column,value)`
+
+When adding a new column, it is added at the end (on the right) by default. You can also insert a column anywhere else using the `insert()` method:
+
+
+```python
+df.insert(1, "i", range(len(df)))
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>i</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>3</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `assign(new_col,value)`
+
+This method will create a new dataframe with a new column added to the old dataframe. Note that this returns a new `DataFrame` object, **the original is not modified:**
+
+
+```python
+df2 = df.assign(new=range(len(df)))
+df2
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>i</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+      <th>new</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>Bob</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>Alice</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2</td>
+      <td>Bob</td>
+      <td>3</td>
+      <td>NaN</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>3</td>
+      <td>Alice</td>
+      <td>4</td>
+      <td>NaN</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+Note that you cannot access columns created within the same assignment:
+
+### Moving Columns Position
+
+
+```python
+import numpy as np
+import pandas as pd
+
+df = pd.DataFrame(np.random.rand(5, 3))
+df['mean'] = df.mean(1)
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.016342</td>
+      <td>0.861809</td>
+      <td>0.225315</td>
+      <td>0.367822</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.226359</td>
+      <td>0.728893</td>
+      <td>0.477359</td>
+      <td>0.477537</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.623582</td>
+      <td>0.774813</td>
+      <td>0.920502</td>
+      <td>0.772966</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.950771</td>
+      <td>0.064937</td>
+      <td>0.622619</td>
+      <td>0.546109</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.392424</td>
+      <td>0.147109</td>
+      <td>0.299565</td>
+      <td>0.279699</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+popped_col = df.pop('mean')
+df.insert(0, 'mean', popped_col)
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.367822</td>
+      <td>0.016342</td>
+      <td>0.861809</td>
+      <td>0.225315</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.477537</td>
+      <td>0.226359</td>
+      <td>0.728893</td>
+      <td>0.477359</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.772966</td>
+      <td>0.623582</td>
+      <td>0.774813</td>
+      <td>0.920502</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.546109</td>
+      <td>0.950771</td>
+      <td>0.064937</td>
+      <td>0.622619</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.279699</td>
+      <td>0.392424</td>
+      <td>0.147109</td>
+      <td>0.299565</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.insert(0, 'mean', df.pop('mean'))
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.367822</td>
+      <td>0.016342</td>
+      <td>0.861809</td>
+      <td>0.225315</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.477537</td>
+      <td>0.226359</td>
+      <td>0.728893</td>
+      <td>0.477359</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.772966</td>
+      <td>0.623582</td>
+      <td>0.774813</td>
+      <td>0.920502</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.546109</td>
+      <td>0.950771</td>
+      <td>0.064937</td>
+      <td>0.622619</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.279699</td>
+      <td>0.392424</td>
+      <td>0.147109</td>
+      <td>0.299565</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### Adding/Appending Rows
+
+- [https://www.geeksforgeeks.org/how-to-add-one-row-in-an-existing-pandas-dataframe/](https://www.geeksforgeeks.org/how-to-add-one-row-in-an-existing-pandas-dataframe/)
+ - [https://www.geeksforgeeks.org/how-to-append-a-list-as-a-row-to-a-pandas-dataframe-in-python/](https://www.geeksforgeeks.org/how-to-append-a-list-as-a-row-to-a-pandas-dataframe-in-python/)
+
+#### `append()` [deprecated]
+
+
+```python
+employees.append({"Name":"Berkay","Department":"Finance","Income":6000,"Age":24},ignore_index=True)
+```
+
+    C:\Users\soiko\AppData\Local\Temp\ipykernel_924\3498463607.py:1: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      employees.append({"Name":"Berkay","Department":"Finance","Income":6000,"Age":24},ignore_index=True)
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Income</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>4800</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>5200</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>6600</td>
+      <td>33</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>5700</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Berkay</td>
+      <td>Finance</td>
+      <td>6000</td>
+      <td>24</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### 🌰 `concat()`
+
+
+```python
+# appending to an empty dataframe
+# output = pd.DataFrame()
+# or
+# output = pd.DataFrame(columns=["Name","Department","Income","Age"])
+# or
+# append to an existing dataframe
+# output = pd.DataFrame({"Name":["Josh","Mike","Julia"],
+#                           "Department":["IT","Human Resources","Finance"],
+#                           "Income":[4800,5200,6600],
+#                           "Age":[24,28,33]})
+# output
+```
+
+
+```python
+output = pd.DataFrame()
+# data
+dictionary = {"Name": "Berkay", "Department": "Finance", "Income": 6000, "Age": 24}
+df_dictionary = pd.DataFrame([dictionary])
+# append
+output = pd.concat([output, df_dictionary], ignore_index=True)
+output
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Income</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Berkay</td>
+      <td>Finance</td>
+      <td>6000</td>
+      <td>24</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `loc()` - dict
+
+
+```python
+n = { "Ex": "loc() dict", "value": 10 }
+# df.loc[len(df.index)] = n
+# or
+df.loc[df.shape[0]] = n
+
+display(df)
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Ex</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>91</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>append() dict</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>append() list</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>loc() dict</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `loc()` - list
+
+
+```python
+# New list for append into df
+l = ["loc() list", 25]
+
+# using loc methods
+df.loc[len(df)] = l
+
+# display
+display(df)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Ex</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>91</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>append() dict</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>append() list</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>loc() dict</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>loc() list</td>
+      <td>25</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `iloc[]` - list
+
+
+```python
+df.iloc[2] = ["iloc() list", 25]
+display(df)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Ex</th>
+      <th>value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>91</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>iloc() list</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>append() dict</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>append() list</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>loc() dict</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>loc() list</td>
+      <td>25</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### Removing Rows/Columns
+
+#### `drop()` - column
+
+
+```python
+arr = np.random.randint(10, 100, size=(4,8))
+df = pd.DataFrame(data=arr,columns=["a", "b", "c", "d", "e", "f", "g", "h"])
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>c</th>
+      <th>d</th>
+      <th>e</th>
+      <th>f</th>
+      <th>g</th>
+      <th>h</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11</td>
+      <td>51</td>
+      <td>81</td>
+      <td>84</td>
+      <td>63</td>
+      <td>65</td>
+      <td>36</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>56</td>
+      <td>16</td>
+      <td>48</td>
+      <td>10</td>
+      <td>15</td>
+      <td>52</td>
+      <td>63</td>
+      <td>81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>25</td>
+      <td>27</td>
+      <td>99</td>
+      <td>24</td>
+      <td>77</td>
+      <td>94</td>
+      <td>11</td>
+      <td>79</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39</td>
+      <td>61</td>
+      <td>11</td>
+      <td>31</td>
+      <td>93</td>
+      <td>97</td>
+      <td>28</td>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+delC = df.pop('c')  # removes column c
+del df["d"] # removes column d
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>e</th>
+      <th>f</th>
+      <th>g</th>
+      <th>h</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11</td>
+      <td>51</td>
+      <td>63</td>
+      <td>65</td>
+      <td>36</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>56</td>
+      <td>16</td>
+      <td>15</td>
+      <td>52</td>
+      <td>63</td>
+      <td>81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>25</td>
+      <td>27</td>
+      <td>77</td>
+      <td>94</td>
+      <td>11</td>
+      <td>79</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39</td>
+      <td>61</td>
+      <td>93</td>
+      <td>97</td>
+      <td>28</td>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.drop(columns=['e','f']) # removes columns e, f
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>g</th>
+      <th>h</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11</td>
+      <td>51</td>
+      <td>36</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>56</td>
+      <td>16</td>
+      <td>63</td>
+      <td>81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>25</td>
+      <td>27</td>
+      <td>11</td>
+      <td>79</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39</td>
+      <td>61</td>
+      <td>28</td>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>e</th>
+      <th>f</th>
+      <th>g</th>
+      <th>h</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11</td>
+      <td>51</td>
+      <td>63</td>
+      <td>65</td>
+      <td>36</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>56</td>
+      <td>16</td>
+      <td>15</td>
+      <td>52</td>
+      <td>63</td>
+      <td>81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>25</td>
+      <td>27</td>
+      <td>77</td>
+      <td>94</td>
+      <td>11</td>
+      <td>79</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39</td>
+      <td>61</td>
+      <td>93</td>
+      <td>97</td>
+      <td>28</td>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+`drop` creates a new copy for you with the required changes. To modify the original Dataframe use `inplace=True` options.
+
+
+```python
+df.drop(columns=['e', 'f'], inplace=True)  # original df is modified
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>a</th>
+      <th>b</th>
+      <th>g</th>
+      <th>h</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11</td>
+      <td>51</td>
+      <td>36</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>56</td>
+      <td>16</td>
+      <td>63</td>
+      <td>81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>25</td>
+      <td>27</td>
+      <td>11</td>
+      <td>79</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>39</td>
+      <td>61</td>
+      <td>28</td>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### `drop()` - row
+
+
+```python
+data = {'Name': ['Tom', 'nick', 'jhon', 'jack', 'jane', 'jill', 'joe'],
+        'Age': [20, 21, 19, 18, 19, 20, 18]}
+
+df = pd.DataFrame(data)
+
+df.head()
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>nick</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.drop(index=1,inplace=True) # removes row 1
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>joe</td>
+      <td>18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.drop(index=[2,4]) # removes row 2,4
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>joe</td>
+      <td>18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+##### 🔥Conditional Drop🔥
+
+
+```python
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>jack</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>joe</td>
+      <td>18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+filteredDf = df[df['Age'] != 18]
+display(filteredDf)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+filteredDf = df[~df.Age.isin([18,19])]
+display(filteredDf)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+idx = df.index[df['Age'] == 18]
+# idx = df.index[df['Age'] == 18].tolist()
+# idx = df[df['Age'] == 18].index
+# idx = df[df['Age'] == 18].index.values.tolist()
+print(idx)
+filteredDf = df.drop(index=idx)
+filteredDf
+
+```
+
+    Int64Index([3, 6], dtype='int64')
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Tom</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>jhon</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>jane</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>jill</td>
+      <td>20</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### 👫Duplicate Rows👫
+
+#### Find Duplicates
+
+You can use the `duplicated()` function to find duplicate values in a pandas DataFrame.
+
+
+```python
+#find duplicate rows across all columns
+duplicateRows = df[df.duplicated()]
+duplicateRows = df[df.duplicated(keep='last')]
+
+#find duplicate rows across specific columns
+duplicateRows = df[df.duplicated(['col1', 'col2'])]
+```
+
+
+```python
+#create DataFrame
+df = pd.DataFrame({'team': ['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B','C'],
+                   'points': [10, 10, 12, 12, 15, 17, 20, 20,11],
+                   'assists': [5, 5, 7, 9, 12, 9, 6, 6,4]})
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>12</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>17</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+#identify duplicate rows
+df[df.duplicated()]
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df[df.duplicated(['team', 'points'])]
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+#### Drop Duplicate Rows
+
+The easiest way to drop duplicate rows in a pandas DataFrame is by using the `drop_duplicates()` function, which uses the following syntax:
+
+
+```python
+df.drop_duplicates(subset=None, keep='first', inplace=False)
+```
+
+where:
+
+- `subset`: Which columns to consider for identifying duplicates. Default is all columns.
+- `keep`: Indicates which duplicates (if any) to keep.
+  - `first`: Delete all duplicate rows except first.
+  - `last`: Delete all duplicate rows except last.
+  - `False`: Delete all duplicates.
+- `inplace`: Indicates whether to drop duplicates in place or return a copy of the DataFrame.
+
+
+```python
+df.drop_duplicates(subset=['team'])
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.drop_duplicates(subset=['team'],keep='last')
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+# However, we could use the keep=False argument to delete all duplicates entirely:
+df.drop_duplicates(keep=False)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>12</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>17</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### Renaming Columns
+
+
+```python
+data = pd.read_csv('spam.csv')
+data.head()
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+      <th>Unnamed: 2</th>
+      <th>Unnamed: 3</th>
+      <th>Unnamed: 4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+data.drop(columns=['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], inplace=True)
+```
+
+
+```python
+data.head()
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>v1</th>
+      <th>v2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+data.rename(columns={'v1': 'label', 'v2': 'messages'}, inplace=True)
+```
+
+
+```python
+data.head()
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>label</th>
+      <th>messages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ham</td>
+      <td>Go until jurong point, crazy.. Available only ...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ham</td>
+      <td>Ok lar... Joking wif u oni...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>spam</td>
+      <td>Free entry in 2 a wkly comp to win FA Cup fina...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ham</td>
+      <td>U dun say so early hor... U c already then say...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ham</td>
+      <td>Nah I don't think he goes to usf, he lives aro...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### 👉Shuffle a DataFrame rows
+
+#### Using `pd.sample()`
+
+The first option you have for shuffling pandas DataFrames is the `panads.DataFrame.sample` method that **returns a random sample of items**. In this method you can specify either the exact number or the fraction of records that you wish to sample. Since we want to shuffle the whole DataFrame, we are going to use `frac=1 `so that all records are returned.
+
+
+
+```python
+original = pd.DataFrame({
+    'colA': [10, 20, 30, 40, 50],
+    'colB': ['a', 'b', 'c', 'd', 'e'],
+    'colC': [True, False, False, True, False],
+    'colD': [0.5, 1.2, 2.4, 3.3, 5.5],
+})
+original
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+a = original.sample(frac=1)
+a
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+b = original.sample(frac=1, random_state=42).reset_index(drop=True)
+b
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+- `frac=1` means all rows of a dataframe
+- `random_state=42` means keeping same order in each execution
+- `reset_index(drop=True)` means reinitialize index for randomized dataframe
+
+#### Using `sklearn.utils.shuffle()`
+
+
+```python
+from sklearn.utils import shuffle
+c = shuffle(original, random_state=42)
+c
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>colA</th>
+      <th>colB</th>
+      <th>colC</th>
+      <th>colD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>20</td>
+      <td>b</td>
+      <td>False</td>
+      <td>1.2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>e</td>
+      <td>False</td>
+      <td>5.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>30</td>
+      <td>c</td>
+      <td>False</td>
+      <td>2.4</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>10</td>
+      <td>a</td>
+      <td>True</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>40</td>
+      <td>d</td>
+      <td>True</td>
+      <td>3.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+- https://www.geeksforgeeks.org/different-ways-to-create-pandas-dataframe/
+
+## Merge/Join/Concat DataFrame
+
+- [https://realpython.com/pandas-merge-join-and-concat/](https://realpython.com/pandas-merge-join-and-concat/)
+
+### `concat()`: appending rows or columns
+
+
+```python
+df1 = pd.DataFrame({'key': ['K0', 'K1',],
+                   'A': ['A0', 'A1']})
+df1
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key</th>
+      <th>A</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>A0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>A1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+more = pd.DataFrame({'key': [ 'K2', 'K3'],
+                   'A': ['A2', 'A3', ]})
+df1 = pd.concat([df1,more])
+df1
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key</th>
+      <th>A</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>A0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>A1</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>K2</td>
+      <td>A2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K3</td>
+      <td>A3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# different column names
+df2 = pd.DataFrame({'key': ['K0', 'K1'],
+                      'B': ['B0', 'B1']})
+df2
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key</th>
+      <th>B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>B0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>B1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# concat with different column names
+pd.concat([df1,df2])
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key</th>
+      <th>A</th>
+      <th>B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>A0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>A1</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>K2</td>
+      <td>A2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K3</td>
+      <td>A3</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>NaN</td>
+      <td>B0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>NaN</td>
+      <td>B1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+result = pd.concat([df1,df2],axis=1)
+result
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key</th>
+      <th>A</th>
+      <th>key</th>
+      <th>B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>A0</td>
+      <td>K0</td>
+      <td>B0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>A1</td>
+      <td>K1</td>
+      <td>B1</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>K2</td>
+      <td>A2</td>
+      <td>K0</td>
+      <td>B0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K3</td>
+      <td>A3</td>
+      <td>K1</td>
+      <td>B1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### `merge()`
+
+#### Intro
+
+- [https://towardsdatascience.com/all-the-pandas-merge-you-should-know-for-combining-datasets-526b9ecaf184](https://towardsdatascience.com/all-the-pandas-merge-you-should-know-for-combining-datasets-526b9ecaf184)
+
+They are 4 types of joins available to Pandas `merge()` function. The logic behind these joins is very much the same that you have in SQL when you join tables. You can perform a type of join by specifying the how argument with the following values:
+
+- `inner`: the default join type in Pandas `merge()` function and it produces records that have matching values in both DataFrames
+- `left`: produces all records from the left DataFrame and the matched records from the right DataFrame
+- `right`: produces all records from the right DataFrame and the matched records from the left DataFrame
+- `outer`: produces all records when there is a match in either left or right DataFrame
+
+
+<div align="center">
+<img src="img/merge.jpg" alt="merge.jpg" width="800px">
+</div>
+
+`pd.merge(A, B, on='id', how=?)`
+
+<div align="center">
+<img src="img/merge_ex.png" alt="merge_ex.png" width="600px">
+</div>
+
+#### Inner Join (Default)
+
+
+
+By default, Pandas `merge()` is performing the inner join and it produces only the set of records that match in both DataFrame.
+
+
+
+<div align="center">
+<img src="img/inner_join.png" alt="inner_join.png" width="700px">
+</div>
+
+##### 1. Without any key column
+
+
+```python
+df_customer = pd.DataFrame({
+    'id': [1, 2, 3, 4],
+    'name': ['Tom', 'Jenny', 'James', 'Dan'],
+})
+df_customer
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Tom</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Jenny</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>James</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Dan</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df_info = pd.DataFrame({
+    'id': [2, 3, 4, 5],
+    'age': [31, 20, 40, 70],
+    'sex': ['F', 'M', 'M', 'F']
+})
+df_info
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>age</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>31</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>20</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>40</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>70</td>
+      <td>F</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.merge(df_customer, df_info)
+# or df_customer.merge(df_info)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>name</th>
+      <th>age</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>Jenny</td>
+      <td>31</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>James</td>
+      <td>20</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>Dan</td>
+      <td>40</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+By default, the function will combine data on common columns (It is the column `id` in our example) and produces only the result that matches in both left and right DataFrames.
+
+##### 2. Specifying key columns using argument on
+
+You can specify the common columns for merging. To do so, pass an additional argument on as the name of the common column, here `'id'` in our example, to `merge()` function:
+
+
+
+
+```python
+pd.merge(df_customer, df_info, on='id')
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>name</th>
+      <th>age</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>Jenny</td>
+      <td>31</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>James</td>
+      <td>20</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>Dan</td>
+      <td>40</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+If you use on , you have to make sure the column you specify must be present in both left and right DataFrames.
+
+To combine data on multiple common columns, you can pass a list toon:
+
+`pd.merge(df_customer, df_order, on=['id', 'name'])`
+
+##### 3. Merging using left_on and right_on
+
+
+It might happen that the column on which you want to merge the DataFrames have **different columns names**. For such merges, you will have to specify the left_on as the left DataFrame name and right_on as the right DataFrame name, for example:
+
+
+
+
+```python
+df_info_2 = pd.DataFrame({
+    'customer_id': [2, 3, 4, 5],
+    'age': [31, 20, 40, 70],
+    'sex': ['F', 'M', 'M', 'F']
+})
+df_info_2
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>customer_id</th>
+      <th>age</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>31</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>20</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>40</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>70</td>
+      <td>F</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.merge(
+  df_customer,
+  df_info_2,
+  left_on='id',
+  right_on='customer_id'
+)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>name</th>
+      <th>customer_id</th>
+      <th>age</th>
+      <th>sex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>Jenny</td>
+      <td>2</td>
+      <td>31</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>James</td>
+      <td>3</td>
+      <td>20</td>
+      <td>M</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>Dan</td>
+      <td>4</td>
+      <td>40</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+####  left join
+
+
+The left join produces all records from the left DataFrame, and the matched records from the right DataFrame. If there is no match, the left side will contain NaN. You can set the argument `how='left'` to do left join:
+
+`pd.merge(df_customer, df_info, how='left', on='id')`
+
+<div align="center">
+<img src="img/left_join.png" alt="left_join.png" width="800px">
+</div>
+
+#### right join
+
+
+The right join produces all records from the right DataFrame, and the matched records from the left DataFrame. If there is no match, the right side will contain NaN. You can set the argument how='right' to do right join:
+
+`pd.merge(df_customer, df_info, how='right', on='id')`
+
+<div align="center">
+<img src="img/right_join.png" alt="right_join.png" width="800px">
+</div>
+
+#### outer join
+
+
+The outer join produces all records when there is a match in either left or right DataFrame. NaN will be filled for no match on either sides. You can set the argument how='outer' to do outer join:
+
+`pd.merge(df_customer, df_info, how='outer', on='id')`
+
+<div align="center">
+<img src="img/outer_join.png" alt="outer_join.png" width="800px">
+</div>
+
+### `join()`
+
+
+```python
+data1 = {
+    "name": ["Sally", "Mary", "John"],
+    "age": [50, 40, 30]
+}
+data2 = {
+    "qualified": [True, False, False]
+}
+df1 = pd.DataFrame(data1)
+df2 = pd.DataFrame(data2)
+df1.join(df2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>age</th>
+      <th>qualified</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sally</td>
+      <td>50</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Mary</td>
+      <td>40</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>John</td>
+      <td>30</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df1 = pd.DataFrame({'key': ['K0', 'K1', 'K2', 'K3', 'K4', 'K5'],
+                   'A': ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']})
+
+df2 = pd.DataFrame({'key': ['K0', 'K1', 'K2'],
+                      'B': ['B0', 'B1', 'B2']})
+
+print(df1)
+print(df2)
+```
+
+      key   A
+    0  K0  A0
+    1  K1  A1
+    2  K2  A2
+    3  K3  A3
+    4  K4  A4
+    5  K5  A5
+      key   B
+    0  K0  B0
+    1  K1  B1
+    2  K2  B2
+
+
+
+```python
+df1.join(df2, lsuffix='_A', rsuffix='_B')
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key_A</th>
+      <th>A</th>
+      <th>key_B</th>
+      <th>B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>K0</td>
+      <td>A0</td>
+      <td>K0</td>
+      <td>B0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>K1</td>
+      <td>A1</td>
+      <td>K1</td>
+      <td>B1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>K2</td>
+      <td>A2</td>
+      <td>K2</td>
+      <td>B2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>K3</td>
+      <td>A3</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>K4</td>
+      <td>A4</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>K5</td>
+      <td>A5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ## Querying a `DataFrame`
 
 The `query()` method lets you filter a `DataFrame` based on a query expression:
@@ -8855,204 +9334,7 @@ employees = pd.DataFrame({"Name":["Josh","Mike","Julia","Sergio","Julia","Michae
                           "Income":[4800,5200,6600,5700,7200,8400,7700,4200,9400],
                           "Age":[24,28,33,41,22,46,31,27,39],
                           "Experience":[2,5,9,17,1,24,10,6,13]})
-employees.head(2)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-employees["Name"].apply(len) #We get length of all names
-```
-
-
-
-
-    0    4
-    1    4
-    2    5
-    3    6
-    4    5
-    5    7
-    6    6
-    7    5
-    8    5
-    Name: Name, dtype: int64
-
-
-
-
-```python
-def increase_age(x):
-    return x + 1
-
-```
-
-
-```python
-employees["Age"].apply(increase_age)  # We increase each age.
-
-```
-
-
-
-
-    0    25
-    1    29
-    2    34
-    3    42
-    4    23
-    5    47
-    6    32
-    7    28
-    8    40
-    Name: Age, dtype: int64
-
-
-
-
-```python
-employees["Age"].apply(lambda x: x+1) #We increase each age.
-
-```
-
-
-
-
-    0    25
-    1    29
-    2    34
-    3    42
-    4    23
-    5    47
-    6    32
-    7    28
-    8    40
-    Name: Age, dtype: int64
-
-
-
-
-```python
-employees.groupby("Department")["Income"].apply(np.sum) #We get sum of salaries by each department.
-```
-
-
-
-
-    Department
-    Finance            13800
-    Human Resources     9400
-    IT                 12500
-    Law                 9400
-    Marketing           8400
-    Supply Chain        5700
-    Name: Income, dtype: int64
-
-
-
-
-```python
-# We get smallest age by each department.
-employees.groupby("Department")["Age"].apply(min)
-
-```
-
-
-
-
-    Department
-    Finance            22
-    Human Resources    27
-    IT                 24
-    Law                39
-    Marketing          46
-    Supply Chain       41
-    Name: Age, dtype: int64
-
-
-
-
-```python
-employees.loc[:, ["Income", "Age"]].apply(["max", "min"])
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Income</th>
-      <th>Age</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>max</th>
-      <td>9400</td>
-      <td>46</td>
-    </tr>
-    <tr>
-      <th>min</th>
-      <td>4200</td>
-      <td>22</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### `applymap()`
-
-We can also use `applymap()` function in order to apply a function to a Dataframe elementwise.
-
-
-```python
 employees.head()
-
 ```
 
 
@@ -9120,7 +9402,8 @@ employees.head()
 
 
 ```python
-employees[["Name","Department"]].applymap(len)
+employees["Name Len"] = employees["Name"].apply(len) # We get length of all names
+employees.head()
 ```
 
 
@@ -9134,53 +9417,57 @@ employees[["Name","Department"]].applymap(len)
       <th></th>
       <th>Name</th>
       <th>Department</th>
+      <th>Income</th>
+      <th>Age</th>
+      <th>Experience</th>
+      <th>Name Len</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>4</td>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>4800</td>
+      <td>24</td>
       <td>2</td>
+      <td>4</td>
     </tr>
     <tr>
       <th>1</th>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>5200</td>
+      <td>28</td>
+      <td>5</td>
       <td>4</td>
-      <td>15</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>6600</td>
+      <td>33</td>
+      <td>9</td>
       <td>5</td>
-      <td>7</td>
     </tr>
     <tr>
       <th>3</th>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>5700</td>
+      <td>41</td>
+      <td>17</td>
       <td>6</td>
-      <td>12</td>
     </tr>
     <tr>
       <th>4</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>7200</td>
+      <td>22</td>
+      <td>1</td>
       <td>5</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>7</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>6</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>5</td>
-      <td>15</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>5</td>
-      <td>3</td>
     </tr>
   </tbody>
 </table>
@@ -9190,7 +9477,14 @@ employees[["Name","Department"]].applymap(len)
 
 
 ```python
-employees[["Name"]].applymap(str.upper) #We get upper values of each name.
+def increase_age(x):
+    return x + 1
+```
+
+
+```python
+employees["Age+1"] = employees["Age"].apply(increase_age)  # we increase each age.
+employees.head()
 ```
 
 
@@ -9203,44 +9497,308 @@ employees[["Name"]].applymap(str.upper) #We get upper values of each name.
     <tr style="text-align: right;">
       <th></th>
       <th>Name</th>
+      <th>Department</th>
+      <th>Income</th>
+      <th>Age</th>
+      <th>Experience</th>
+      <th>Name Len</th>
+      <th>Age+1</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>JOSH</td>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>4800</td>
+      <td>24</td>
+      <td>2</td>
+      <td>4</td>
+      <td>25</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>MIKE</td>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>5200</td>
+      <td>28</td>
+      <td>5</td>
+      <td>4</td>
+      <td>29</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>JULIA</td>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>6600</td>
+      <td>33</td>
+      <td>9</td>
+      <td>5</td>
+      <td>34</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>SERGIO</td>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>5700</td>
+      <td>41</td>
+      <td>17</td>
+      <td>6</td>
+      <td>42</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>JULIA</td>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>7200</td>
+      <td>22</td>
+      <td>1</td>
+      <td>5</td>
+      <td>23</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+employees["Age"].apply(lambda x: x+1) # using lambda
+```
+
+
+
+
+    0    25
+    1    29
+    2    34
+    3    42
+    4    23
+    5    47
+    6    32
+    7    28
+    8    40
+    Name: Age, dtype: int64
+
+
+
+
+```python
+cluster = pd.DataFrame({"cluster": range(1,6)})
+cluster
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cluster</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
     </tr>
     <tr>
-      <th>5</th>
-      <td>MICHAEL</td>
+      <th>1</th>
+      <td>2</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>SARATH</td>
+      <th>2</th>
+      <td>3</td>
     </tr>
     <tr>
-      <th>7</th>
-      <td>JAKUB</td>
+      <th>3</th>
+      <td>4</td>
     </tr>
     <tr>
-      <th>8</th>
-      <td>CHRIS</td>
+      <th>4</th>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+cluster["computed"] = cluster['cluster'].apply(lambda x: f"cluster {x}")
+cluster
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cluster</th>
+      <th>computed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>cluster 3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>cluster 4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>cluster 5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+cluster = pd.DataFrame({"cluster": range(1,6)})
+cluster["cluster"] = cluster['cluster'].apply(lambda x: f"cluster {x}")
+cluster
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cluster</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cluster 3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>cluster 4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>cluster 5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pd.DataFrame([
+	{""}
+])
+```
+
+
+```python
+employees.groupby("Department")["Income"].apply(np.sum) #We get sum of salaries by each department.
+```
+
+
+
+
+    Department
+    Finance            13800
+    Human Resources     9400
+    IT                 12500
+    Law                 9400
+    Marketing           8400
+    Supply Chain        5700
+    Name: Income, dtype: int64
+
+
+
+
+```python
+# We get smallest age by each department.
+employees.groupby("Department")["Age"].apply(min)
+```
+
+
+
+
+    Department
+    Finance            22
+    Human Resources    27
+    IT                 24
+    Law                39
+    Marketing          46
+    Supply Chain       41
+    Name: Age, dtype: int64
+
+
+
+
+```python
+employees.loc[:, ["Income", "Age"]].apply(["max", "min"])
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Income</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>max</th>
+      <td>9400</td>
+      <td>46</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>4200</td>
+      <td>22</td>
     </tr>
   </tbody>
 </table>
@@ -9380,6 +9938,200 @@ employees
 </table>
 </div>
 
+
+
+### `applymap()`
+
+We can also use `applymap()` function in order to apply a function to a Dataframe elementwise.
+
+
+```python
+employees.head()
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Income</th>
+      <th>Age</th>
+      <th>Experience</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>4800</td>
+      <td>24</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>5200</td>
+      <td>28</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>6600</td>
+      <td>33</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>5700</td>
+      <td>41</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>7200</td>
+      <td>22</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+employees[["Name","Department"]].applymap(len)
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Department</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>4</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>6</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>7</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>6</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>5</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>5</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+employees[["Name"]].applymap(str.upper) #We get upper values of each name.
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>JOSH</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MIKE</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>JULIA</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SERGIO</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>JULIA</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>MICHAEL</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>SARATH</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>JAKUB</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>CHRIS</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 ## 🌶️ Converting to/from `DataFrame`
@@ -10141,7 +10893,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_445_1.png)
+![png](README_files/README_483_1.png)
 
 
 
@@ -10160,7 +10912,7 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_446_1.png)
+![png](README_files/README_484_1.png)
 
 
 
@@ -11316,7 +12068,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_474_1.jpg)
+![jpeg](README_files/README_512_1.jpg)
 
 
 
@@ -11336,7 +12088,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_475_1.jpg)
+![jpeg](README_files/README_513_1.jpg)
 
 
 
@@ -11551,7 +12303,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_478_1.jpg)
+![jpeg](README_files/README_516_1.jpg)
 
 
 
@@ -11571,7 +12323,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_479_1.jpg)
+![jpeg](README_files/README_517_1.jpg)
 
 
 
@@ -12342,6 +13094,206 @@ country_variety_counts
 
 
 
+
+
+### `groupby()` and `transform()`
+
+- [https://www.statology.org/pandas-groupby-transform/](https://www.statology.org/pandas-groupby-transform/)
+
+
+```python
+#create DataFrame
+df = pd.DataFrame({'team': ['A', 'A', 'A', 'A', 'B', 'B',  'B','C'],
+                   'points': [10, 10, 12, 12, 15, 17,  20,11],
+                   'assists': [5, 5, 7, 9, 12, 9,  6,4]})
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>12</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>17</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df.groupby('team')['team'].transform('count')
+```
+
+
+    0    4
+    1    4
+    2    4
+    3    4
+    4    3
+    5    3
+    6    3
+    7    1
+    Name: team, dtype: int64
+
+
+
+```python
+df["TeamCount"]= df.groupby('team')['team'].transform('count')
+df['mean_points'] = df.groupby('team')['points'].transform('mean')
+df['point+1'] = df.groupby('team')['points'].transform(lambda x:x+1)
+
+df
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>team</th>
+      <th>points</th>
+      <th>assists</th>
+      <th>TeamCount</th>
+      <th>mean_points</th>
+      <th>point+1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+      <td>4</td>
+      <td>11.000000</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A</td>
+      <td>10</td>
+      <td>5</td>
+      <td>4</td>
+      <td>11.000000</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>12</td>
+      <td>7</td>
+      <td>4</td>
+      <td>11.000000</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A</td>
+      <td>12</td>
+      <td>9</td>
+      <td>4</td>
+      <td>11.000000</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>15</td>
+      <td>12</td>
+      <td>3</td>
+      <td>17.333333</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>17</td>
+      <td>9</td>
+      <td>3</td>
+      <td>17.333333</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>B</td>
+      <td>20</td>
+      <td>6</td>
+      <td>3</td>
+      <td>17.333333</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>C</td>
+      <td>11</td>
+      <td>4</td>
+      <td>1</td>
+      <td>11.000000</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 ## Categorical encoding
 
 ### Introduction
@@ -13038,7 +13990,7 @@ df.plot()
 
 
 
-![png](README_files/README_543_1.png)
+![png](README_files/README_587_1.png)
 
 
 
@@ -13056,7 +14008,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_544_1.png)
+![png](README_files/README_588_1.png)
 
 
 
@@ -13067,7 +14019,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_545_0.png)
+![png](README_files/README_589_0.png)
 
 
 
@@ -13080,7 +14032,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_547_0.png)
+![png](README_files/README_591_0.png)
 
 
 
@@ -13101,7 +14053,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_548_1.jpg)
+![jpeg](README_files/README_592_1.jpg)
 
 
 
@@ -13120,7 +14072,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_549_1.jpg)
+![jpeg](README_files/README_593_1.jpg)
 
 
 
@@ -13152,7 +14104,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_552_1.png)
+![png](README_files/README_596_1.png)
 
 
 
@@ -13164,7 +14116,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_553_0.png)
+![png](README_files/README_597_0.png)
 
 
 
@@ -13176,7 +14128,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_554_0.png)
+![png](README_files/README_598_0.png)
 
 
 
@@ -13197,7 +14149,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_556_1.png)
+![png](README_files/README_600_1.png)
 
 
 
@@ -13208,7 +14160,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_557_0.png)
+![png](README_files/README_601_0.png)
 
 
 
@@ -13228,7 +14180,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_559_1.jpg)
+![jpeg](README_files/README_603_1.jpg)
 
 
 
@@ -13247,7 +14199,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_560_1.jpg)
+![jpeg](README_files/README_604_1.jpg)
 
 
 
@@ -13286,7 +14238,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_563_1.jpg)
+![jpeg](README_files/README_607_1.jpg)
 
 
 
@@ -13307,6 +14259,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_564_1.jpg)
+![jpeg](README_files/README_608_1.jpg)
 
 
