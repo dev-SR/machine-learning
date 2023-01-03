@@ -31,8 +31,8 @@
       - [🚀All In One](#all-in-one)
     - [🥈V2: Pipelining + GridSearchCV (Single Model Hyperparameter Tuning)](#v2-pipelining--gridsearchcv-single-model-hyperparameter-tuning)
     - [🥇V3: Pipelining + GridSearchCV (Multi Models Hyperparameter Tuning) 🔥](#v3-pipelining--gridsearchcv-multi-models-hyperparameter-tuning-)
+  - [GridSearch: Clustering](#gridsearch-clustering)
   - [Resource](#resource)
-
 
 
 ```python
@@ -2673,5 +2673,193 @@ sns.lineplot(x='param_classifier__n_estimators', y='mean_test_score', data=nesm)
 - [https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/](https://machinelearninghd.com/gridsearchcv-classification-hyper-parameter-tuning/	)
 - [https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once](https://towardsdatascience.com/how-to-tune-multiple-ml-models-with-gridsearchcv-at-once-9fcebfcc6c23)
 - [https://machinelearninghd.com/sklearn-svm-starter-guide/](https://machinelearninghd.com/sklearn-svm-starter-guide/)
+
+## GridSearch: Clustering
+
+
+```python
+import pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+from sklearn.cluster import KMeans,AgglomerativeClustering
+from sklearn.feature_extraction.text import TfidfVectorizer
+```
+
+
+```python
+# Define the list of key phrases
+data = ['paper', 'paper',
+        'paper approach',
+        'identif system',
+        'speaker identif system',
+        'recognit system',
+        'industri',
+        'line power system',
+        'paper approach harmon',
+        'identif process markov',
+        'text speaker identif',
+        'approach perform',
+        'text speaker',
+        'text',
+        'speaker identif',
+        'paper strategi text']
+
+# Create a dataframe with the key phrases
+df = pd.DataFrame(
+    {'key_phrases': data}
+)
+
+# Define the pipeline with TfidfVectorizer and KMeans
+pipeline = Pipeline([
+    ('vectorizer', TfidfVectorizer()),
+    ('model', KMeans())
+])
+
+# Define the grid search parameters
+param_grid = {
+    'vectorizer__analyzer': ["word", "char"],
+    'vectorizer__ngram_range': [(1, 2),(1,3)],
+    'model__n_clusters': range(2, 5)
+}
+# Create a grid search object with the pipeline and parameters
+grid = GridSearchCV(pipeline, param_grid, cv=5)
+
+# Fit the grid search object to the data
+grid.fit(df['key_phrases'].tolist())
+
+# Get the best parameters and model from the grid search
+best_params = grid.best_params_
+best_model = grid.best_estimator_
+print(best_params)
+# Predict the clusters for the key phrases using the best model
+cluster_labels = best_model.predict(df['key_phrases'].tolist())
+
+# Add the cluster labels to the dataframe
+df["cluster"] = cluster_labels
+df['cluster_name'] = df['cluster'].apply(lambda x: f"cluster {x}")
+
+# Print the dataframe
+df
+```
+
+    {'model__n_clusters': 4, 'vectorizer__analyzer': 'char', 'vectorizer__ngram_range': (1, 2)}
+
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>key_phrases</th>
+      <th>cluster</th>
+      <th>cluster_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>paper</td>
+      <td>2</td>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>paper</td>
+      <td>2</td>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>paper approach</td>
+      <td>2</td>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>identif system</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>speaker identif system</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>recognit system</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>industri</td>
+      <td>3</td>
+      <td>cluster 3</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>line power system</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>paper approach harmon</td>
+      <td>2</td>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>identif process markov</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>text speaker identif</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>approach perform</td>
+      <td>2</td>
+      <td>cluster 2</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>text speaker</td>
+      <td>0</td>
+      <td>cluster 0</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>text</td>
+      <td>0</td>
+      <td>cluster 0</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>speaker identif</td>
+      <td>1</td>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>paper strategi text</td>
+      <td>0</td>
+      <td>cluster 0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ## Resource
