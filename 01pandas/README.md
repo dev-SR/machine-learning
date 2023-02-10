@@ -41,7 +41,12 @@
     - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
     - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
     - [`isnull`](#isnull)
-    - [Filtering with filter() function](#filtering-with-filter-function)
+  - [Querying a `DataFrame`](#querying-a-dataframe)
+    - [Introduction](#introduction-1)
+    - [Specifying Multiple Conditions](#specifying-multiple-conditions)
+    - [Methods within query](#methods-within-query)
+    - [Comparing Numeric Columns](#comparing-numeric-columns)
+    - [Comparing Multiple Columns](#comparing-multiple-columns)
   - [CRUD Row/Column Wise](#crud-rowcolumn-wise)
     - [Adding Columns](#adding-columns)
       - [`d['new_col'] = list()`](#dnew_col--list)
@@ -64,6 +69,7 @@
     - [👫Duplicate Rows👫](#duplicate-rows)
       - [Find Duplicates](#find-duplicates)
       - [Drop Duplicate Rows](#drop-duplicate-rows)
+      - [based on two columns combinations](#based-on-two-columns-combinations)
     - [Renaming Columns](#renaming-columns)
     - [👉Shuffle a DataFrame rows](#shuffle-a-dataframe-rows)
       - [Using `pd.sample()`](#using-pdsample)
@@ -80,7 +86,6 @@
       - [right join](#right-join)
       - [outer join](#outer-join)
     - [`join()`](#join)
-  - [Querying a `DataFrame`](#querying-a-dataframe)
   - [Aggregation and Summary Functions](#aggregation-and-summary-functions)
     - [Aggregation](#aggregation)
     - [Summary Function](#summary-function)
@@ -117,10 +122,9 @@
       - [`sort_index`](#sort_index)
       - [`sort_values`](#sort_values)
       - [`nlargest()` and `nsmallest()`](#nlargest-and-nsmallest)
-    - [More example:](#more-example)
     - [`groupby()` and `transform()`](#groupby-and-transform)
   - [Categorical encoding](#categorical-encoding)
-    - [Introduction](#introduction-1)
+    - [Introduction](#introduction-2)
     - [Label Encoding](#label-encoding)
       - [🌟🌟Custom Map Function](#custom-map-function)
         - [🚀Unique Values with labels assigned side-by-side🚀](#unique-values-with-labels-assigned-side-by-side)
@@ -484,19 +488,24 @@ arr
 ```
 
 
-    array([[30, 27, 82, 14],
-           [94, 66, 75, 56],
-           [53, 19, 72, 20],
-           [32, 91, 10, 14],
-           [88, 65, 70, 49],
-           [31, 57, 27, 95]])
+
+
+    array([[90, 50, 90, 34],
+           [68, 30, 90, 40],
+           [96, 57, 18, 68],
+           [86, 48, 25, 13],
+           [43, 81, 82, 16],
+           [29, 88, 21, 97]])
+
 
 
 
 ```python
-df = pd.DataFrame(data=arr)
+df = pd.DataFrame(arr)
 df
 ```
+
+
 
 
 <div>
@@ -514,49 +523,50 @@ df
   <tbody>
     <tr>
       <th>0</th>
-      <td>30</td>
-      <td>27</td>
-      <td>82</td>
-      <td>14</td>
+      <td>90</td>
+      <td>50</td>
+      <td>90</td>
+      <td>34</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>94</td>
-      <td>66</td>
-      <td>75</td>
-      <td>56</td>
+      <td>68</td>
+      <td>30</td>
+      <td>90</td>
+      <td>40</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>53</td>
-      <td>19</td>
-      <td>72</td>
-      <td>20</td>
+      <td>96</td>
+      <td>57</td>
+      <td>18</td>
+      <td>68</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>32</td>
-      <td>91</td>
-      <td>10</td>
-      <td>14</td>
+      <td>86</td>
+      <td>48</td>
+      <td>25</td>
+      <td>13</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>88</td>
-      <td>65</td>
-      <td>70</td>
-      <td>49</td>
+      <td>43</td>
+      <td>81</td>
+      <td>82</td>
+      <td>16</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>31</td>
-      <td>57</td>
-      <td>27</td>
-      <td>95</td>
+      <td>29</td>
+      <td>88</td>
+      <td>21</td>
+      <td>97</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 
@@ -568,6 +578,8 @@ df.index = "p q r s t u".split()
 df
 
 ```
+
+
 
 
 <div>
@@ -585,119 +597,50 @@ df
   <tbody>
     <tr>
       <th>p</th>
-      <td>19</td>
-      <td>51</td>
-      <td>72</td>
-      <td>11</td>
+      <td>57</td>
+      <td>82</td>
+      <td>15</td>
+      <td>40</td>
     </tr>
     <tr>
       <th>q</th>
-      <td>92</td>
-      <td>26</td>
-      <td>88</td>
-      <td>15</td>
+      <td>90</td>
+      <td>98</td>
+      <td>76</td>
+      <td>56</td>
     </tr>
     <tr>
       <th>r</th>
-      <td>68</td>
-      <td>10</td>
-      <td>90</td>
-      <td>14</td>
+      <td>21</td>
+      <td>65</td>
+      <td>82</td>
+      <td>64</td>
     </tr>
     <tr>
       <th>s</th>
-      <td>46</td>
-      <td>61</td>
-      <td>37</td>
-      <td>41</td>
+      <td>63</td>
+      <td>26</td>
+      <td>65</td>
+      <td>45</td>
     </tr>
     <tr>
       <th>t</th>
-      <td>12</td>
-      <td>78</td>
-      <td>48</td>
-      <td>93</td>
+      <td>14</td>
+      <td>76</td>
+      <td>31</td>
+      <td>19</td>
     </tr>
     <tr>
       <th>u</th>
-      <td>29</td>
-      <td>28</td>
-      <td>17</td>
-      <td>40</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-np.random.seed(5)
-arr=np.random.randint(100, size=(5, 5))
-df = pd.DataFrame(arr,
-				columns=list("ABCDE"),
-                index=["R" + str(i) for i in range(5)])
-df
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>A</th>
-      <th>B</th>
-      <th>C</th>
-      <th>D</th>
-      <th>E</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>R0</th>
-      <td>99</td>
-      <td>78</td>
-      <td>61</td>
-      <td>16</td>
-      <td>73</td>
-    </tr>
-    <tr>
-      <th>R1</th>
-      <td>8</td>
-      <td>62</td>
-      <td>27</td>
-      <td>30</td>
-      <td>80</td>
-    </tr>
-    <tr>
-      <th>R2</th>
-      <td>7</td>
-      <td>76</td>
-      <td>15</td>
-      <td>53</td>
-      <td>80</td>
-    </tr>
-    <tr>
-      <th>R3</th>
-      <td>27</td>
-      <td>44</td>
-      <td>77</td>
-      <td>75</td>
       <td>65</td>
-    </tr>
-    <tr>
-      <th>R4</th>
-      <td>47</td>
-      <td>30</td>
-      <td>84</td>
-      <td>86</td>
-      <td>18</td>
+      <td>33</td>
+      <td>70</td>
+      <td>41</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 ### 🚀🚀 lists of lists: row wise data
@@ -710,7 +653,7 @@ list(np.random.random(3))
 
 
 
-    [0.4199111706306522, 0.7491701900315496, 0.2603523272964693]
+    [0.29607993273364797, 0.6287879088794833, 0.579837810189545]
 
 
 
@@ -863,6 +806,8 @@ df
 ```
 
 
+
+
 <div>
 
 <table border="1" class="dataframe">
@@ -899,6 +844,7 @@ df
 </div>
 
 
+
 ### 🚀🚀list of dicts: column wise data
 
 
@@ -913,6 +859,8 @@ df = pd.DataFrame(data)
 df
 
 ```
+
+
 
 
 <div>
@@ -942,6 +890,7 @@ df
   </tbody>
 </table>
 </div>
+
 
 
 ### 🚀using `zip()`; list of tuple
@@ -1084,6 +1033,8 @@ df.head()
 ```
 
 
+
+
 <div>
 
 <table border="1" class="dataframe">
@@ -1099,36 +1050,37 @@ df.head()
     <tr>
       <th>0</th>
       <td>0</td>
-      <td>0.212280</td>
+      <td>-0.458027</td>
       <td>cat</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>0.492354</td>
+      <td>0.435163</td>
       <td>hippo</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>1.667453</td>
+      <td>-0.583595</td>
       <td>dog</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>-1.904760</td>
-      <td>cat</td>
+      <td>0.816847</td>
+      <td>dog</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4</td>
-      <td>-0.520301</td>
+      <td>0.672721</td>
       <td>hippo</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 ### Saving: creating new file
@@ -3838,12 +3790,16 @@ res.head(n=3)
 
 
 
-### Filtering with filter() function
+## Querying a `DataFrame`
+
+### Introduction
+
+The `query()` method lets you filter a `DataFrame` based on a query expression:
 
 
 ```python
-employees
-
+df = pd.read_csv('titanic_train.csv')
+df.head(n=2)
 ```
 
 
@@ -3855,40 +3811,596 @@ employees
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
       <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
+      <th>Sex</th>
       <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.2500</td>
+      <td>NaN</td>
+      <td>S</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Let’s find all the passengers that embarked from `Southampton (‘S’)`. Using `square` bracket indexing, the code looks like this:
+
+`df[df['Embarked'] == 'S'].head(n=2)`
+
+However, if you use the `query()` method, it looks neater:
+
+`df.query('Embarked == "S"')`
+
+
+```python
+df.query('Embarked == "S"').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.250</td>
+      <td>NaN</td>
+      <td>S</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
+      <td>3</td>
+      <td>1</td>
+      <td>3</td>
+      <td>Heikkinen, Miss. Laina</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>STON/O2. 3101282</td>
+      <td>7.925</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Very often, you might want to pass in values of variables into your query string. You can do so using the `@` character:
+
+
+```python
+embarked = 'S'
+df.query('Embarked == @embarked').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.250</td>
+      <td>NaN</td>
+      <td>S</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
+      <th>2</th>
+      <td>3</td>
+      <td>1</td>
+      <td>3</td>
+      <td>Heikkinen, Miss. Laina</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>STON/O2. 3101282</td>
+      <td>7.925</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Alternatively, you can also use a f-string, like this:
+
+
+```python
+df.query(f'Embarked == "{embarked}"').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.250</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>1</td>
+      <td>3</td>
+      <td>Heikkinen, Miss. Laina</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>STON/O2. 3101282</td>
+      <td>7.925</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Specifying Multiple Conditions
+
+
+```python
+df[(df['Embarked'] == 'S') | (df['Embarked'] == 'C')].head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.2500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Notice that you need to reference your dataframe (df) twice in your condition. Using the query() method, this is a walk in the park:
+
+
+```python
+df.query('Embarked in ("S","C")').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.2500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+If you want to find all passengers who did not embarked from Southampton (‘S’) or Cherbourg (‘C’), you can use the negation operator `(~)` in Pandas: `df[~((df['Embarked'] == 'S') | (df['Embarked'] == 'C'))]`
+
+
+```python
+df.query('Embarked not in ("S","C")').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Moran, Mr. James</td>
+      <td>male</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>330877</td>
+      <td>8.4583</td>
+      <td>NaN</td>
+      <td>Q</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>17</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Rice, Master. Eugene</td>
+      <td>male</td>
+      <td>2.0</td>
+      <td>4</td>
+      <td>1</td>
+      <td>382652</td>
+      <td>29.1250</td>
+      <td>NaN</td>
+      <td>Q</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Methods within query
+
+Talking about missing values, how do you query for missing values? You can find missing values using the `isnull()` method, when it is applied to column name:
+
+
+```python
+df.query('Embarked.isnull()').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>61</th>
+      <td>62</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Icard, Miss. Amelie</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>113572</td>
+      <td>80.0</td>
+      <td>B28</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>829</th>
+      <td>830</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Stone, Mrs. George Nelson (Martha Evelyn)</td>
+      <td>female</td>
+      <td>62.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>113572</td>
+      <td>80.0</td>
+      <td>B28</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+In fact, you can call various Series methods directly on the column name. Here are some examples:
+
+
+```python
+df.query('Name.str.len() < 20').head(n=2)  # find passengers whose name is
+                                 					# less than 20 characters
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Moran, Mr. James</td>
+      <td>male</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>330877</td>
+      <td>8.4583</td>
+      <td>NaN</td>
+      <td>Q</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>30</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Todoroff, Mr. Lalio</td>
+      <td>male</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>349216</td>
+      <td>7.8958</td>
+      <td>NaN</td>
+      <td>S</td>
     </tr>
   </tbody>
 </table>
@@ -3898,8 +4410,8 @@ employees
 
 
 ```python
-employees.filter(items=["Department", "Age"])
-
+df.query(f'Ticket.str.startswith("A")').head(n=2) # find all passengers whose
+                                        # ticket starts with A
 ```
 
 
@@ -3911,30 +4423,50 @@ employees.filter(items=["Department", "Age"])
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Department</th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
       <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>IT</td>
-      <td>24</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.25</td>
+      <td>NaN</td>
+      <td>S</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>Human Resources</td>
-      <td>28</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Finance</td>
-      <td>33</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Supply Chain</td>
-      <td>41</td>
+      <th>12</th>
+      <td>13</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Saundercock, Mr. William Henry</td>
+      <td>male</td>
+      <td>20.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>A/5. 2151</td>
+      <td>8.05</td>
+      <td>NaN</td>
+      <td>S</td>
     </tr>
   </tbody>
 </table>
@@ -3942,12 +4474,11 @@ employees.filter(items=["Department", "Age"])
 
 
 
-Regex is another thema but we can also filter by using regex.
+### Comparing Numeric Columns
 
 
 ```python
-employees.filter(regex='e$', axis=1)  # Columns end with "e"
-
+df.query('Fare > 50').head(n=2)
 ```
 
 
@@ -3959,35 +4490,119 @@ employees.filter(regex='e$', axis=1)  # Columns end with "e"
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
       <th>Name</th>
-      <th>Income</th>
+      <th>Sex</th>
       <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>4800</td>
-      <td>24</td>
-    </tr>
-    <tr>
       <th>1</th>
-      <td>Mike</td>
-      <td>5200</td>
-      <td>28</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>6600</td>
-      <td>33</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>Sergio</td>
-      <td>5700</td>
-      <td>41</td>
+      <td>4</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>113803</td>
+      <td>53.1000</td>
+      <td>C123</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Comparing Multiple Columns
+
+You can also compare multiple columns using the `and`, `or`, and `not` operators. The following statement retrieves all the rows that has Fare greater than 50 and Age greater than 30:
+
+
+```python
+df.query('Fare > 50 and Age > 30').head(n=2)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>113803</td>
+      <td>53.1000</td>
+      <td>C123</td>
+      <td>S</td>
     </tr>
   </tbody>
 </table>
@@ -5998,6 +6613,140 @@ df.drop_duplicates(keep=False)
 </div>
 
 
+#### based on two columns combinations
+
+eliminate the duplicates based on columns combinations.
+
+
+
+
+```python
+data = [{
+	"A":"ML",
+	"B":"AI",
+	"similarity":.5,
+
+},{
+	"A":"AI",
+	"B":"ML",
+	"similarity":.5
+},
+{
+	"A":"AI",
+	"B":"CV",
+	"similarity":.4
+}]
+df= pd.DataFrame(data)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>similarity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ML</td>
+      <td>AI</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>AI</td>
+      <td>ML</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>AI</td>
+      <td>CV</td>
+      <td>0.4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df[['A', 'B']].apply(set, axis=1)
+```
+
+
+
+
+    0    {AI, ML}
+    1    {AI, ML}
+    2    {AI, CV}
+    dtype: object
+
+
+
+
+```python
+df[['A', 'B']].apply(set, axis=1).duplicated()
+```
+
+
+
+
+    0    False
+    1     True
+    2    False
+    dtype: bool
+
+
+
+
+```python
+df[~df[['A', 'B']].apply(set, axis=1).duplicated()]
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>similarity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ML</td>
+      <td>AI</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>AI</td>
+      <td>CV</td>
+      <td>0.4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ### Renaming Columns
 
 
@@ -7237,10 +7986,6 @@ df1.join(df2, lsuffix='_A', rsuffix='_B')
 </div>
 
 
-
-## Querying a `DataFrame`
-
-The `query()` method lets you filter a `DataFrame` based on a query expression:
 
 ## Aggregation and Summary Functions
 
@@ -9681,6 +10426,7 @@ cluster
 
 
 ```python
+# Inplace
 cluster = pd.DataFrame({"cluster": range(1,6)})
 cluster["cluster"] = cluster['cluster'].apply(lambda x: f"cluster {x}")
 cluster
@@ -9725,12 +10471,106 @@ cluster
 
 
 
+> NOTE: Incase of waring following warning with `apply`, try `reset_index()`
+
+```
+SettingWithCopyWarning:
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+```
+
+Using a dictionary:
+
 
 ```python
-pd.DataFrame([
-	{""}
-])
+cluster = pd.DataFrame({"cluster": [0]*2+[1,2]})
+cluster
 ```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cluster</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+cluster_map = {
+	"0":"cluster 0",
+	"1":"cluster 1",
+	"2":"cluster 2"
+}
+```
+
+
+```python
+cluster["cluster"] = cluster['cluster'].apply(lambda x: cluster_map[str(x)])
+cluster
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cluster</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cluster 0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cluster 0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cluster 1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>cluster 2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 
 ```python
@@ -10893,7 +11733,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_483_1.png)
+![png](README_files/README_513_1.png)
 
 
 
@@ -10912,7 +11752,7 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_484_1.png)
+![png](README_files/README_514_1.png)
 
 
 
@@ -11310,7 +12150,7 @@ employees.groupby("Department") #It will create an object
 
 
 
-    <pandas.core.groupby.generic.DataFrameGroupBy object at 0x00000281DD836640>
+    <pandas.core.groupby.generic.DataFrameGroupBy object at 0x000001716A758910>
 
 
 
@@ -12068,7 +12908,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_512_1.jpg)
+![jpeg](README_files/README_542_1.jpg)
 
 
 
@@ -12088,7 +12928,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_513_1.jpg)
+![jpeg](README_files/README_543_1.jpg)
 
 
 
@@ -12303,7 +13143,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_516_1.jpg)
+![jpeg](README_files/README_546_1.jpg)
 
 
 
@@ -12323,7 +13163,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_517_1.jpg)
+![jpeg](README_files/README_547_1.jpg)
 
 
 
@@ -12441,71 +13281,6 @@ df
       <td>17588462</td>
       <td>7000</td>
       <td>19</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Note that `sort_index` returned a sorted *copy* of the `DataFrame`. To modify `people` directly, we can set the `inplace` argument to `True`. Also, we can sort the columns instead of the rows by setting `axis=1`:
-
-
-```python
-people.sort_index(axis=1,ascending=False, inplace=True)
-people
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>name</th>
-      <th>country</th>
-      <th>cgpa</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>A</td>
-      <td>BD</td>
-      <td>3.56</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>B</td>
-      <td>IN</td>
-      <td>4.00</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>C</td>
-      <td>PAK</td>
-      <td>3.55</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>D</td>
-      <td>SL</td>
-      <td>3.86</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>E</td>
-      <td>US</td>
-      <td>3.99</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>F</td>
-      <td>IN</td>
-      <td>3.89</td>
     </tr>
   </tbody>
 </table>
@@ -12868,246 +13643,20 @@ employees["Income"].nsmallest(2)
 
 
 
-### More example:
-
-
-```python
-reviews_written = reviews.groupby('taster_twitter_handle').size()
-reviews_written
-```
-
-
-
-
-    taster_twitter_handle
-    @AnneInVino          1
-    @JoeCz               2
-    @gordone_cellars     1
-    @kerinokeefe        13
-    @mattkettmann        3
-    @paulgwine           6
-    @vboone             16
-    @vossroger          16
-    @wawinereport        6
-    @wineschach         10
-    dtype: int64
-
-
-
-What is the **best** wine I can buy for a given amount of money? Create a `Series` whose index is wine prices and whose values is the maximum number of points a wine costing that much was given in a review. Sort the values by price, ascending (so that `4.0` dollars is at the top and `3300.0` dollars is at the bottom).
-
-
-```python
-best_rating_per_price = reviews.groupby('price')['points'].max().sort_index()
-best_rating_per_price
-```
-
-
-
-
-    price
-    9.0      86
-    10.0     86
-    11.0     86
-    12.0     88
-    13.0     87
-    14.0     87
-    15.0     87
-    16.0     87
-    17.0     87
-    18.0     88
-    19.0     88
-    20.0     88
-    21.0     86
-    22.0     88
-    23.0     88
-    24.0     87
-    25.0     86
-    26.0     86
-    27.0     87
-    28.0     50
-    29.0     86
-    30.0     88
-    32.0     87
-    34.0     87
-    35.0     87
-    40.0     86
-    46.0     86
-    50.0     86
-    55.0     88
-    58.0     86
-    65.0     90
-    69.0     87
-    75.0     88
-    100.0    86
-    Name: points, dtype: int64
-
-
-
-What are the minimum and maximum prices for each `variety` of wine? Create a `DataFrame` whose index is the `variety` category from the dataset and whose values are the `min` and `max` values thereof.
-
-
-```python
-price_extremes = reviews.groupby('variety').price.agg([min, max])
-price_extremes[:3]
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>min</th>
-      <th>max</th>
-    </tr>
-    <tr>
-      <th>variety</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Aglianico</th>
-      <td>32.0</td>
-      <td>32.0</td>
-    </tr>
-    <tr>
-      <th>Albariño</th>
-      <td>16.0</td>
-      <td>20.0</td>
-    </tr>
-    <tr>
-      <th>Bordeaux-style Red Blend</th>
-      <td>46.0</td>
-      <td>75.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Create a `Series` whose index is reviewers and whose values is the average review score given out by that reviewer. Hint: you will need the `taster_name` and `points` columns.
-
-
-```python
-reviewer_mean_ratings=reviews.groupby('taster_name').points.mean()
-reviewer_mean_ratings
-```
-
-
-
-
-    taster_name
-    Alexander Peartree    87.000000
-    Anna Lee C. Iijima    86.800000
-    Anne Krebiehl MW      88.000000
-    Jim Gordon            86.000000
-    Joe Czerwinski        86.000000
-    Kerin O’Keefe         86.000000
-    Matt Kettmann         86.666667
-    Michael Schachner     80.800000
-    Paul Gregutt          87.000000
-    Roger Voss            86.812500
-    Sean P. Sullivan      86.333333
-    Virginie Boone        86.625000
-    Name: points, dtype: float64
-
-
-
-What combination of countries and varieties are most common? Create a `Series` whose index is a `MultiIndex`of `{country, variety}` pairs. For example, a pinot noir produced in the US should map to `{"US", "Pinot Noir"}`. Sort the values in the `Series` in descending order based on wine count.
-
-
-```python
-country_variety_counts = reviews.groupby(
-    ['country', 'variety']).size().sort_values(ascending=False)
-country_variety_counts
-
-```
-
-
-
-
-    country    variety
-    US         Pinot Noir                    6
-               Red Blend                     5
-               Cabernet Sauvignon            5
-    France     Gamay                         5
-    Italy      Red Blend                     4
-    US         Sauvignon Blanc               4
-               Chardonnay                    4
-    Italy      White Blend                   4
-    US         Riesling                      3
-    Italy      Nero d'Avola                  3
-    US         Bordeaux-style Red Blend      3
-    Germany    Riesling                      3
-    Argentina  Malbec                        2
-    US         Meritage                      2
-    Italy      Sangiovese                    2
-    France     Gewürztraminer                2
-               Chardonnay                    2
-               Champagne Blend               2
-    US         Merlot                        2
-               Pinot Gris                    2
-               Chenin Blanc                  1
-               Cabernet Franc                1
-               Petite Sirah                  1
-               Albariño                      1
-    Spain      Tempranillo-Merlot            1
-               Tempranillo Blend             1
-               Albariño                      1
-    Portugal   Touriga Nacional              1
-    US         Viognier                      1
-    Portugal   Portuguese Red                1
-    US         Malbec                        1
-    Italy      Primitivo                     1
-               Vernaccia                     1
-    France     Pinot Gris                    1
-    Australia  Rosé                          1
-    Austria    Grüner Veltliner              1
-    Chile      Carmenère                     1
-               Merlot                        1
-               Petit Verdot                  1
-               Pinot Noir                    1
-               Viognier-Chardonnay           1
-    France     Bordeaux-style White Blend    1
-               Petit Manseng                 1
-    Germany    Gewürztraminer                1
-    Italy      Rosato                        1
-               Aglianico                     1
-               Cabernet Sauvignon            1
-               Catarratto                    1
-               Frappato                      1
-               Grillo                        1
-               Inzolia                       1
-               Monica                        1
-               Nerello Mascalese             1
-    Australia  Chardonnay                    1
-    US         Zinfandel                     1
-    dtype: int64
-
-
-
-
-
 ### `groupby()` and `transform()`
 
 - [https://www.statology.org/pandas-groupby-transform/](https://www.statology.org/pandas-groupby-transform/)
 
+The `groupby()` and `transform()` methods in Pandas are used to group and transform data, respectively.
+
 
 ```python
-#create DataFrame
-df = pd.DataFrame({'team': ['A', 'A', 'A', 'A', 'B', 'B',  'B','C'],
-                   'points': [10, 10, 12, 12, 15, 17,  20,11],
-                   'assists': [5, 5, 7, 9, 12, 9,  6,4]})
-df
+df = pd.DataFrame({'team': ['A', 'B', 'C', 'A', 'A', 'B', 'D'],
+                   'points': [30, 22, 19, 14, 14, 11, 20]})
+df.head(2)
 ```
+
+
 
 
 <div>
@@ -13118,57 +13667,18 @@ df
       <th></th>
       <th>team</th>
       <th>points</th>
-      <th>assists</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>A</td>
-      <td>10</td>
-      <td>5</td>
+      <td>30</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>A</td>
-      <td>12</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>A</td>
-      <td>12</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>4</th>
       <td>B</td>
-      <td>15</td>
-      <td>12</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>B</td>
-      <td>17</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>B</td>
-      <td>20</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>C</td>
-      <td>11</td>
-      <td>4</td>
+      <td>22</td>
     </tr>
   </tbody>
 </table>
@@ -13176,30 +13686,23 @@ df
 
 
 
-```python
-df.groupby('team')['team'].transform('count')
-```
-
-
-    0    4
-    1    4
-    2    4
-    3    4
-    4    3
-    5    3
-    6    3
-    7    1
-    Name: team, dtype: int64
-
-
 
 ```python
-df["TeamCount"]= df.groupby('team')['team'].transform('count')
-df['mean_points'] = df.groupby('team')['points'].transform('mean')
-df['point+1'] = df.groupby('team')['points'].transform(lambda x:x+1)
+# Group the data by column C
+grouped_df = df.groupby(by='team')
 
+# Compute the mean of column B for each group
+mean_points = grouped_df['points'].transform('mean')
+
+# Add the mean of column B to the original DataFrame
+df['mean_points'] = mean_points
+
+# adding count colum
+df['team_count'] = df.groupby(by='team')['team'].transform('count')
 df
 ```
+
+
 
 
 <div>
@@ -13210,88 +13713,64 @@ df
       <th></th>
       <th>team</th>
       <th>points</th>
-      <th>assists</th>
-      <th>TeamCount</th>
       <th>mean_points</th>
-      <th>point+1</th>
+      <th>team_count</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>A</td>
-      <td>10</td>
-      <td>5</td>
-      <td>4</td>
-      <td>11.000000</td>
-      <td>11</td>
+      <td>30</td>
+      <td>19.333333</td>
+      <td>3</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>A</td>
-      <td>10</td>
-      <td>5</td>
-      <td>4</td>
-      <td>11.000000</td>
-      <td>11</td>
+      <td>B</td>
+      <td>22</td>
+      <td>16.500000</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>A</td>
-      <td>12</td>
-      <td>7</td>
-      <td>4</td>
-      <td>11.000000</td>
-      <td>13</td>
+      <td>C</td>
+      <td>19</td>
+      <td>19.000000</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>3</th>
       <td>A</td>
-      <td>12</td>
-      <td>9</td>
-      <td>4</td>
-      <td>11.000000</td>
-      <td>13</td>
+      <td>14</td>
+      <td>19.333333</td>
+      <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>B</td>
-      <td>15</td>
-      <td>12</td>
+      <td>A</td>
+      <td>14</td>
+      <td>19.333333</td>
       <td>3</td>
-      <td>17.333333</td>
-      <td>16</td>
     </tr>
     <tr>
       <th>5</th>
       <td>B</td>
-      <td>17</td>
-      <td>9</td>
-      <td>3</td>
-      <td>17.333333</td>
-      <td>18</td>
+      <td>11</td>
+      <td>16.500000</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>B</td>
+      <td>D</td>
       <td>20</td>
-      <td>6</td>
-      <td>3</td>
-      <td>17.333333</td>
-      <td>21</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>C</td>
-      <td>11</td>
-      <td>4</td>
+      <td>20.000000</td>
       <td>1</td>
-      <td>11.000000</td>
-      <td>12</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 ## Categorical encoding
@@ -13990,7 +14469,7 @@ df.plot()
 
 
 
-![png](README_files/README_587_1.png)
+![png](README_files/README_603_1.png)
 
 
 
@@ -14008,7 +14487,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_588_1.png)
+![png](README_files/README_604_1.png)
 
 
 
@@ -14019,7 +14498,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_589_0.png)
+![png](README_files/README_605_0.png)
 
 
 
@@ -14032,7 +14511,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_591_0.png)
+![png](README_files/README_607_0.png)
 
 
 
@@ -14053,7 +14532,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_592_1.jpg)
+![jpeg](README_files/README_608_1.jpg)
 
 
 
@@ -14072,7 +14551,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_593_1.jpg)
+![jpeg](README_files/README_609_1.jpg)
 
 
 
@@ -14104,7 +14583,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_596_1.png)
+![png](README_files/README_612_1.png)
 
 
 
@@ -14116,7 +14595,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_597_0.png)
+![png](README_files/README_613_0.png)
 
 
 
@@ -14128,7 +14607,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_598_0.png)
+![png](README_files/README_614_0.png)
 
 
 
@@ -14149,7 +14628,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_600_1.png)
+![png](README_files/README_616_1.png)
 
 
 
@@ -14160,7 +14639,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_601_0.png)
+![png](README_files/README_617_0.png)
 
 
 
@@ -14180,7 +14659,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_603_1.jpg)
+![jpeg](README_files/README_619_1.jpg)
 
 
 
@@ -14199,7 +14678,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_604_1.jpg)
+![jpeg](README_files/README_620_1.jpg)
 
 
 
@@ -14238,7 +14717,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_607_1.jpg)
+![jpeg](README_files/README_623_1.jpg)
 
 
 
@@ -14259,6 +14738,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_608_1.jpg)
+![jpeg](README_files/README_624_1.jpg)
 
 
