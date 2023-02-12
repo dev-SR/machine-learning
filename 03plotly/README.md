@@ -2,6 +2,12 @@
 
 # Plotly.py
 
+- [Plotly.py](#plotlypy)
+  - [Scatter Plot](#scatter-plot)
+  - [Save to Pdf/PNG..](#save-to-pdfpng)
+  - [🔥 Example](#-example)
+    - [Joint PDFs + Area Under Curve](#joint-pdfs--area-under-curve)
+
 
 ```python
 """
@@ -38,19 +44,7 @@ df.head(2)
   <div id="df-f87e0a41-93e8-48b6-a4b1-492e9da9f195">
     <div class="colab-df-container">
       <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -467,7 +461,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](README_files/README_17_0.png)
-    
+
 
