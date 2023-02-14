@@ -29,7 +29,7 @@
       - [Choosing between loc and iloc](#choosing-between-loc-and-iloc)
     - [🚀🚀 Split Input and Output Features and convert to NumPy arrays](#-split-input-and-output-features-and-convert-to-numpy-arrays)
     - [♻️Reset Index](#️reset-index)
-  - [🚀🚀Masking - logical filtering](#masking---logical-filtering)
+  - [🚀Masking - logical filtering](#masking---logical-filtering)
     - [`SELECT * FROM df WHERE columnX = value`](#select--from-df-where-columnx--value)
     - [🔥`SELECT col1,col2.. FROM df WHERE columnX = value`](#select-col1col2-from-df-where-columnx--value)
     - [`SELECT * FROM df WHERE col1 = value 🤝AND🤝 col2 = value`](#select--from-df-where-col1--value-and-col2--value)
@@ -41,7 +41,7 @@
     - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
     - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
     - [`isnull`](#isnull)
-  - [Querying a `DataFrame`](#querying-a-dataframe)
+  - [🚀Querying a `DataFrame`](#querying-a-dataframe)
     - [Introduction](#introduction-1)
     - [Specifying Multiple Conditions](#specifying-multiple-conditions)
     - [Methods within query](#methods-within-query)
@@ -2628,7 +2628,7 @@ df
 
 
 
-## 🚀🚀Masking - logical filtering
+## 🚀Masking - logical filtering
 
 
 ```python
@@ -3790,7 +3790,7 @@ res.head(n=3)
 
 
 
-## Querying a `DataFrame`
+## 🚀Querying a `DataFrame`
 
 ### Introduction
 
@@ -4204,11 +4204,80 @@ df.query('Embarked in ("S","C")').head(n=2)
 
 
 
+
+```python
+# or
+
+Embarked = ("S","C")
+df.query('Embarked in @Embarked').head(n=2)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.2500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 If you want to find all passengers who did not embarked from Southampton (‘S’) or Cherbourg (‘C’), you can use the negation operator `(~)` in Pandas: `df[~((df['Embarked'] == 'S') | (df['Embarked'] == 'C'))]`
 
 
 ```python
-df.query('Embarked not in ("S","C")').head(n=2)
+df.query('Embarked not in @Embarked').head(n=2)
 ```
 
 
@@ -11733,7 +11802,7 @@ df.plot(kind='bar')
 
 
 
-![png](README_files/README_513_1.png)
+![png](README_files/README_514_1.png)
 
 
 
@@ -11752,7 +11821,7 @@ df.plot(kind='bar', stacked=True)
 
 
 
-![png](README_files/README_514_1.png)
+![png](README_files/README_515_1.png)
 
 
 
@@ -12908,7 +12977,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_542_1.jpg)
+![jpeg](README_files/README_543_1.jpg)
 
 
 
@@ -12928,7 +12997,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_543_1.jpg)
+![jpeg](README_files/README_544_1.jpg)
 
 
 
@@ -13143,7 +13212,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_546_1.jpg)
+![jpeg](README_files/README_547_1.jpg)
 
 
 
@@ -13163,7 +13232,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_547_1.jpg)
+![jpeg](README_files/README_548_1.jpg)
 
 
 
@@ -14469,7 +14538,7 @@ df.plot()
 
 
 
-![png](README_files/README_603_1.png)
+![png](README_files/README_604_1.png)
 
 
 
@@ -14487,7 +14556,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_604_1.png)
+![png](README_files/README_605_1.png)
 
 
 
@@ -14498,7 +14567,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_605_0.png)
+![png](README_files/README_606_0.png)
 
 
 
@@ -14511,7 +14580,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_607_0.png)
+![png](README_files/README_608_0.png)
 
 
 
@@ -14532,7 +14601,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_608_1.jpg)
+![jpeg](README_files/README_609_1.jpg)
 
 
 
@@ -14551,7 +14620,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_609_1.jpg)
+![jpeg](README_files/README_610_1.jpg)
 
 
 
@@ -14583,7 +14652,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_612_1.png)
+![png](README_files/README_613_1.png)
 
 
 
@@ -14595,7 +14664,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_613_0.png)
+![png](README_files/README_614_0.png)
 
 
 
@@ -14607,7 +14676,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_614_0.png)
+![png](README_files/README_615_0.png)
 
 
 
@@ -14628,7 +14697,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_616_1.png)
+![png](README_files/README_617_1.png)
 
 
 
@@ -14639,7 +14708,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_617_0.png)
+![png](README_files/README_618_0.png)
 
 
 
@@ -14659,7 +14728,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_619_1.jpg)
+![jpeg](README_files/README_620_1.jpg)
 
 
 
@@ -14678,7 +14747,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_620_1.jpg)
+![jpeg](README_files/README_621_1.jpg)
 
 
 
@@ -14717,7 +14786,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_623_1.jpg)
+![jpeg](README_files/README_624_1.jpg)
 
 
 
@@ -14738,6 +14807,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_624_1.jpg)
+![jpeg](README_files/README_625_1.jpg)
 
 
