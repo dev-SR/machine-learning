@@ -2,27 +2,23 @@
 
 - [Pandas](#pandas)
   - [Introduction](#introduction)
-  - [`Series` objects](#series-objects)
-    - [Creating a `Series`](#creating-a-series)
-      - [Init from `dict`](#init-from-dict)
-    - [Similar to a 1D `ndarray`](#similar-to-a-1d-ndarray)
-    - [Indexing](#indexing)
-      - [Slicing a `Series` also slices the index labels:](#slicing-a-series-also-slices-the-index-labels)
+  - [Series](#series)
+    - [Series to py list + numpy](#series-to-py-list--numpy)
+    - [🟡Series to python dict](#series-to-python-dict)
   - [`DataFrame` objects](#dataframe-objects)
   - [Creating `DataFrame`](#creating-dataframe)
     - [From Numpy Array](#from-numpy-array)
-    - [🚀🚀 lists of lists: row wise data](#-lists-of-lists-row-wise-data)
+    - [🚀 lists of lists: row wise data](#-lists-of-lists-row-wise-data)
     - [dict of narray/lists](#dict-of-narraylists)
     - [🚀🚀list of dicts: column wise data](#list-of-dicts-column-wise-data)
     - [🚀using `zip()`; list of tuple](#using-zip-list-of-tuple)
-    - [Dicts of series.](#dicts-of-series)
   - [Saving \& loading files](#saving--loading-files)
     - [Saving: creating new file](#saving-creating-new-file)
     - [Saving: Append to Existing File](#saving-append-to-existing-file)
     - [Loading](#loading)
       - [Minimize the size of Large DataSet; `nrows=n`](#minimize-the-size-of-large-dataset-nrowsn)
       - [🔥Load All Csv Files In A Folder](#load-all-csv-files-in-a-folder)
-  - [Indexing](#indexing-1)
+  - [Indexing](#indexing)
     - [🚀Extracting Columns `df[col]`, `df[[col1,col2,..]]` + `.values` property](#extracting-columns-dfcol-dfcol1col2--values-property)
     - [🚀Index-based selection - `iloc[row_indexer,col_indexer]`](#index-based-selection---ilocrow_indexercol_indexer)
     - [🚀Label-based selection - `loc[row_indexer,col_indexer]`](#label-based-selection---locrow_indexercol_indexer)
@@ -39,8 +35,8 @@
     - [`isin()` ; `SELECT * FROM df WHERE columnX IN (value1,value2,..)`](#isin--select--from-df-where-columnx-in-value1value2)
     - ["NOT IN" - `df[~df['col_name'].isin(values_list)]`](#not-in---dfdfcol_nameisinvalues_list)
     - [🔥🔥Replacing/Updating on condition](#replacingupdating-on-condition)
-    - [Select all rows containing a sub string](#select-all-rows-containing-a-sub-string)
     - [`isnull`](#isnull)
+    - [String Operations](#string-operations)
   - [🚀Querying a `DataFrame`](#querying-a-dataframe)
     - [Introduction](#introduction-1)
     - [Specifying Multiple Conditions](#specifying-multiple-conditions)
@@ -87,13 +83,13 @@
       - [outer join](#outer-join)
     - [`join()`](#join)
   - [Aggregation and Summary Functions](#aggregation-and-summary-functions)
-    - [Aggregation](#aggregation)
+    - [Mathematical Aggregation Functions](#mathematical-aggregation-functions)
     - [Summary Function](#summary-function)
       - [`shape` , `dtypes` , `info()`, `describe()`](#shape--dtypes--info-describe)
       - [`head()` and `tail()`](#head-and-tail)
       - [`columns`](#columns)
       - [`unique()` and `nunique()`](#unique-and-nunique)
-      - [`value_counts()`](#value_counts)
+      - [🦄 `value_counts()` count occupance of each unique element](#-value_counts-count-occupance-of-each-unique-element)
   - [Data Types and Missing Values](#data-types-and-missing-values)
     - [`dtypes`, `astype()`](#dtypes-astype)
     - [Missing data](#missing-data)
@@ -113,27 +109,16 @@
       - [`np.asarray(df)`](#npasarraydf)
     - [To python list of dicts: `to_dict()`](#to-python-list-of-dicts-to_dict)
     - [To Python List/List of List](#to-python-listlist-of-list)
-  - [🔥Pivot Tables](#pivot-tables)
-    - [Visualize Pivot Table](#visualize-pivot-table)
   - [Grouping and Sorting](#grouping-and-sorting)
-    - [Groupwise analysis](#groupwise-analysis)
+    - [`groupby()`](#groupby)
       - [Example:](#example)
     - [Sorting: `sort_index`, `sort_values`](#sorting-sort_index-sort_values)
       - [`sort_index`](#sort_index)
       - [`sort_values`](#sort_values)
       - [`nlargest()` and `nsmallest()`](#nlargest-and-nsmallest)
-    - [`groupby()` and `transform()`](#groupby-and-transform)
-  - [Categorical encoding](#categorical-encoding)
-    - [Introduction](#introduction-2)
-    - [Label Encoding](#label-encoding)
-      - [🌟🌟Custom Map Function](#custom-map-function)
-        - [🚀Unique Values with labels assigned side-by-side🚀](#unique-values-with-labels-assigned-side-by-side)
-      - [🌟🌟`sklearn.LabelEncoder()`](#sklearnlabelencoder)
-        - [Decoding](#decoding)
-    - [One-Hot-Encoding](#one-hot-encoding)
-        - [Using `Pandas.get_dummies()`](#using-pandasget_dummies)
-      - [Using 🌟`sklearn.OneHotEncoder()`🌟](#using-sklearnonehotencoder)
-    - [Discretization](#discretization)
+    - [`groupby()` + `transform()`](#groupby--transform)
+  - [🔥Pivot Tables](#pivot-tables)
+    - [Visualize Pivot Table](#visualize-pivot-table)
   - [Visualization with Pandas](#visualization-with-pandas)
     - [Line plot](#line-plot)
     - [Scatter plot](#scatter-plot)
@@ -174,294 +159,154 @@ plt.rcParams.update({
 
 ```
 
-## `Series` objects
+## Series
 
-- A `Series` object is 1D array that can hold/store data.
-
-### Creating a `Series`
+### Series to py list + numpy
 
 
 ```python
-l = ["C", "C++", "Python", "Javascript"]
-s = pd.Series(l)
-s
+# Create a Pandas Series
+series = pd.Series([1, 2, 3, 4, 5])
+# Convert Series to List
+my_list = series.tolist()
+print(my_list)
+# Convert Series to NumPy Array
+my_array = series.to_numpy()
+print(my_array)
+
+```
+
+    [1, 2, 3, 4, 5]
+    [1 2 3 4 5]
+
+
+### 🟡Series to python dict
+
+
+```python
+# Create a Pandas Series
+series = pd.Series([1, 2, 3, 4, 5])
+# Convert Series to Dict
+print(series.to_dict())
+# VS series with dictionary
+series = pd.Series([1, 2, 3, 4, 5], index=['A', 'B', 'C', 'D', 'E'])
+print(series.to_dict())
+
+```
+
+    {0: 1, 1: 2, 2: 3, 3: 4, 4: 5}
+    {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5}
+
+
+This is helpful in scenarios like below:
+
+
+```python
+# Preparing Data
+import random
+X = ['cs.AI', 'cs.ML', 'cs.CV', 'cs.IT', 'cs.NI']
+# Generate random value counts for each element in X
+value_counts = {element: random.randint(10, 100) for element in X}
+# Create a list of categories based on the value counts
+categories = []
+for category, count in value_counts.items():
+    categories.extend([category] * count)
+
+# Generate random values for the value column
+values = [random.randint(0, 100) for _ in range(sum(value_counts.values()))]
+# Create the sample DataFrame
+df = pd.DataFrame({'Category': categories, 'Value': values})
+df
 ```
 
 
 
 
-    0             C
-    1           C++
-    2        Python
-    3    Javascript
-    dtype: object
-
-
-
-#### Init from `dict`
-
-
-```python
-weights = {"a": 68, "b": 83, "c": 86, "d": 68}
-s3 = pd.Series(weights)
-s3
-
-```
-
-
-
-
-    a    68
-    b    83
-    c    86
-    d    68
-    dtype: int64
-
-
-
-### Similar to a 1D `ndarray`
-
-`Series` objects behave much like one-dimensional NumPy `ndarray`s, and you can often pass them as parameters to NumPy functions:
-
-
-```python
-import numpy as np
-
-s = pd.Series([2,4,6,8])
-np.exp(s)
-```
-
-
-
-
-    0       7.389056
-    1      54.598150
-    2     403.428793
-    3    2980.957987
-    dtype: float64
-
-
-
-Arithmetic operations on `Series` are also possible, and they apply *elementwise*, just like for `ndarray`s:
-
-
-```python
-s + [1000,2000,3000,4000]
-```
-
-
-
-
-    0    1002
-    1    2004
-    2    3006
-    3    4008
-    dtype: int64
-
-
-
-Similar to NumPy, if you add a single number to a `Series`, that number is added to all items in the `Series`. This is called * broadcasting*:
-
-
-```python
-s + 1000
-```
-
-
-
-
-    0    1002
-    1    1004
-    2    1006
-    3    1008
-    dtype: int64
-
-
-
-The same is true for all binary operations such as `*` or `/`, and even conditional operations:
-
-
-```python
-s < 0
-```
-
-
-
-
-    0    False
-    1    False
-    2    False
-    3    False
-    dtype: bool
-
-
-
-### Indexing
-
-
-```python
-s2 = pd.Series(l, index=["a", "b", "c", "d"])
-s2
-```
-
-
-
-
-    a             C
-    b           C++
-    c        Python
-    d    Javascript
-    dtype: object
-
-
-
-You can then use the `Series` just like a `dict`:
-
-
-```python
-s2["b"]
-```
-
-
-
-
-    'C++'
-
-
-
-You can still access the items by integer location, like in a regular array:
-
-
-```python
-s2[1]
-```
-
-
-
-
-    'C++'
-
-
-
-To make it clear when you are accessing by label or by integer location, it is recommended to always use the `loc` attribute when accessing by label, and the `iloc` attribute when accessing by integer location:
-
-
-```python
-s2.loc["b"]
-```
-
-
-
-
-    'C++'
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>47</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cs.AI</td>
+      <td>45</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cs.AI</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>cs.AI</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>cs.AI</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>366</th>
+      <td>cs.NI</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>367</th>
+      <td>cs.NI</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>368</th>
+      <td>cs.NI</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>369</th>
+      <td>cs.NI</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>370</th>
+      <td>cs.NI</td>
+      <td>29</td>
+    </tr>
+  </tbody>
+</table>
+<p>371 rows × 2 columns</p>
+</div>
 
 
 
 
 ```python
-s2.iloc[1]
+series = df['Category'].value_counts()
+filtered_series = series[series > 98]
+# get list:
+print(filtered_series.index.tolist())
+# get record:
+print(filtered_series.to_dict())
 ```
 
-
-
-
-    'C++'
-
-
-
-#### Slicing a `Series` also slices the index labels:
-
-
-```python
-s2.iloc[1:3]
-```
-
-
-
-
-    b       C++
-    c    Python
-    dtype: object
-
-
-
-This can lead to unexpected results when using the default numeric labels, so be careful:
-
-
-```python
-surprise = pd.Series([1000, 1001, 1002, 1003])
-surprise
-```
-
-
-
-
-    0    1000
-    1    1001
-    2    1002
-    3    1003
-    dtype: int64
-
-
-
-
-```python
-surprise_slice = surprise[2:]
-surprise_slice
-```
-
-
-
-
-    2    1002
-    3    1003
-    dtype: int64
-
-
-
-Oh look! The first element has index label `2`. The element with index label `0` is absent from the slice:
-
-
-```python
-try:
-    surprise_slice[0]
-except KeyError as e:
-    print("Key error:", e)
-```
-
-    Key error: 0
-
-
-But remember that you can access elements by integer location using the `iloc` attribute. This illustrates another reason why it's always better to use `loc` and `iloc` to access `Series` objects:
-
-
-```python
-surprise_slice.iloc[0]
-```
-
-
-
-
-    1002
-
-
-
-You can create a `Series` object from a `dict`. The keys will be used as index labels:
-
-
-```python
-
-```
-
-
-
-
-    a    68
-    b    83
-    c    86
-    d    68
-    dtype: int64
-
+    ['cs.IT']
+    {'cs.IT': 99}
 
 
 ## `DataFrame` objects
@@ -643,7 +488,7 @@ df
 
 
 
-### 🚀🚀 lists of lists: row wise data
+### 🚀 lists of lists: row wise data
 
 
 ```python
@@ -958,60 +803,6 @@ df
       <th>3</th>
       <td>juli</td>
       <td>22</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-### Dicts of series.
-
-
-```python
-d = {'one': pd.Series([10, 20, 30, 40],
-                      index=['a', 'b', 'c', 'd']),
-     'two': pd.Series([10, 20, 30, 40],
-                      index=['a', 'b', 'c', 'd'])}
-
-# creates Dataframe.
-df = pd.DataFrame(d)
-
-# print the data.
-df
-
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>one</th>
-      <th>two</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>a</th>
-      <td>10</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>b</th>
-      <td>20</td>
-      <td>20</td>
-    </tr>
-    <tr>
-      <th>c</th>
-      <td>30</td>
-      <td>30</td>
-    </tr>
-    <tr>
-      <th>d</th>
-      <td>40</td>
-      <td>40</td>
     </tr>
   </tbody>
 </table>
@@ -3704,45 +3495,6 @@ df
 
 
 
-###  Select all rows containing a sub string
-
-
-```python
-df[df.degree.str.contains('duate', case=False)]
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>first_name</th>
-      <th>degree</th>
-      <th>nationality</th>
-      <th>age</th>
-      <th>grade</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2</th>
-      <td>Kia</td>
-      <td>Graduate</td>
-      <td>UK</td>
-      <td>19</td>
-      <td>C</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
 ###  `isnull`
 
 The second is `isnull` (and its companion `notnull`). These methods let you highlight values which are (or are not) e`mpty (`NaN`). For example, to filter out wines lacking a price tag in the dataset, here's what we would do:
@@ -3754,8 +3506,6 @@ res = drinks.loc[drinks.continent.isnull(), ['country', 'wine_servings']]
 res.head(n=3)
 
 ```
-
-
 
 
 <div>
@@ -3783,6 +3533,421 @@ res.head(n=3)
       <th>14</th>
       <td>Barbados</td>
       <td>36</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### String Operations
+
+
+```python
+categories = ['cs.AI', 'cs.ML', 'cs.CV']
+paper_titles = ['DEEPCAL0: Deep Learning for Image Classification', 'Generative Adversarial Networks in Machine Learning', 'Computer Vision: Techniques and Applications', ]
+
+df = pd.DataFrame({'Category': categories, 'Paper Title': paper_titles})
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cs.ML</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cs.CV</td>
+      <td>Computer Vision: Techniques and Applications</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+len_series = df['Paper Title'].str.len()
+len_series
+```
+
+
+
+
+    0    48
+    1    51
+    2    44
+    Name: Paper Title, dtype: int64
+
+
+
+
+```python
+match_series = df['Paper Title'].str.contains('machine learning',case=False)
+match_series
+```
+
+
+
+
+    0    False
+    1     True
+    2    False
+    Name: Paper Title, dtype: bool
+
+
+
+
+```python
+# Filter rows where the title contains a specific word:
+match_df = df[df['Paper Title'].str.contains('machine learning',case=False)]
+match_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>cs.ML</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Filter rows where the title matches any of multiple specific words:
+keywords = ['machine learning', 'computer vision', 'natural language processing']
+filtered_df = df[df['Paper Title'].str.contains('|'.join(keywords),case=False)]
+filtered_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>cs.ML</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cs.CV</td>
+      <td>Computer Vision: Techniques and Applications</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+import re
+filtered_df = df[df['Paper Title'].str.contains(r'^.*\d+.*$')]
+filtered_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+import re
+filtered_df = df[df['Paper Title'].str.match(r'^.*\d+.*$')]
+filtered_df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Filter rows where the title starts with a specific word:
+filtered_df = df[df['Paper Title'].str.startswith('Deep')]
+# Filter rows where the title ends with a specific word:
+filtered_df = df[df['Paper Title'].str.endswith('Networks')]
+```
+
+
+```python
+# Filter rows where the title has a certain length range:
+df[(df['Paper Title'].str.len() >= 30) & (df['Paper Title'].str.len() <= 50)]
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cs.CV</td>
+      <td>Computer Vision: Techniques and Applications</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Length of the title:
+ex = df.copy()
+ex['Title Length'] = ex['Paper Title'].str.len()
+# Convert the title to lowercase:
+ex['Lowercase Title'] = ex['Paper Title'].str.lower()
+# Check if the title starts with a specific word:
+ex['Starts with Computer'] = ex['Paper Title'].str.startswith('Computer')
+# Check if the title ends with a specific word:
+ex['Ends with Networks'] = ex['Paper Title'].str.endswith('Networks')
+# Count the occurrences of a specific word in the title:
+ex['Word Count'] = ex['Paper Title'].str.count('Machine')
+# Extract a substring from the title based on position:
+ex['Substring'] = ex['Paper Title'].str[5:15]
+# Replace a specific word in the title:
+ex['Replaced Title'] = ex['Paper Title'].str.replace('Learning', 'Training')
+# Split the title into a list of words:
+ex['Title Words'] = ex['Paper Title'].str.split()
+# Join a list of words into a single string:
+ex['Joined Title'] = ex['Title Words'].str.join(' ')
+# Extract the first word from the title:
+ex['First Word'] = ex['Paper Title'].str.split().str[0]
+ex.head(2)
+
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+      <th>Title Length</th>
+      <th>Lowercase Title</th>
+      <th>Starts with Computer</th>
+      <th>Ends with Networks</th>
+      <th>Word Count</th>
+      <th>Substring</th>
+      <th>Replaced Title</th>
+      <th>Title Words</th>
+      <th>Joined Title</th>
+      <th>First Word</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+      <td>48</td>
+      <td>deepcal0: deep learning for image classification</td>
+      <td>False</td>
+      <td>False</td>
+      <td>0</td>
+      <td>AL0: Deep</td>
+      <td>DEEPCAL0: Deep Training for Image Classification</td>
+      <td>[DEEPCAL0:, Deep, Learning, for, Image, Classi...</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+      <td>DEEPCAL0:</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cs.ML</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
+      <td>51</td>
+      <td>generative adversarial networks in machine lea...</td>
+      <td>False</td>
+      <td>False</td>
+      <td>1</td>
+      <td>ative Adve</td>
+      <td>Generative Adversarial Networks in Machine Tra...</td>
+      <td>[Generative, Adversarial, Networks, in, Machin...</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
+      <td>Generative</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+same with apply()
+
+
+```python
+ex = df.copy()
+# Length of the title
+ex['Title Length'] = ex['Paper Title'].apply(lambda x: len(x))
+# Convert the title to lowercase
+ex['Lowercase Title'] = ex['Paper Title'].apply(lambda x: x.lower())
+# Check if the title starts with a specific word
+ex['Starts with Computer'] = ex['Paper Title'].apply(lambda x: x.startswith('Computer'))
+# Check if the title ends with a specific word
+ex['Ends with Networks'] = ex['Paper Title'].apply(lambda x: x.endswith('Networks'))
+# Count the occurrences of a specific word in the title
+ex['Word Count'] = ex['Paper Title'].apply(lambda x: x.count('Machine'))
+# Extract a substring from the title based on position
+ex['Substring'] = ex['Paper Title'].apply(lambda x: x[5:15])
+# Replace a specific word in the title
+ex['Replaced Title'] = ex['Paper Title'].apply(lambda x: x.replace('Learning', 'Training'))
+# Split the title into a list of words
+ex['Title Words'] = ex['Paper Title'].apply(lambda x: x.split())
+# Join a list of words into a single string
+ex['Joined Title'] = ex['Title Words'].apply(lambda x: ' '.join(x))
+# Extract the first word from the title
+ex['First Word'] = ex['Paper Title'].apply(lambda x: x.split()[0])
+ex.head(1)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+      <th>Title Length</th>
+      <th>Lowercase Title</th>
+      <th>Starts with Computer</th>
+      <th>Ends with Networks</th>
+      <th>Word Count</th>
+      <th>Substring</th>
+      <th>Replaced Title</th>
+      <th>Title Words</th>
+      <th>Joined Title</th>
+      <th>First Word</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+      <td>48</td>
+      <td>deepcal0: deep learning for image classification</td>
+      <td>False</td>
+      <td>False</td>
+      <td>0</td>
+      <td>AL0: Deep</td>
+      <td>DEEPCAL0: Deep Training for Image Classification</td>
+      <td>[DEEPCAL0:, Deep, Learning, for, Image, Classi...</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+      <td>DEEPCAL0:</td>
     </tr>
   </tbody>
 </table>
@@ -8074,7 +8239,7 @@ Common Aggregation Functions
 - `describe()`
 - `sem()`
 
-### Aggregation
+### Mathematical Aggregation Functions
 
 
 ```python
@@ -8171,7 +8336,7 @@ employees.count() #It count elements by columns
 employees.mean() #Compute mean of each column if it's numeric
 ```
 
-    C:\Users\soiko\AppData\Local\Temp\ipykernel_924\979836247.py:1: FutureWarning: Dropping of nuisance columns in DataFrame reductions (with 'numeric_only=None') is deprecated; in a future version this will raise TypeError.  Select only valid columns before calling the reduction.
+    C:\Users\soiko\AppData\Local\Temp\ipykernel_6672\979836247.py:1: FutureWarning: Dropping of nuisance columns in DataFrame reductions (with 'numeric_only=None') is deprecated; in a future version this will raise TypeError.  Select only valid columns before calling the reduction.
       employees.mean() #Compute mean of each column if it's numeric
 
 
@@ -8231,108 +8396,28 @@ employees["Income"].sum()  # We can also compute sum of a spesific column
 
 
 ```python
-employees.min()  # Compute mminimum value of each column
-
-```
-
-
-
-
-    Name            Chris
-    Department    Finance
-    Income           4200
-    Age                22
-    Experience          1
-    dtype: object
-
-
-
-
-```python
 # We can also compute minimum value of a spesific column
-employees["Age"].min()
+employees["Age"].min(),employees["Age"].max()
+
 
 ```
 
 
 
 
-    22
+    (22, 46)
 
 
 
 
 ```python
-# We can also compute maximum value of a spesific column
-employees["Age"].max()
-
+employees["Income"].std() ,employees["Income"].var()
 ```
 
 
 
 
-    46
-
-
-
-
-```python
-employees.std()  # Compute standart deviation of each column if it's numeric
-
-```
-
-    C:\Users\soiko\AppData\Local\Temp\ipykernel_924\3187459354.py:1: FutureWarning: Dropping of nuisance columns in DataFrame reductions (with 'numeric_only=None') is deprecated; in a future version this will raise TypeError.  Select only valid columns before calling the reduction.
-      employees.std() #Compute standart deviation of each column if it's numeric
-
-
-
-
-
-    Income        1746.981524
-    Age              8.154753
-    Experience       7.416198
-    dtype: float64
-
-
-
-
-```python
-employees.var()  # Compute variance of each column if it's numeric
-
-```
-
-    C:\Users\soiko\AppData\Local\Temp\ipykernel_924\3917970784.py:1: FutureWarning: Dropping of nuisance columns in DataFrame reductions (with 'numeric_only=None') is deprecated; in a future version this will raise TypeError.  Select only valid columns before calling the reduction.
-      employees.var() #Compute variance of each column if it's numeric
-
-
-
-
-
-    Income        3.051944e+06
-    Age           6.650000e+01
-    Experience    5.500000e+01
-    dtype: float64
-
-
-
-
-```python
-# It computes standard error of the mean values for each column if it's numeric.
-employees.sem()
-
-```
-
-    C:\Users\soiko\AppData\Local\Temp\ipykernel_924\1066356533.py:1: FutureWarning: Dropping of nuisance columns in DataFrame reductions (with 'numeric_only=None') is deprecated; in a future version this will raise TypeError.  Select only valid columns before calling the reduction.
-      employees.sem() #It computes standard error of the mean values for each column if it's numeric.
-
-
-
-
-
-    Income        582.327175
-    Age             2.718251
-    Experience      2.472066
-    dtype: float64
+    (1746.981523784509, 3051944.4444444445)
 
 
 
@@ -8458,7 +8543,6 @@ reviews.head(n=2)
 
 ```python
 reviews.shape
-
 ```
 
 
@@ -8471,7 +8555,6 @@ reviews.shape
 
 ```python
 reviews.dtypes
-
 ```
 
 
@@ -8590,7 +8673,6 @@ reviews.describe()
 
 ```python
 reviews.describe().T
-
 ```
 
 
@@ -8644,7 +8726,6 @@ reviews.describe().T
 
 ```python
 reviews.describe(include=object).T
-
 ```
 
 
@@ -9124,41 +9205,211 @@ reviews['country'].unique()
 
 
 
-#### `value_counts()`
-
-count occupance of each unique element
+#### 🦄 `value_counts()` count occupance of each unique element
 
 
 ```python
-reviews['country'].value_counts()
+# Preparing Data
+import random
+X = ['cs.AI', 'cs.ML', 'cs.CV', 'cs.IR', 'cs.IT', 'cs.NI']
+# Generate random value counts for each element in X
+value_counts = {element: random.randint(10, 100) for element in X}
+# Create a list of categories based on the value counts
+categories = []
+for category, count in value_counts.items():
+    categories.extend([category] * count)
+
+# Generate random values for the value column
+values = [random.randint(0, 100) for _ in range(sum(value_counts.values()))]
+
+# Create the sample DataFrame
+df = pd.DataFrame({'Category': categories, 'Value': values})
+df
 ```
 
 
 
 
-    US           43
-    Italy        24
-    France       14
-    Chile         5
-    Germany       4
-    Spain         3
-    Portugal      2
-    Argentina     2
-    Australia     2
-    Austria       1
-    Name: country, dtype: int64
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.AI</td>
+      <td>46</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cs.AI</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cs.AI</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>cs.AI</td>
+      <td>86</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>cs.AI</td>
+      <td>61</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>385</th>
+      <td>cs.NI</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>386</th>
+      <td>cs.NI</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <th>387</th>
+      <td>cs.NI</td>
+      <td>71</td>
+    </tr>
+    <tr>
+      <th>388</th>
+      <td>cs.NI</td>
+      <td>91</td>
+    </tr>
+    <tr>
+      <th>389</th>
+      <td>cs.NI</td>
+      <td>16</td>
+    </tr>
+  </tbody>
+</table>
+<p>390 rows × 2 columns</p>
+</div>
 
 
 
 
 ```python
-reviews['country'].value_counts()['US']
+value_counts_series = new_df['Category'].value_counts()
+value_counts_series
 ```
 
 
 
 
-    43
+    cs.IR    100
+    cs.ML     92
+    cs.AI     89
+    cs.CV     63
+    cs.IT     55
+    cs.NI     36
+    Name: Category, dtype: int64
+
+
+
+
+```python
+new_df['Category'].value_counts().to_dict()
+```
+
+
+
+
+    {'cs.IR': 100, 'cs.ML': 92, 'cs.AI': 89, 'cs.CV': 63, 'cs.IT': 55, 'cs.NI': 36}
+
+
+
+
+```python
+value_counts = new_df['Category'].value_counts()
+filtered_values = value_counts[value_counts > 30]
+# return series object
+display(filtered_values)
+# get count:
+print(filtered_values['cs.ML'])
+# get list:
+print(filtered_values.index.tolist())
+# get record:
+print(filtered_values.to_dict())
+
+```
+
+
+    cs.IR    100
+    cs.ML     92
+    cs.AI     89
+    cs.CV     63
+    cs.IT     55
+    cs.NI     36
+    Name: Category, dtype: int64
+
+
+    92
+    ['cs.IR', 'cs.ML', 'cs.AI', 'cs.CV', 'cs.IT', 'cs.NI']
+    {'cs.IR': 100, 'cs.ML': 92, 'cs.AI': 89, 'cs.CV': 63, 'cs.IT': 55, 'cs.NI': 36}
+
+
+
+```python
+import pandas as pd
+
+# Sample DataFrame
+df = pd.DataFrame({
+    'Category': ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C', 'C'],
+})
+
+# Count the occurrences of each category
+value_counts = df.groupby('Category').size().reset_index(name='Count')
+value_counts
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
@@ -10143,12 +10394,11 @@ l = [{name,dept} for name, dept in zip(df['Name'], df['Department'])]
 
 
 ```python
-employees = pd.DataFrame({"Name":["Josh","Mike","Julia","Sergio","Julia","Michael","Sarath","Jakub","Chris"],
-                          "Department":["IT","Human Resources","Finance","Supply Chain","Finance","Marketing","IT","Human Resources","Law"],
-                          "Income":[4800,5200,6600,5700,7200,8400,7700,4200,9400],
-                          "Age":[24,28,33,41,22,46,31,27,39],
-                          "Experience":[2,5,9,17,1,24,10,6,13]})
-employees.head()
+categories = ['cs.AI', 'cs.ML', 'cs.CV']
+paper_titles = ['DEEPCAL0: Deep Learning for Image Classification', 'Generative Adversarial Networks in Machine Learning', 'Computer Vision: Techniques and Applications', ]
+
+df = pd.DataFrame({'Category': categories, 'Paper Title': paper_titles})
+df
 ```
 
 
@@ -10160,53 +10410,25 @@ employees.head()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
+      <th>Category</th>
+      <th>Paper Title</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
+      <td>cs.ML</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
+      <td>cs.CV</td>
+      <td>Computer Vision: Techniques and Applications</td>
     </tr>
   </tbody>
 </table>
@@ -10216,8 +10438,93 @@ employees.head()
 
 
 ```python
-employees["Name Len"] = employees["Name"].apply(len) # We get length of all names
-employees.head()
+# Apply a function to a `DataFrame`
+df_result = df.apply(lambda x: x['Category'].replace("cs.",""), axis=1)
+# VS
+# Apply a function to a `Series`
+series =  df['Category']
+series_result = series.apply(lambda x:x.replace("cs.",""))
+
+print(df_result)
+print(series_result)
+# Note: Both return series
+```
+
+    0    AI
+    1    ML
+    2    CV
+    dtype: object
+    0    AI
+    1    ML
+    2    CV
+    Name: Category, dtype: object
+
+
+
+```python
+
+# Apply single column of a DataFrame vs All column of a DataFrame
+df_result = df.apply(lambda x: x['Category'].replace("cs.",""), axis=1)
+# axis=1 is used to indicate that the function should be applied along each row of the DataFrame.
+display(df_result) # return series
+# vs
+df_result = df.apply(lambda x: x.str.replace("A","--X--"))
+# This will replace the occurrences of "A" with an "--X--" string in each column of the DataFrame.
+display(df_result) # return series
+
+```
+
+
+    0    AI
+    1    ML
+    2    CV
+    dtype: object
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Category</th>
+      <th>Paper Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cs.--X--I</td>
+      <td>DEEPC--X--L0: Deep Learning for Image Classifi...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>cs.ML</td>
+      <td>Generative --X--dversarial Networks in Machine...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cs.CV</td>
+      <td>Computer Vision: Techniques and --X--pplications</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+🟡 Utilizing returned value of apply
+
+
+```python
+ex = df.copy()
+# Length of the title
+ex['Title Length'] = ex['Paper Title'].apply(len)
+# Convert the title to lowercase
+ex['Lowercase Title'] = ex['Paper Title'].apply(lambda x: x.lower()[:10]+"...")
+# Convert the title to lowercase
+ex['Cat+Title'] = df.apply(lambda x: x['Category'] +" | "+ x['Paper Title'], axis=1)
+ex
 ```
 
 
@@ -10229,59 +10536,37 @@ employees.head()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
-      <th>Name Len</th>
+      <th>Category</th>
+      <th>Paper Title</th>
+      <th>Title Length</th>
+      <th>Lowercase Title</th>
+      <th>Cat+Title</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
-      <td>4</td>
+      <td>cs.AI</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
+      <td>48</td>
+      <td>deepcal0: ...</td>
+      <td>cs.AI | DEEPCAL0: Deep Learning for Image Clas...</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
-      <td>4</td>
+      <td>cs.ML</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
+      <td>51</td>
+      <td>generative...</td>
+      <td>cs.ML | Generative Adversarial Networks in Mac...</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
-      <td>5</td>
+      <td>cs.CV</td>
+      <td>Computer Vision: Techniques and Applications</td>
+      <td>44</td>
+      <td>computer v...</td>
+      <td>cs.CV | Computer Vision: Techniques and Applic...</td>
     </tr>
   </tbody>
 </table>
@@ -10289,357 +10574,7 @@ employees.head()
 
 
 
-
-```python
-def increase_age(x):
-    return x + 1
-```
-
-
-```python
-employees["Age+1"] = employees["Age"].apply(increase_age)  # we increase each age.
-employees.head()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
-      <th>Name Len</th>
-      <th>Age+1</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
-      <td>4</td>
-      <td>25</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
-      <td>4</td>
-      <td>29</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-      <td>5</td>
-      <td>34</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-      <td>6</td>
-      <td>42</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
-      <td>5</td>
-      <td>23</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-employees["Age"].apply(lambda x: x+1) # using lambda
-```
-
-
-
-
-    0    25
-    1    29
-    2    34
-    3    42
-    4    23
-    5    47
-    6    32
-    7    28
-    8    40
-    Name: Age, dtype: int64
-
-
-
-
-```python
-cluster = pd.DataFrame({"cluster": range(1,6)})
-cluster
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cluster</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-cluster["computed"] = cluster['cluster'].apply(lambda x: f"cluster {x}")
-cluster
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cluster</th>
-      <th>computed</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>cluster 1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>cluster 2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>cluster 3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>cluster 4</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-      <td>cluster 5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# Inplace
-cluster = pd.DataFrame({"cluster": range(1,6)})
-cluster["cluster"] = cluster['cluster'].apply(lambda x: f"cluster {x}")
-cluster
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cluster</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>cluster 1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>cluster 2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>cluster 3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>cluster 4</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>cluster 5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-> NOTE: Incase of waring following warning with `apply`, try `reset_index()`
-
-```
-SettingWithCopyWarning:
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-```
-
-Using a dictionary:
-
-
-```python
-cluster = pd.DataFrame({"cluster": [0]*2+[1,2]})
-cluster
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cluster</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-cluster_map = {
-	"0":"cluster 0",
-	"1":"cluster 1",
-	"2":"cluster 2"
-}
-```
-
-
-```python
-cluster["cluster"] = cluster['cluster'].apply(lambda x: cluster_map[str(x)])
-cluster
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cluster</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>cluster 0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>cluster 0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>cluster 1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>cluster 2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
+Other examples
 
 
 ```python
@@ -10717,41 +10652,19 @@ employees.loc[:, ["Income", "Age"]].apply(["max", "min"])
 
 ### `map()`
 
-We can use `map()` function in order to map values of Series according to input correspondence.
-
-
-
 
 ```python
-employees["Department"].map({"IT":"Information Technology"})
-```
+ex = df.copy()
+# Define the mapping
+mapping = {
+    'cs.AI': 'Artificial Intelligence',
+    'cs.ML': 'Machine Learning',
+    'cs.CV': 'Computer Vision'
+}
+# Apply the mapping using map()
+ex['Category'] = ex['Category'].map(mapping)
+ex
 
-
-
-
-    0    Information Technology
-    1                       NaN
-    2                       NaN
-    3                       NaN
-    4                       NaN
-    5                       NaN
-    6    Information Technology
-    7                       NaN
-    8                       NaN
-    Name: Department, dtype: object
-
-
-
-But it also looks other values. In order to apply that just to `IT`, we will use `replace()` method.
-
-
-```python
-employees["Department"].replace({"IT":"Information Technology"},inplace=True)
-```
-
-
-```python
-employees
 ```
 
 
@@ -10763,85 +10676,25 @@ employees
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
+      <th>Category</th>
+      <th>Paper Title</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Josh</td>
-      <td>Information Technology</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
+      <td>Artificial Intelligence</td>
+      <td>DEEPCAL0: Deep Learning for Image Classification</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
+      <td>Machine Learning</td>
+      <td>Generative Adversarial Networks in Machine Lea...</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Michael</td>
-      <td>Marketing</td>
-      <td>8400</td>
-      <td>46</td>
-      <td>24</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Sarath</td>
-      <td>Information Technology</td>
-      <td>7700</td>
-      <td>31</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Jakub</td>
-      <td>Human Resources</td>
-      <td>4200</td>
-      <td>27</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Chris</td>
-      <td>Law</td>
-      <td>9400</td>
-      <td>39</td>
-      <td>13</td>
+      <td>Computer Vision</td>
+      <td>Computer Vision: Techniques and Applications</td>
     </tr>
   </tbody>
 </table>
@@ -10851,13 +10704,16 @@ employees
 
 ### `applymap()`
 
-We can also use `applymap()` function in order to apply a function to a Dataframe elementwise.
+The `applymap()` function in pandas is used to apply a function element-wise to a DataFrame. It is similar to the `apply()` function, but `applymap()` operates on each individual element of the DataFrame rather than on a column or row. Here's an example of using `applymap()`:
+
+
 
 
 ```python
-employees.head()
-
+df.applymap(lambda x:x.upper())
 ```
+
+
 
 
 <div>
@@ -10866,181 +10722,30 @@ employees.head()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
+      <th>Category</th>
+      <th>Paper Title</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
+      <td>CS.AI</td>
+      <td>DEEPCAL0: DEEP LEARNING FOR IMAGE CLASSIFICATION</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
+      <td>CS.ML</td>
+      <td>GENERATIVE ADVERSARIAL NETWORKS IN MACHINE LEA...</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
+      <td>CS.CV</td>
+      <td>COMPUTER VISION: TECHNIQUES AND APPLICATIONS</td>
     </tr>
   </tbody>
 </table>
 </div>
 
-
-
-```python
-employees[["Name","Department"]].applymap(len)
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>4</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>4</td>
-      <td>15</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>5</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>6</td>
-      <td>12</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>7</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>6</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>5</td>
-      <td>15</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>5</td>
-      <td>3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-```python
-employees[["Name"]].applymap(str.upper) #We get upper values of each name.
-```
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>JOSH</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>MIKE</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>JULIA</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>SERGIO</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>JULIA</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>MICHAEL</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>SARATH</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>JAKUB</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>CHRIS</td>
-    </tr>
-  </tbody>
-</table>
-</div>
 
 
 ## 🌶️ Converting to/from `DataFrame`
@@ -11527,606 +11232,10 @@ df.iloc[0].to_numpy().tolist()
 
 
 
-## 🔥Pivot Tables
-
-It creates a spreadsheet-style pivot table as a DataFrame.
-
-The levels in the pivot table will be stored in MultiIndex objects (hierarchical indexes) on the index and columns of the result DataFrame.
-
-<div align="center">
-<img src="img/pivot_table.jpg" alt="pivot_table.jpg" width="700px">
-</div>
-
-
-```python
-employees = pd.DataFrame({"Name": ["Josh", "Mike", "Julia", "Sergio", "Julia", "Michael", "Sarath", "Jakub", "Chris"],
-                          "Department": ["IT", "Human Resources", "Finance", "Supply Chain", "Finance", "Marketing", "IT", "Human Resources", "Law"],
-                          "Work Level": ["WL3", "WL2", "WL2", "WL1", "WL3", "WL2", "WL1", "WL3", "WL1"],
-                          "Income": [4800, 5200, 6600, 5700, 7200, 8400, 7700, 4200, 9400],
-                          "Age": [24, 28, 33, 41, 22, 46, 31, 27, 39],
-                          "Experience": [2, 5, 9, 17, 1, 24, 10, 6, 13]})
-employees.head()
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Work Level</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>WL3</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>WL2</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>WL2</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>WL1</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>WL3</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-employees.groupby("Department")["Income"].mean()
-
-```
-
-
-
-
-    Department
-    Finance            6900.0
-    Human Resources    4700.0
-    IT                 6250.0
-    Law                9400.0
-    Marketing          8400.0
-    Supply Chain       5700.0
-    Name: Income, dtype: float64
-
-
-
-
-```python
-employees.groupby(["Department", "Work Level"])[["Income"]].agg("mean")
-#We get mean of income according to department and work level. We see no nan values here, because it does not get na values.
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th></th>
-      <th>Income</th>
-    </tr>
-    <tr>
-      <th>Department</th>
-      <th>Work Level</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="2" valign="top">Finance</th>
-      <th>WL2</th>
-      <td>6600.0</td>
-    </tr>
-    <tr>
-      <th>WL3</th>
-      <td>7200.0</td>
-    </tr>
-    <tr>
-      <th rowspan="2" valign="top">Human Resources</th>
-      <th>WL2</th>
-      <td>5200.0</td>
-    </tr>
-    <tr>
-      <th>WL3</th>
-      <td>4200.0</td>
-    </tr>
-    <tr>
-      <th rowspan="2" valign="top">IT</th>
-      <th>WL1</th>
-      <td>7700.0</td>
-    </tr>
-    <tr>
-      <th>WL3</th>
-      <td>4800.0</td>
-    </tr>
-    <tr>
-      <th>Law</th>
-      <th>WL1</th>
-      <td>9400.0</td>
-    </tr>
-    <tr>
-      <th>Marketing</th>
-      <th>WL2</th>
-      <td>8400.0</td>
-    </tr>
-    <tr>
-      <th>Supply Chain</th>
-      <th>WL1</th>
-      <td>5700.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-employees.groupby(["Department", "Work Level"])[
-    ["Income"]].agg("mean").unstack()
-#We get mean of income according to department and work level. Unstack() helps to see better.
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr>
-      <th></th>
-      <th colspan="3" halign="left">Income</th>
-    </tr>
-    <tr>
-      <th>Work Level</th>
-      <th>WL1</th>
-      <th>WL2</th>
-      <th>WL3</th>
-    </tr>
-    <tr>
-      <th>Department</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Finance</th>
-      <td>NaN</td>
-      <td>6600.0</td>
-      <td>7200.0</td>
-    </tr>
-    <tr>
-      <th>Human Resources</th>
-      <td>NaN</td>
-      <td>5200.0</td>
-      <td>4200.0</td>
-    </tr>
-    <tr>
-      <th>IT</th>
-      <td>7700.0</td>
-      <td>NaN</td>
-      <td>4800.0</td>
-    </tr>
-    <tr>
-      <th>Law</th>
-      <td>9400.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Marketing</th>
-      <td>NaN</td>
-      <td>8400.0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Supply Chain</th>
-      <td>5700.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-df = employees.groupby(["Department", "Work Level"])[["Income"]].agg("mean").unstack()
-df.plot(kind='bar')
-```
-
-
-
-
-    <AxesSubplot:xlabel='Department'>
-
-
-
-
-
-![png](README_files/README_514_1.png)
-
-
-
-
-```python
-df.plot(kind='bar', stacked=True)
-
-```
-
-
-
-
-    <AxesSubplot:xlabel='Department'>
-
-
-
-
-
-![png](README_files/README_515_1.png)
-
-
-
-
-```python
-employees
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Name</th>
-      <th>Department</th>
-      <th>Work Level</th>
-      <th>Income</th>
-      <th>Age</th>
-      <th>Experience</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Josh</td>
-      <td>IT</td>
-      <td>WL3</td>
-      <td>4800</td>
-      <td>24</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Mike</td>
-      <td>Human Resources</td>
-      <td>WL2</td>
-      <td>5200</td>
-      <td>28</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>WL2</td>
-      <td>6600</td>
-      <td>33</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Sergio</td>
-      <td>Supply Chain</td>
-      <td>WL1</td>
-      <td>5700</td>
-      <td>41</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Julia</td>
-      <td>Finance</td>
-      <td>WL3</td>
-      <td>7200</td>
-      <td>22</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Michael</td>
-      <td>Marketing</td>
-      <td>WL2</td>
-      <td>8400</td>
-      <td>46</td>
-      <td>24</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Sarath</td>
-      <td>IT</td>
-      <td>WL1</td>
-      <td>7700</td>
-      <td>31</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Jakub</td>
-      <td>Human Resources</td>
-      <td>WL3</td>
-      <td>4200</td>
-      <td>27</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Chris</td>
-      <td>Law</td>
-      <td>WL1</td>
-      <td>9400</td>
-      <td>39</td>
-      <td>13</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# We get mean of income according to department and work level.
-"""
-`index` : index is the column name which we want to group by.
-`columns`: the columns that we want to see in the pivot table.
-`values` : the values in each column.
-
- """
-employees.pivot_table(index="Department",columns=["Work Level"],values="Income")
-
-
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>Work Level</th>
-      <th>WL1</th>
-      <th>WL2</th>
-      <th>WL3</th>
-    </tr>
-    <tr>
-      <th>Department</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Finance</th>
-      <td>NaN</td>
-      <td>6600.0</td>
-      <td>7200.0</td>
-    </tr>
-    <tr>
-      <th>Human Resources</th>
-      <td>NaN</td>
-      <td>5200.0</td>
-      <td>4200.0</td>
-    </tr>
-    <tr>
-      <th>IT</th>
-      <td>7700.0</td>
-      <td>NaN</td>
-      <td>4800.0</td>
-    </tr>
-    <tr>
-      <th>Law</th>
-      <td>9400.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Marketing</th>
-      <td>NaN</td>
-      <td>8400.0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Supply Chain</th>
-      <td>5700.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-exp = pd.cut(employees["Experience"],[0,9,16,24])
-exp #We will create a new column
-```
-
-
-
-
-    0      (0, 9]
-    1      (0, 9]
-    2      (0, 9]
-    3    (16, 24]
-    4      (0, 9]
-    5    (16, 24]
-    6     (9, 16]
-    7      (0, 9]
-    8     (9, 16]
-    Name: Experience, dtype: category
-    Categories (3, interval[int64, right]): [(0, 9] < (9, 16] < (16, 24]]
-
-
-
-
-```python
-employees.pivot_table(values="Income",index=["Department",exp],columns="Work Level")
-#We can make it easier.
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Work Level</th>
-      <th>WL1</th>
-      <th>WL2</th>
-      <th>WL3</th>
-    </tr>
-    <tr>
-      <th>Department</th>
-      <th>Experience</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Finance</th>
-      <th>(0, 9]</th>
-      <td>NaN</td>
-      <td>6600.0</td>
-      <td>7200.0</td>
-    </tr>
-    <tr>
-      <th>Human Resources</th>
-      <th>(0, 9]</th>
-      <td>NaN</td>
-      <td>5200.0</td>
-      <td>4200.0</td>
-    </tr>
-    <tr>
-      <th rowspan="2" valign="top">IT</th>
-      <th>(0, 9]</th>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>4800.0</td>
-    </tr>
-    <tr>
-      <th>(9, 16]</th>
-      <td>7700.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Law</th>
-      <th>(9, 16]</th>
-      <td>9400.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Marketing</th>
-      <th>(16, 24]</th>
-      <td>NaN</td>
-      <td>8400.0</td>
-      <td>NaN</td>
-    </tr>
-    <tr>
-      <th>Supply Chain</th>
-      <th>(16, 24]</th>
-      <td>5700.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### Visualize Pivot Table
-
-- [https://opendatascience.com/how-to-pivot-and-plot-data-with-pandas/](https://opendatascience.com/how-to-pivot-and-plot-data-with-pandas/)
-
 ## Grouping and Sorting
 
 
-### Groupwise analysis
-
+### `groupby()`
 
 Any groupby operation involves one of the following operations on the original object. They are;
 
@@ -12219,14 +11328,14 @@ employees.groupby("Department") #It will create an object
 
 
 
-    <pandas.core.groupby.generic.DataFrameGroupBy object at 0x000001716A758910>
+    <pandas.core.groupby.generic.DataFrameGroupBy object at 0x0000019523A4DC70>
 
 
 
 
 ```python
 employees_departments = employees.groupby("Department")
-employees_departments.get_group("IT") #We can get the rows that employee is working in IT department.
+employees_departments.get_group("IT").head(5) #We can get the rows that employee is working in IT department.
 ```
 
 
@@ -12270,7 +11379,7 @@ employees_departments.get_group("IT") #We can get the rows that employee is work
 
 
 ```python
-employees[employees["Department"] == "IT"]
+employees[employees["Department"] == "IT"].head(5)
 
 ```
 
@@ -12387,10 +11496,10 @@ employees.groupby("Department").mean() #We can get mean of every department.
 
 
 ```python
-employees.groupby("Department").mean()["Income"] #We can also get mean of each department by a spesific column.
+income_series = employees.groupby("Department").mean()["Income"] #We can also get mean of each department by a spesific column.
+display(income_series)
+income_series.to_dict()
 ```
-
-
 
 
     Department
@@ -12405,40 +11514,49 @@ employees.groupby("Department").mean()["Income"] #We can also get mean of each d
 
 
 
-```python
-employees.groupby("Department")["Experience"].sum()
-```
 
-
-
-
-    Department
-    Finance            10
-    Human Resources    11
-    IT                 12
-    Law                13
-    Marketing          24
-    Supply Chain       17
-    Name: Experience, dtype: int64
+    {'Finance': 6900.0,
+     'Human Resources': 4700.0,
+     'IT': 6250.0,
+     'Law': 9400.0,
+     'Marketing': 8400.0,
+     'Supply Chain': 5700.0}
 
 
 
 
 ```python
-employees.groupby("Department").sum()["Experience"]
+sum_series = employees.groupby("Department")["Experience"].sum()
+sum_series.to_dict()
 ```
 
 
 
 
-    Department
-    Finance            10
-    Human Resources    11
-    IT                 12
-    Law                13
-    Marketing          24
-    Supply Chain       17
-    Name: Experience, dtype: int64
+    {'Finance': 10,
+     'Human Resources': 11,
+     'IT': 12,
+     'Law': 13,
+     'Marketing': 24,
+     'Supply Chain': 17}
+
+
+
+
+```python
+# v2
+employees.groupby("Department").sum()["Experience"].to_dict()
+```
+
+
+
+
+    {'Finance': 10,
+     'Human Resources': 11,
+     'IT': 12,
+     'Law': 13,
+     'Marketing': 24,
+     'Supply Chain': 17}
 
 
 
@@ -12624,16 +11742,13 @@ employees.groupby("Department")["Age"].agg(["mean", "max", "median"])
 
 
 ```python
-employees.groupby("Department")["Income"].agg(["mean","max","median"]).loc["Finance"]
+employees.groupby("Department")["Income"].agg(["mean","max","median"]).loc["Finance"].to_dict()
 ```
 
 
 
 
-    mean      6900.0
-    max       7200.0
-    median    6900.0
-    Name: Finance, dtype: float64
+    {'mean': 6900.0, 'max': 7200.0, 'median': 6900.0}
 
 
 
@@ -12977,7 +12092,7 @@ batting_team_wining.head()
 
 
 
-![jpeg](README_files/README_543_1.jpg)
+![jpeg](README_files/README_494_1.jpg)
 
 
 
@@ -12997,7 +12112,7 @@ sns.barplot(x='bowling_team',y='count',hue='result',data=bowling_team)
 
 
 
-![jpeg](README_files/README_544_1.jpg)
+![jpeg](README_files/README_495_1.jpg)
 
 
 
@@ -13212,7 +12327,7 @@ sns.barplot(x='city',y='count',hue='result',data=chn)
 
 
 
-![jpeg](README_files/README_547_1.jpg)
+![jpeg](README_files/README_498_1.jpg)
 
 
 
@@ -13232,7 +12347,7 @@ sns.barplot(x='city',y='count',hue='result',data=sh)
 
 
 
-![jpeg](README_files/README_548_1.jpg)
+![jpeg](README_files/README_499_1.jpg)
 
 
 
@@ -13712,7 +12827,7 @@ employees["Income"].nsmallest(2)
 
 
 
-### `groupby()` and `transform()`
+### `groupby()` + `transform()`
 
 - [https://www.statology.org/pandas-groupby-transform/](https://www.statology.org/pandas-groupby-transform/)
 
@@ -13842,73 +12957,27 @@ df
 
 
 
-## Categorical encoding
+## 🔥Pivot Tables
 
-### Introduction
+It creates a spreadsheet-style pivot table as a DataFrame.
 
-In many Machine-learning or Data Science activities, the**data set might contain text or categorical values** (basically non-numerical values). For example, color feature having values like red, orange, blue, white etc. Meal plan having values like breakfast, lunch, snacks, dinner, tea etc. Few algorithms such as CATBOAST, decision-trees can handle categorical values very well but **most of the algorithms expect numerical values** to achieve state-of-the-art results.
-
-Over your learning curve in AI and Machine Learning, one thing you would notice that **most of the algorithms work better with numerical inputs**. *Therefore, the main challenge faced by an analyst is to convert text/categorical data into numerical data and still make an algorithm/model to make sense out of it*. **Neural networks, which is a base of deep-learning, expects input values to be numerical.**
-
-There are many ways to convert categorical values into numerical values. Each approach has its own trade-offs and impact on the feature set. Hereby, I would focus on 2 main methods:` One-Hot-Encoding` and `Label-Encoder`.
+The levels in the pivot table will be stored in MultiIndex objects (hierarchical indexes) on the index and columns of the result DataFrame.
 
 <div align="center">
-<img src="img/len.jpg" alt="encoding.jpg" width="800px">
+<img src="img/pivot_table.jpg" alt="pivot_table.jpg" width="700px">
 </div>
 
 
-[More](https://towardsdatascience.com/categorical-encoding-using-label-encoding-and-one-hot-encoder-911ef77fb5bd)
-
-### Label Encoding
-
-#### 🌟🌟Custom Map Function
-
-
 ```python
-# creating initial dataframe
-gender_types = ['male','female','other','male','female','male','male','female','other']
-gender_df = pd.DataFrame(gender_types, columns=['gender'])
-gender_df['gender'].unique()
+employees = pd.DataFrame({"Name": ["Josh", "Mike", "Julia", "Sergio", "Julia", "Michael", "Sarath", "Jakub", "Chris"],
+                          "Department": ["IT", "Human Resources", "Finance", "Supply Chain", "Finance", "Marketing", "IT", "Human Resources", "Law"],
+                          "Work Level": ["WL3", "WL2", "WL2", "WL1", "WL3", "WL2", "WL1", "WL3", "WL1"],
+                          "Income": [4800, 5200, 6600, 5700, 7200, 8400, 7700, 4200, 9400],
+                          "Age": [24, 28, 33, 41, 22, 46, 31, 27, 39],
+                          "Experience": [2, 5, 9, 17, 1, 24, 10, 6, 13]})
+employees.head()
 
 ```
-
-
-
-
-    array(['male', 'female', 'other'], dtype=object)
-
-
-
-
-```python
-def f(g):
-	if g == 'male':
-		return 0
-	elif g == "female":
-		return 1
-	else:
-		return 2
-
-gender_df['label'] = gender_df.gender.apply(f)
-gender_df['label'].unique()
-
-```
-
-
-
-
-    array([0, 1, 2], dtype=int64)
-
-
-
-##### 🚀Unique Values with labels assigned side-by-side🚀
-
-
-```python
-gender_df[['gender','label']].drop_duplicates()
-```
-
-
 
 
 <div>
@@ -13917,545 +12986,545 @@ gender_df[['gender','label']].drop_duplicates()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>gender</th>
-      <th>label</th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Work Level</th>
+      <th>Income</th>
+      <th>Age</th>
+      <th>Experience</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>male</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>female</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>other</td>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>WL3</td>
+      <td>4800</td>
+      <td>24</td>
       <td>2</td>
     </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-#### 🌟🌟`sklearn.LabelEncoder()`
-
-
-
-```python
-# creating initial dataframe
-gender_types = ['male','female','other','male','female','male','male','female','other']
-gender_df = pd.DataFrame(gender_types, columns=['gender'])
-gender_df['gender'].unique()
-
-```
-
-
-
-
-    array(['male', 'female', 'other'], dtype=object)
-
-
-
-
-```python
-# creating instance of labelencoder
-from sklearn.preprocessing import LabelEncoder
-labelencoder = LabelEncoder()
-```
-
-
-```python
-# Assigning numerical values and storing in another column
-gender_df['label'] = labelencoder.fit_transform( gender_df['gender'])
-gender_df['label'].unique()
-
-```
-
-
-
-
-    array([1, 0, 2])
-
-
-
-
-```python
-gender_df[['gender','label']].drop_duplicates()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-      <th>label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>male</td>
-      <td>1</td>
-    </tr>
     <tr>
       <th>1</th>
-      <td>female</td>
-      <td>0</td>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>WL2</td>
+      <td>5200</td>
+      <td>28</td>
+      <td>5</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>other</td>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-##### Decoding
-
-
-```python
-labelencoder.inverse_transform([0])
-```
-
-
-
-
-    array(['female'], dtype=object)
-
-
-
-
-```python
-labelencoder.inverse_transform([0,0,1,1,1,2])
-```
-
-
-
-
-    array(['female', 'female', 'male', 'male', 'male', 'other'], dtype=object)
-
-
-
-### One-Hot-Encoding
-
-Though label encoding is straight but it has the disadvantage that the numeric values can be misinterpreted by algorithms as having some sort of hierarchy/order in them. This ordering issue is addressed in another common alternative approach called ‘One-Hot Encoding’. In this strategy, each category value is converted into a new column and assigned a 1 or 0 (notation for true/false) value to the column.
-
-##### Using `Pandas.get_dummies()`
-
-
-```python
-gender_df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-      <th>label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>male</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>female</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>other</td>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-pd.get_dummies(gender_df.gender)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>female</th>
-      <th>male</th>
-      <th>other</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-pd.get_dummies(gender_df.gender,prefix='Sex')
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Sex_female</th>
-      <th>Sex_male</th>
-      <th>Sex_other</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Attaching to the DataFrame:
-
-
-```python
-dummies = pd.get_dummies(gender_df.gender,prefix='Sex')
-gender_df = pd.concat([gender_df, dummies], axis=1)
-gender_df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-      <th>label</th>
-      <th>Sex_female</th>
-      <th>Sex_male</th>
-      <th>Sex_other</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>male</td>
-      <td>1</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>female</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>other</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Multiple Columns can be transform at a time : i.e df = pd.get_dummies(df, columns=['Sex', 'Embarked'])
-
-
-[More](https://towardsdatascience.com/what-is-one-hot-encoding-and-how-to-use-pandas-get-dummies-function-922eb9bd4970)
-
-#### Using 🌟`sklearn.OneHotEncoder()`🌟
-
-
-```python
-gender_df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-      <th>label</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>male</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>female</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>other</td>
-      <td>2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-from sklearn.preprocessing import OneHotEncoder
-# creating instance of one-hot-encoder
-enc = OneHotEncoder(handle_unknown='ignore')
-# passing bridge-types-cat column (label encoded values of bridge_types)
-enc_df = pd.DataFrame(enc.fit_transform(gender_df[['label']]).toarray())
-enc_df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# merge with main df gender_df on key values
-gender_df = gender_df.join(enc_df)
-gender_df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>gender</th>
-      <th>label</th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>male</td>
-      <td>1</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>female</td>
-      <td>0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>other</td>
-      <td>2</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### Discretization
-
-
-```python
-data = [['Alex',10],['Bob',16],['Clarke',26],['James',24],['John',69]]
-df = pd.DataFrame(data,columns=['name','age'])
-```
-
-
-```python
-category = ['Child', 'Young', 'Adults', 'Senior']
-
-df['category']=pd.cut(x=df['age'], bins=[0,14,24,64,100],labels=category)
-df
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>name</th>
-      <th>age</th>
-      <th>category</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Alex</td>
-      <td>10</td>
-      <td>Child</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Bob</td>
-      <td>16</td>
-      <td>Young</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Clarke</td>
-      <td>26</td>
-      <td>Adults</td>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>WL2</td>
+      <td>6600</td>
+      <td>33</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>James</td>
-      <td>24</td>
-      <td>Young</td>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>WL1</td>
+      <td>5700</td>
+      <td>41</td>
+      <td>17</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>John</td>
-      <td>69</td>
-      <td>Senior</td>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>WL3</td>
+      <td>7200</td>
+      <td>22</td>
+      <td>1</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
+
+```python
+series_mean = employees.groupby("Department")["Income"].mean()
+series_mean.to_dict()
+
+```
+
+
+    {'Finance': 6900.0,
+     'Human Resources': 4700.0,
+     'IT': 6250.0,
+     'Law': 9400.0,
+     'Marketing': 8400.0,
+     'Supply Chain': 5700.0}
+
+
+
+```python
+employees.groupby(["Department", "Work Level"])[["Income"]].agg("mean")
+#We get mean of income according to department and work level. We see no nan values here, because it does not get na values.
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>Income</th>
+    </tr>
+    <tr>
+      <th>Department</th>
+      <th>Work Level</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Finance</th>
+      <th>WL2</th>
+      <td>6600.0</td>
+    </tr>
+    <tr>
+      <th>WL3</th>
+      <td>7200.0</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Human Resources</th>
+      <th>WL2</th>
+      <td>5200.0</td>
+    </tr>
+    <tr>
+      <th>WL3</th>
+      <td>4200.0</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">IT</th>
+      <th>WL1</th>
+      <td>7700.0</td>
+    </tr>
+    <tr>
+      <th>WL3</th>
+      <td>4800.0</td>
+    </tr>
+    <tr>
+      <th>Law</th>
+      <th>WL1</th>
+      <td>9400.0</td>
+    </tr>
+    <tr>
+      <th>Marketing</th>
+      <th>WL2</th>
+      <td>8400.0</td>
+    </tr>
+    <tr>
+      <th>Supply Chain</th>
+      <th>WL1</th>
+      <td>5700.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+employees.groupby(["Department", "Work Level"])[
+    ["Income"]].agg("mean").unstack()
+#We get mean of income according to department and work level. Unstack() helps to see better.
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">Income</th>
+    </tr>
+    <tr>
+      <th>Work Level</th>
+      <th>WL1</th>
+      <th>WL2</th>
+      <th>WL3</th>
+    </tr>
+    <tr>
+      <th>Department</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Finance</th>
+      <td>NaN</td>
+      <td>6600.0</td>
+      <td>7200.0</td>
+    </tr>
+    <tr>
+      <th>Human Resources</th>
+      <td>NaN</td>
+      <td>5200.0</td>
+      <td>4200.0</td>
+    </tr>
+    <tr>
+      <th>IT</th>
+      <td>7700.0</td>
+      <td>NaN</td>
+      <td>4800.0</td>
+    </tr>
+    <tr>
+      <th>Law</th>
+      <td>9400.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Marketing</th>
+      <td>NaN</td>
+      <td>8400.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Supply Chain</th>
+      <td>5700.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+df = employees.groupby(["Department", "Work Level"])[["Income"]].agg("mean").unstack()
+df.plot(kind='bar')
+```
+
+
+    <AxesSubplot:xlabel='Department'>
+
+
+
+
+![png](README_files/README_526_1.png)
+
+
+
+
+```python
+df.plot(kind='bar', stacked=True)
+
+```
+
+
+    <AxesSubplot:xlabel='Department'>
+
+
+
+
+![png](README_files/README_527_1.png)
+
+
+
+
+```python
+employees
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Work Level</th>
+      <th>Income</th>
+      <th>Age</th>
+      <th>Experience</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Josh</td>
+      <td>IT</td>
+      <td>WL3</td>
+      <td>4800</td>
+      <td>24</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Mike</td>
+      <td>Human Resources</td>
+      <td>WL2</td>
+      <td>5200</td>
+      <td>28</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>WL2</td>
+      <td>6600</td>
+      <td>33</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Sergio</td>
+      <td>Supply Chain</td>
+      <td>WL1</td>
+      <td>5700</td>
+      <td>41</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Julia</td>
+      <td>Finance</td>
+      <td>WL3</td>
+      <td>7200</td>
+      <td>22</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Michael</td>
+      <td>Marketing</td>
+      <td>WL2</td>
+      <td>8400</td>
+      <td>46</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Sarath</td>
+      <td>IT</td>
+      <td>WL1</td>
+      <td>7700</td>
+      <td>31</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Jakub</td>
+      <td>Human Resources</td>
+      <td>WL3</td>
+      <td>4200</td>
+      <td>27</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Chris</td>
+      <td>Law</td>
+      <td>WL1</td>
+      <td>9400</td>
+      <td>39</td>
+      <td>13</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+# We get mean of income according to department and work level.
+"""
+`index` : index is the column name which we want to group by.
+`columns`: the columns that we want to see in the pivot table.
+`values` : the values in each column.
+
+ """
+employees.pivot_table(index="Department",columns=["Work Level"],values="Income")
+
+
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Work Level</th>
+      <th>WL1</th>
+      <th>WL2</th>
+      <th>WL3</th>
+    </tr>
+    <tr>
+      <th>Department</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Finance</th>
+      <td>NaN</td>
+      <td>6600.0</td>
+      <td>7200.0</td>
+    </tr>
+    <tr>
+      <th>Human Resources</th>
+      <td>NaN</td>
+      <td>5200.0</td>
+      <td>4200.0</td>
+    </tr>
+    <tr>
+      <th>IT</th>
+      <td>7700.0</td>
+      <td>NaN</td>
+      <td>4800.0</td>
+    </tr>
+    <tr>
+      <th>Law</th>
+      <td>9400.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Marketing</th>
+      <td>NaN</td>
+      <td>8400.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Supply Chain</th>
+      <td>5700.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+exp = pd.cut(employees["Experience"],[0,9,16,24])
+exp #We will create a new column
+```
+
+
+    0      (0, 9]
+    1      (0, 9]
+    2      (0, 9]
+    3    (16, 24]
+    4      (0, 9]
+    5    (16, 24]
+    6     (9, 16]
+    7      (0, 9]
+    8     (9, 16]
+    Name: Experience, dtype: category
+    Categories (3, interval[int64, right]): [(0, 9] < (9, 16] < (16, 24]]
+
+
+
+```python
+employees.pivot_table(values="Income",index=["Department",exp],columns="Work Level")
+#We can make it easier.
+```
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Work Level</th>
+      <th>WL1</th>
+      <th>WL2</th>
+      <th>WL3</th>
+    </tr>
+    <tr>
+      <th>Department</th>
+      <th>Experience</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Finance</th>
+      <th>(0, 9]</th>
+      <td>NaN</td>
+      <td>6600.0</td>
+      <td>7200.0</td>
+    </tr>
+    <tr>
+      <th>Human Resources</th>
+      <th>(0, 9]</th>
+      <td>NaN</td>
+      <td>5200.0</td>
+      <td>4200.0</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">IT</th>
+      <th>(0, 9]</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>4800.0</td>
+    </tr>
+    <tr>
+      <th>(9, 16]</th>
+      <td>7700.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Law</th>
+      <th>(9, 16]</th>
+      <td>9400.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Marketing</th>
+      <th>(16, 24]</th>
+      <td>NaN</td>
+      <td>8400.0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Supply Chain</th>
+      <th>(16, 24]</th>
+      <td>5700.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### Visualize Pivot Table
+
+- [https://opendatascience.com/how-to-pivot-and-plot-data-with-pandas/](https://opendatascience.com/how-to-pivot-and-plot-data-with-pandas/)
+
+
+```python
+
+```
 
 ## Visualization with Pandas
 
@@ -14538,7 +13607,7 @@ df.plot()
 
 
 
-![png](README_files/README_604_1.png)
+![png](README_files/README_538_1.png)
 
 
 
@@ -14556,7 +13625,7 @@ df.plot(x="col_1", y="col_2")
 
 
 
-![png](README_files/README_605_1.png)
+![png](README_files/README_539_1.png)
 
 
 
@@ -14567,7 +13636,7 @@ df.plot(subplots=True, figsize=(8, 8));
 
 
 
-![png](README_files/README_606_0.png)
+![png](README_files/README_540_0.png)
 
 
 
@@ -14580,7 +13649,7 @@ df.plot.scatter(x='col_1', y='col_3');
 
 
 
-![png](README_files/README_608_0.png)
+![png](README_files/README_542_0.png)
 
 
 
@@ -14601,7 +13670,7 @@ df.plot.scatter(x="col_2", y="col_4", color="orange", s=100, ax=ax)
 
 
 
-![jpeg](README_files/README_609_1.jpg)
+![jpeg](README_files/README_543_1.jpg)
 
 
 
@@ -14620,7 +13689,7 @@ df.plot.scatter(x="col_2", y="col_4", c='col_1', s=100)
 
 
 
-![jpeg](README_files/README_610_1.jpg)
+![jpeg](README_files/README_544_1.jpg)
 
 
 
@@ -14652,7 +13721,7 @@ df.plot(kind="bar")
 
 
 
-![png](README_files/README_613_1.png)
+![png](README_files/README_547_1.png)
 
 
 
@@ -14664,7 +13733,7 @@ df.plot.bar(stacked=True);
 
 
 
-![png](README_files/README_614_0.png)
+![png](README_files/README_548_0.png)
 
 
 
@@ -14676,7 +13745,7 @@ df.plot.barh(stacked=True)
 
 
 
-![png](README_files/README_615_0.png)
+![png](README_files/README_549_0.png)
 
 
 
@@ -14697,7 +13766,7 @@ df.plot.box()
 
 
 
-![png](README_files/README_617_1.png)
+![png](README_files/README_551_1.png)
 
 
 
@@ -14708,7 +13777,7 @@ df.plot.box(vert=False, positions=[1, 2, 3, 4]);
 
 
 
-![png](README_files/README_618_0.png)
+![png](README_files/README_552_0.png)
 
 
 
@@ -14728,7 +13797,7 @@ df.plot.area()
 
 
 
-![jpeg](README_files/README_620_1.jpg)
+![jpeg](README_files/README_554_1.jpg)
 
 
 
@@ -14747,7 +13816,7 @@ df.plot.area(stacked=False)
 
 
 
-![jpeg](README_files/README_621_1.jpg)
+![jpeg](README_files/README_555_1.jpg)
 
 
 
@@ -14786,7 +13855,7 @@ pie.plot.pie()
 
 
 
-![jpeg](README_files/README_624_1.jpg)
+![jpeg](README_files/README_558_1.jpg)
 
 
 
@@ -14807,6 +13876,6 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 
-![jpeg](README_files/README_625_1.jpg)
+![jpeg](README_files/README_559_1.jpg)
 
 
