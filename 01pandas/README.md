@@ -126,7 +126,8 @@
     - [Box plot](#box-plot)
     - [Area plot](#area-plot)
     - [Pie chart](#pie-chart)
-
+  - [One hot encoding examples](#one-hot-encoding-examples)
+    - [Multi-label one-hot encoding](#multi-label-one-hot-encoding)
 
 ## Introduction
 
@@ -13877,5 +13878,634 @@ df.plot.pie(subplots=True, figsize=(15, 15))
 
 
 ![jpeg](README_files/README_559_1.jpg)
+
+
+
+## One hot encoding examples
+
+### Multi-label one-hot encoding
+
+
+```python
+df = pd.read_csv("multi-label.csv")
+x = df['labels'].iloc[0]
+print(type(x))
+df
+```
+
+    <class 'str'>
+
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>kps</th>
+      <th>labels</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>triangular charact</td>
+      <td>['cs.GR', 'cs.CV']</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>activ analysi system</td>
+      <td>['cs.MM', 'cs.HC']</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>memrist crossbar map</td>
+      <td>['cs.ET']</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>pin-entri task</td>
+      <td>['cs.HC', 'cs.AI', 'cs.LG']</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>memristor model base</td>
+      <td>['cs.ET']</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>genet program agent</td>
+      <td>['cs.NE']</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>machin program system</td>
+      <td>['cs.SE', 'cs.AI', 'cs.LG']</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>enterpris comput</td>
+      <td>['cs.NI']</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>act recognit</td>
+      <td>['cs.CL']</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>sensorless photovolta system</td>
+      <td>['cs.SY']</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df['labels'].tolist()
+# values are in string literal form
+```
+
+
+
+
+    ["['cs.GR', 'cs.CV']",
+     "['cs.MM', 'cs.HC']",
+     "['cs.ET']",
+     "['cs.HC', 'cs.AI', 'cs.LG']",
+     "['cs.ET']",
+     "['cs.NE']",
+     "['cs.SE', 'cs.AI', 'cs.LG']",
+     "['cs.NI']",
+     "['cs.CL']",
+     "['cs.SY']"]
+
+
+
+
+```python
+import ast
+
+# Convert labels column from string literal to list
+df['labels'] = df['labels'].apply(ast.literal_eval)
+x = df['labels'].iloc[0]
+print(type(x))
+df
+```
+
+    <class 'list'>
+
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>kps</th>
+      <th>labels</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>triangular charact</td>
+      <td>[cs.GR, cs.CV]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>activ analysi system</td>
+      <td>[cs.MM, cs.HC]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>memrist crossbar map</td>
+      <td>[cs.ET]</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>pin-entri task</td>
+      <td>[cs.HC, cs.AI, cs.LG]</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>memristor model base</td>
+      <td>[cs.ET]</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>genet program agent</td>
+      <td>[cs.NE]</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>machin program system</td>
+      <td>[cs.SE, cs.AI, cs.LG]</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>enterpris comput</td>
+      <td>[cs.NI]</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>act recognit</td>
+      <td>[cs.CL]</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>sensorless photovolta system</td>
+      <td>[cs.SY]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df['labels'].tolist()
+```
+
+
+
+
+    [['cs.GR', 'cs.CV'],
+     ['cs.MM', 'cs.HC'],
+     ['cs.ET'],
+     ['cs.HC', 'cs.AI', 'cs.LG'],
+     ['cs.ET'],
+     ['cs.NE'],
+     ['cs.SE', 'cs.AI', 'cs.LG'],
+     ['cs.NI'],
+     ['cs.CL'],
+     ['cs.SY']]
+
+
+
+
+```python
+from sklearn.preprocessing import MultiLabelBinarizer
+
+# Extract the labels column
+labels = df['labels']
+
+# Create an instance of MultiLabelBinarizer and fit-transform the labels
+mlb = MultiLabelBinarizer()
+one_hot_labels = mlb.fit_transform(labels)
+
+# Create a new DataFrame with the encoded labels
+encoded_labels_df = pd.DataFrame(one_hot_labels, columns=mlb.classes_)
+
+# Concatenate the original DataFrame with the encoded labels DataFrame
+df = pd.concat([df['kps'], encoded_labels_df], axis=1)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>kps</th>
+      <th>cs.AI</th>
+      <th>cs.CL</th>
+      <th>cs.CV</th>
+      <th>cs.ET</th>
+      <th>cs.GR</th>
+      <th>cs.HC</th>
+      <th>cs.LG</th>
+      <th>cs.MM</th>
+      <th>cs.NE</th>
+      <th>cs.NI</th>
+      <th>cs.SE</th>
+      <th>cs.SY</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>triangular charact</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>activ analysi system</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>memrist crossbar map</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>pin-entri task</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>memristor model base</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>genet program agent</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>machin program system</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>enterpris comput</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>act recognit</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>sensorless photovolta system</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+cols = df.columns.tolist()
+labels = cols[1:]
+num_labels = len(labels)
+print('Labels',labels)
+print('Number of Labels: ' ,num_labels)
+id2label = {idx:label for idx, label in enumerate(labels)}
+label2id = {label:idx for idx, label in enumerate(labels)}
+print(label2id)
+print(id2label)
+```
+
+    Labels ['cs.AI', 'cs.CL', 'cs.CV', 'cs.ET', 'cs.GR', 'cs.HC', 'cs.LG', 'cs.MM', 'cs.NE', 'cs.NI', 'cs.SE', 'cs.SY']
+    Number of Labels:  12
+    {'cs.AI': 0, 'cs.CL': 1, 'cs.CV': 2, 'cs.ET': 3, 'cs.GR': 4, 'cs.HC': 5, 'cs.LG': 6, 'cs.MM': 7, 'cs.NE': 8, 'cs.NI': 9, 'cs.SE': 10, 'cs.SY': 11}
+    {0: 'cs.AI', 1: 'cs.CL', 2: 'cs.CV', 3: 'cs.ET', 4: 'cs.GR', 5: 'cs.HC', 6: 'cs.LG', 7: 'cs.MM', 8: 'cs.NE', 9: 'cs.NI', 10: 'cs.SE', 11: 'cs.SY'}
+
+
+
+```python
+df['one_hot_labels'] = df[labels].values.tolist()
+df.head(3)
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>kps</th>
+      <th>cs.AI</th>
+      <th>cs.CL</th>
+      <th>cs.CV</th>
+      <th>cs.ET</th>
+      <th>cs.GR</th>
+      <th>cs.HC</th>
+      <th>cs.LG</th>
+      <th>cs.MM</th>
+      <th>cs.NE</th>
+      <th>cs.NI</th>
+      <th>cs.SE</th>
+      <th>cs.SY</th>
+      <th>one_hot_labels</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>triangular charact</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>[0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>activ analysi system</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>[0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>memrist crossbar map</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.drop(inplace=True,columns=labels)
+df
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>kps</th>
+      <th>one_hot_labels</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>triangular charact</td>
+      <td>[0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>activ analysi system</td>
+      <td>[0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>memrist crossbar map</td>
+      <td>[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>pin-entri task</td>
+      <td>[1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>memristor model base</td>
+      <td>[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>genet program agent</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>machin program system</td>
+      <td>[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0]</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>enterpris comput</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>act recognit</td>
+      <td>[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>sensorless photovolta system</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df["one_hot_labels"].values.tolist()
+```
+
+
+
+
+    [[0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+     [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+     [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
+
+
 
 
