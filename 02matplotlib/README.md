@@ -3,20 +3,23 @@
 - [Matplotlib](#matplotlib)
   - [Line Plots](#line-plots)
     - [`plt.plot` and `plt.show()`](#pltplot-and-pltshow)
-    - [Figsize & Plot Dimensions](#figsize--plot-dimensions)
+    - [Figsize \& Plot Dimensions](#figsize--plot-dimensions)
     - [Line style and color](#line-style-and-color)
       - [`style.available`](#styleavailable)
       - [`color`](#color)
       - [`linestyle`](#linestyle)
       - [`marker`](#marker)
-    - [Labels & Titles](#labels--titles)
-    - [Changing X & Y Ticks.](#changing-x--y-ticks)
+    - [Labels \& Titles](#labels--titles)
+    - [Changing X \& Y Ticks.](#changing-x--y-ticks)
     - [Adding Legends To Plots](#adding-legends-to-plots)
     - [Annotation](#annotation)
       - [Arrows](#arrows)
   - [Scatter Plots](#scatter-plots)
     - [Annotate Scatter Plot](#annotate-scatter-plot)
   - [Bar Graphs](#bar-graphs)
+    - [Basic](#basic)
+    - [Grouped Bar Chart :  Basic](#grouped-bar-chart---basic)
+    - [Grouped Bar Chart :  Advanced](#grouped-bar-chart---advanced)
     - [Annotate Bar](#annotate-bar)
   - [Histograms](#histograms)
     - [Standard Deviation](#standard-deviation)
@@ -28,6 +31,7 @@
     - [cropping](#cropping)
     - [RGB Channel](#rgb-channel)
   - [Saving a figure](#saving-a-figure)
+
 
 ```python
 """
@@ -49,8 +53,6 @@ warnings.filterwarnings('ignore')
 # display.set_matplotlib_formats('svg')
 from matplotlib_inline.backend_inline import set_matplotlib_formats
 set_matplotlib_formats('png')
-# "background: #22272E;"
-
 ```
 
 
@@ -685,7 +687,19 @@ df.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -813,6 +827,8 @@ plt.show()
 
 ## Bar Graphs
 
+### Basic
+
 - plot a bar graph between heights and labels we provide
 
 
@@ -837,9 +853,11 @@ plt.bar(x,y,width=0.5,tick_label=['A','B','C','D'])
 
 
 
-![svg](README_files/README_69_2.svg)
+![png](README_files/README_70_2.png)
 
 
+
+### Grouped Bar Chart :  Basic
 
 
 ```python
@@ -849,7 +867,6 @@ y = [40, 17, 12, 9]
 y2= [30, 15, 10, 7]
 plt.bar(x, y, width=0.5, tick_label=['A', 'B', 'C', 'D'])
 plt.bar(x, y2, width=0.5, tick_label=['A', 'B', 'C', 'D'])
-
 ```
 
     [0 1 2 3]
@@ -864,7 +881,7 @@ plt.bar(x, y2, width=0.5, tick_label=['A', 'B', 'C', 'D'])
 
 
 
-![svg](README_files/README_70_2.svg)
+![png](README_files/README_72_2.png)
 
 
 
@@ -888,7 +905,219 @@ plt.show()
 
 
 
-![svg](README_files/README_71_1.svg)
+![png](README_files/README_73_1.png)
+
+
+
+### Grouped Bar Chart :  Advanced
+
+
+```python
+df = pd.read_csv("grouped_data.csv")
+df.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Model</th>
+      <th>F1</th>
+      <th>F2</th>
+      <th>F3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A</td>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>C</td>
+      <td>5</td>
+      <td>6</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df.groupby("Model").mean().reset_index()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Model</th>
+      <th>F1</th>
+      <th>F2</th>
+      <th>F3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>C</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>7.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+res_mean = df.groupby("Model").mean().reset_index()
+res_mean.plot(kind="bar")
+```
+
+
+
+
+    <AxesSubplot:>
+
+
+
+
+
+![png](README_files/README_77_1.png)
+
+
+
+
+```python
+res_mean = df.groupby("Model").mean().reset_index().set_index('Model')
+res_mean.plot(kind="bar")
+```
+
+
+
+
+    <AxesSubplot:xlabel='Model'>
+
+
+
+
+
+![png](README_files/README_78_1.png)
+
+
+
+
+```python
+# Grouping the DataFrame by 'Model'
+grouped = df.groupby('Model').mean()
+
+# Extracting columns and colors
+y_cols = ['F1', 'F2', 'F3']
+colors = ['#1c4cc3', '#1878a7', '#18a88f']
+X = grouped.index
+width = 0.2
+
+# Creating the plot
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+for i, y_col in enumerate(y_cols):
+    x_data = [x + width * i for x in range(len(X))]
+    y_data = grouped[y_col]
+    ax1.bar(x_data, y_data, width=width, color=colors[i], label=y_col)
+
+ax1.set_xlabel('Model')
+ax1.set_ylabel('Mean Value')
+ax1.set_title('Grouped Bar Plot')
+ax1.set_xticks([x + 0.5 * (len(y_cols) - 1) * width for x in range(len(X))])
+ax1.set_xticklabels(X)
+ax1.legend()
+
+plt.tight_layout()
+plt.show()
+
+```
+
+
+
+![png](README_files/README_79_0.png)
 
 
 
@@ -935,7 +1164,7 @@ plt.show()
 
 
 
-![svg](README_files/README_73_0.svg)
+![png](README_files/README_81_0.png)
 
 
 
@@ -959,7 +1188,7 @@ plt.show()
 
 
 
-![svg](README_files/README_76_0.svg)
+![svg](README_files/README_84_0.svg)
 
 
 
@@ -985,7 +1214,7 @@ plt.show()
 
 
 
-![svg](README_files/README_77_0.svg)
+![svg](README_files/README_85_0.svg)
 
 
 
@@ -1023,7 +1252,7 @@ plt.hist(data,bins=10)
 
 
 
-![svg](README_files/README_81_1.svg)
+![svg](README_files/README_89_1.svg)
 
 
 
@@ -1054,7 +1283,7 @@ plt.show()
 
 
 
-![svg](README_files/README_86_0.svg)
+![svg](README_files/README_94_0.svg)
 
 
 
@@ -1075,7 +1304,7 @@ plt.show()
 
 
 
-![svg](README_files/README_89_0.svg)
+![svg](README_files/README_97_0.svg)
 
 
 
@@ -1109,7 +1338,7 @@ ax3.plot(x, x**3)
 
 
 
-![png](README_files/README_92_1.png)
+![png](README_files/README_100_1.png)
 
 
 
@@ -1123,7 +1352,19 @@ df
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1347,7 +1588,7 @@ ax3.set_ylim((0,.35))
 
 
 
-![png](README_files/README_96_1.png)
+![png](README_files/README_104_1.png)
 
 
 
@@ -1395,7 +1636,7 @@ fig.gca(projection='3d')
 
 
 
-![png](README_files/README_100_1.png)
+![png](README_files/README_108_1.png)
 
 
 
@@ -1416,7 +1657,7 @@ plt.show()
 
 
 
-![png](README_files/README_102_0.png)
+![png](README_files/README_110_0.png)
 
 
 
@@ -1456,7 +1697,7 @@ plt.imshow(img)
 
 
 
-![png](README_files/README_107_1.png)
+![png](README_files/README_115_1.png)
 
 
 
@@ -1469,7 +1710,7 @@ plt.show()
 
 
 
-![png](README_files/README_108_0.png)
+![png](README_files/README_116_0.png)
 
 
 
@@ -1498,7 +1739,7 @@ plt.show()
 
 
 
-![png](README_files/README_111_0.png)
+![png](README_files/README_119_0.png)
 
 
 
@@ -1538,7 +1779,7 @@ plt.show()
 
 
 
-![png](README_files/README_115_0.png)
+![png](README_files/README_123_0.png)
 
 
 
@@ -1554,6 +1795,6 @@ plt.savefig("my_square_function.png", transparent=True)
 
 
 
-![svg](README_files/README_117_0.svg)
+![svg](README_files/README_125_0.svg)
 
 
